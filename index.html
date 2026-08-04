@@ -5,76 +5,59 @@
     <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.2/dist/mindar-image-aframe.prod.js"></script>
     <style>
-      /* 화면 로딩 표시 스타일 커스텀 (UI가 멈춘 것처럼 보이지 않게 하기 위함) */
+      /* 거슬리는 스캔 UI 숨김 */
       .mindar-ui-scanning { display: none !important; }
     </style>
   </head>
   <body>
-    <a-scene mindar-image="imageTargetSrc: ./1.mind; filterMinCF:0.001; filterBeta:0.01;" color-space="sRGB" renderer="colorManagement: true, physicallyCorrectLights" vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
+    <!-- 1.mind(원본 1.jpg)를 타겟으로 설정 -->
+    <a-scene mindar-image="imageTargetSrc: ./1.mind;" color-space="sRGB" renderer="colorManagement: true, physicallyCorrectLights" vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
       
       <a-assets>
-        <a-asset-item id="my-model" src="./1.glb"></a-asset-item>
+        <!-- 3D 모델 대신 테스트용 이미지 로드 -->
+        <img id="test-img" src="./detected.png" />
       </a-assets>
 
       <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
       <a-entity id="target-anchor" mindar-image-target="targetIndex: 0">
         
-        <a-entity 
-          id="ar-model"
-          gltf-model="#my-model" 
+        <!-- 인식되었을 때 나타날 2D 이미지 설정 (2배 크기) -->
+        <a-image 
+          id="ar-image"
+          src="#test-img" 
           position="0 0 0" 
           scale="2 2 2"
           visible="false"
-          animation="property: model-opacity; to: 0; dur: 800; startEvents: fadeout">
-        </a-entity>
+          animation="property: material.opacity; to: 0; dur: 800; startEvents: fadeout">
+        </a-image>
         
       </a-entity>
     </a-scene>
 
     <script>
-      // 3D 모델의 불투명도(Opacity)를 조절하기 위한 자체 컴포넌트 등록
-      AFRAME.registerComponent('model-opacity', {
-        schema: {type: 'number', default: 1.0},
-        init: function () {
-          this.el.addEventListener('model-loaded', () => this.update());
-        },
-        update: function () {
-          var mesh = this.el.getObject3D('mesh');
-          var data = this.data;
-          if (!mesh) return;
-          mesh.traverse(function (node) {
-            if (node.isMesh) {
-              node.material.transparent = true;
-              node.material.opacity = data;
-            }
-          });
-        }
-      });
-
       const anchor = document.querySelector('#target-anchor');
-      const model = document.querySelector('#ar-model');
-      let isTriggered = false; // 중복 실행 방지용 플래그
+      const arImage = document.querySelector('#ar-image');
+      let isTriggered = false;
 
-      // 이미지가 카메라에 딱 디텍트(인식) 되었을 때 실행되는 함수
+      // 이미지가 디텍트(인식) 되었을 때 실행
       anchor.addEventListener("targetFound", event => {
         if (isTriggered) return;
         isTriggered = true;
 
-        // 1. 모델을 즉시 보이고, 투명도를 초기화(2배 크기)
-        model.setAttribute('visible', true);
-        model.setAttribute('model-opacity', 1.0);
+        // 1. 이미지를 즉시 띄우고 투명도를 100%로 설정
+        arImage.setAttribute('visible', true);
+        arImage.setAttribute('material', 'opacity', 1.0);
 
-        // 2. 2초(2000ms) 동안 유지한 뒤 페이드아웃 애니메이션 시작
+        // 2. 2초(2000ms) 유지 후 페이드아웃 시작
         setTimeout(() => {
-          model.emit('fadeout');
+          arImage.emit('fadeout');
           
-          // 3. 애니메이션 시간(0.8초)이 지난 뒤 완전히 화면에서 숨김 및 리셋
+          // 3. 페이드아웃(0.8초) 완료 후 숨김 처리
           setTimeout(() => {
-            model.setAttribute('visible', false);
+            arImage.setAttribute('visible', false);
             isTriggered = false; 
           }, 800);
-          
         }, 2000);
       });
     </script>
