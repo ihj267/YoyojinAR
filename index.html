@@ -2,37 +2,81 @@
 <html>
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <!-- A-Frame 및 MindAR 코어 라이브러리 -->
     <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.2/dist/mindar-image-aframe.prod.js"></script>
-    <!-- 터치(이동 및 크기 조절) 제스처 라이브러리 -->
-    <script src="https://raw.githack.com/fcor/arjs-gestures/master/dist/gestures.js"></script>
+    <style>
+      /* 화면 로딩 표시 스타일 커스텀 (UI가 멈춘 것처럼 보이지 않게 하기 위함) */
+      .mindar-ui-scanning { display: none !important; }
+    </style>
   </head>
   <body>
-    <!-- 방금 만든 targets.mind 파일을 읽어오도록 설정 -->
-    <a-scene mindar-image="imageTargetSrc: ./1.mind;" color-space="sRGB" gesture-detector>
+    <a-scene mindar-image="imageTargetSrc: ./1.mind; filterMinCF:0.001; filterBeta:0.01;" color-space="sRGB" renderer="colorManagement: true, physicallyCorrectLights" vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
       
       <a-assets>
-        <!-- 폴더에 있는 3D 모델 불러오기 -->
         <a-asset-item id="my-model" src="./1.glb"></a-asset-item>
       </a-assets>
 
-      <a-camera position="0 0 0" look-controls="enabled: false" raycaster="objects: .clickable"></a-camera>
+      <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
-      <a-entity mindar-image-target="targetIndex: 0">
-        <!-- 
-          요청하신 조건: 초기 크기 2배 (scale="2 2 2"), 
-          손가락 조절 가능 (gesture-handler), 
-          최대 크기 6배 제한 (maxScale: 6 - 초기 2배의 3배) 
-        -->
+      <a-entity id="target-anchor" mindar-image-target="targetIndex: 0">
+        
         <a-entity 
+          id="ar-model"
           gltf-model="#my-model" 
-          class="clickable" 
+          position="0 0 0" 
           scale="2 2 2"
-          gesture-handler="minScale: 1; maxScale: 6">
+          visible="false"
+          animation="property: model-opacity; to: 0; dur: 800; startEvents: fadeout">
         </a-entity>
+        
       </a-entity>
-      
     </a-scene>
+
+    <script>
+      // 3D 모델의 불투명도(Opacity)를 조절하기 위한 자체 컴포넌트 등록
+      AFRAME.registerComponent('model-opacity', {
+        schema: {type: 'number', default: 1.0},
+        init: function () {
+          this.el.addEventListener('model-loaded', () => this.update());
+        },
+        update: function () {
+          var mesh = this.el.getObject3D('mesh');
+          var data = this.data;
+          if (!mesh) return;
+          mesh.traverse(function (node) {
+            if (node.isMesh) {
+              node.material.transparent = true;
+              node.material.opacity = data;
+            }
+          });
+        }
+      });
+
+      const anchor = document.querySelector('#target-anchor');
+      const model = document.querySelector('#ar-model');
+      let isTriggered = false; // 중복 실행 방지용 플래그
+
+      // 이미지가 카메라에 딱 디텍트(인식) 되었을 때 실행되는 함수
+      anchor.addEventListener("targetFound", event => {
+        if (isTriggered) return;
+        isTriggered = true;
+
+        // 1. 모델을 즉시 보이고, 투명도를 초기화(2배 크기)
+        model.setAttribute('visible', true);
+        model.setAttribute('model-opacity', 1.0);
+
+        // 2. 2초(2000ms) 동안 유지한 뒤 페이드아웃 애니메이션 시작
+        setTimeout(() => {
+          model.emit('fadeout');
+          
+          // 3. 애니메이션 시간(0.8초)이 지난 뒤 완전히 화면에서 숨김 및 리셋
+          setTimeout(() => {
+            model.setAttribute('visible', false);
+            isTriggered = false; 
+          }, 800);
+          
+        }, 2000);
+      });
+    </script>
   </body>
 </html>
