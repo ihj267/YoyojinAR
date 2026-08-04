@@ -6,14 +6,10 @@
     name="viewport"
     content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
   />
-  <title>MindAR GLB</title>
+  <title>MindAR Camera Fix</title>
 
-  <!-- MindAR 공식 권장 조합 -->
   <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
-
-  <!-- GLB 안의 애니메이션 재생용 -->
   <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v7.0.0/dist/aframe-extras.min.js"></script>
-
   <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
 
   <style>
@@ -23,7 +19,32 @@
       height: 100%;
       margin: 0;
       overflow: hidden;
-      background: #000;
+
+      /* 중요: 검은 배경을 넣으면 뒤쪽 카메라 영상이 가려질 수 있음 */
+      background: transparent !important;
+    }
+
+    /* MindAR가 body에 생성하는 실제 카메라 영상 */
+    body > video {
+      position: fixed !important;
+      z-index: 0 !important;
+      display: block !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+      object-fit: cover !important;
+    }
+
+    /* AR 장면은 카메라 영상 위에 투명하게 배치 */
+    a-scene {
+      position: fixed !important;
+      inset: 0 !important;
+      z-index: 1 !important;
+      background: transparent !important;
+    }
+
+    .a-canvas {
+      z-index: 1 !important;
+      background: transparent !important;
     }
 
     .mindar-ui-scanning {
@@ -35,23 +56,21 @@
       left: 50%;
       bottom: 24px;
       transform: translateX(-50%);
-      z-index: 9999;
+      z-index: 20;
       max-width: calc(100vw - 40px);
       padding: 9px 14px;
       border-radius: 18px;
-      background: rgba(0, 0, 0, 0.72);
+      background: rgba(0, 0, 0, 0.68);
       color: #fff;
       font: 14px/1.35 Arial, sans-serif;
       text-align: center;
+      white-space: nowrap;
       pointer-events: none;
     }
   </style>
 
   <script>
-    /*
-      첨부된 GLB는 원본 단위가 매우 크므로,
-      로드 후 바운딩 박스를 계산해 자동 축소하고 중심을 맞춥니다.
-    */
+    /* 모델의 가장 긴 축을 타겟 너비 정도로 자동 조절하고 중심을 맞춤 */
     AFRAME.registerComponent("fit-model", {
       schema: {
         targetSize: { type: "number", default: 0.9 }
@@ -59,16 +78,15 @@
 
       init: function () {
         this.el.addEventListener("model-loaded", () => {
-          const model = this.el.getObject3D("mesh");
-          if (!model) return;
+          const mesh = this.el.getObject3D("mesh");
+          if (!mesh) return;
 
-          model.updateMatrixWorld(true);
+          this.el.object3D.scale.set(1, 1, 1);
+          mesh.position.set(0, 0, 0);
+          mesh.updateMatrixWorld(true);
 
-          const box = new THREE.Box3().setFromObject(model);
-          if (box.isEmpty()) {
-            console.error("GLB 바운딩 박스를 계산하지 못했습니다.");
-            return;
-          }
+          const box = new THREE.Box3().setFromObject(mesh);
+          if (box.isEmpty()) return;
 
           const size = new THREE.Vector3();
           const center = new THREE.Vector3();
@@ -80,18 +98,12 @@
 
           const fittedScale = this.data.targetSize / maxDimension;
 
-          /*
-            월드 좌표 중심을 이 엔티티의 로컬 좌표로 바꾼 뒤
-            GLB 루트만 이동합니다. 엔티티의 position 값은 유지됩니다.
-          */
-          const localCenter = this.el.object3D.worldToLocal(center.clone());
-          model.position.sub(localCenter);
-
-          /* 엔티티에서 전체 크기를 조절 */
+          /* 모델 자체를 원점으로 옮긴 뒤 엔티티 전체를 축소 */
+          mesh.position.set(-center.x, -center.y, -center.z);
           this.el.object3D.scale.setScalar(fittedScale);
-          model.updateMatrixWorld(true);
+          mesh.updateMatrixWorld(true);
 
-          console.log("모델 자동 맞춤 완료", {
+          console.log("모델 크기 자동 조절 완료", {
             size: size.toArray(),
             center: center.toArray(),
             fittedScale
@@ -108,7 +120,7 @@
   <a-scene
     id="ar-scene"
     mindar-image="
-      imageTargetSrc: ./1.mind?v=20260805-1;
+      imageTargetSrc: ./1.mind?v=20260805-2;
       autoStart: true;
       uiLoading: no;
       uiScanning: no;
@@ -118,45 +130,41 @@
     "
     gltf-model="dracoDecoderPath: https://www.gstatic.com/draco/versioned/decoders/1.5.7/;"
     color-space="sRGB"
-    renderer="colorManagement: true; physicallyCorrectLights: true; antialias: true;"
+    renderer="
+      alpha: true;
+      colorManagement: true;
+      physicallyCorrectLights: true;
+      antialias: true;
+    "
     vr-mode-ui="enabled: false"
     device-orientation-permission-ui="enabled: false"
   >
+    <a-assets timeout="15000">
+      <a-asset-item
+        id="model-asset"
+        src="./1.glb?v=20260805-2"
+      ></a-asset-item>
+    </a-assets>
+
     <a-camera
       position="0 0 0"
       look-controls="enabled: false"
     ></a-camera>
 
-    <a-light type="ambient" intensity="1.6"></a-light>
-    <a-light type="directional" intensity="1.8" position="1 2 3"></a-light>
+    <a-light type="ambient" intensity="1.5"></a-light>
+    <a-light type="directional" intensity="1.4" position="1 2 3"></a-light>
 
     <a-entity
       id="target-anchor"
       mindar-image-target="targetIndex: 0"
     >
-      <!-- GLB가 준비되지 않았을 때만 보이는 이미지 -->
-      <a-image
-        id="loading-image"
-        src="./detected.png?v=20260805-1"
-        position="0 0 0.01"
-        width="1"
-        height="1"
-        material="shader: flat; transparent: true; side: double"
-        visible="false"
-      ></a-image>
-
-      <!--
-        274KB GLB를 HTML에서 직접 로드합니다.
-        scene의 loaded 이벤트를 기다리지 않으므로 로딩 함수가 누락되지 않습니다.
-      -->
       <a-entity
         id="ar-model"
-        gltf-model="url(./1.glb?v=20260805-1)"
+        gltf-model="#model-asset"
         animation-mixer="clip: *; loop: repeat"
         fit-model="targetSize: 0.9"
         position="0 0 0.05"
         rotation="0 0 0"
-        visible="false"
       ></a-entity>
     </a-entity>
   </a-scene>
@@ -166,90 +174,79 @@
       const scene = document.querySelector("#ar-scene");
       const anchor = document.querySelector("#target-anchor");
       const model = document.querySelector("#ar-model");
-      const loadingImage = document.querySelector("#loading-image");
       const status = document.querySelector("#status");
 
-      let targetFound = false;
-      let modelLoaded = Boolean(model.getObject3D("mesh"));
-      let modelFailed = false;
-
-      function setStatus(message, show = true) {
+      function setStatus(message, visible = true) {
         status.textContent = message;
-        status.style.display = show ? "block" : "none";
+        status.style.display = visible ? "block" : "none";
       }
 
-      function renderState() {
-        if (!targetFound) {
-          loadingImage.setAttribute("visible", false);
-          model.setAttribute("visible", false);
+      /*
+        MindAR가 카메라 video를 뒤쪽 음수 z-index로 생성합니다.
+        생성 직후와 화면 회전 후에도 video/canvas 층을 강제로 바로잡습니다.
+      */
+      function fixCameraLayers() {
+        const videos = document.querySelectorAll("body > video");
+        const canvas = document.querySelector(".a-canvas");
 
-          if (modelFailed) {
-            setStatus("3D 모델을 불러오지 못했습니다.");
-          } else if (!modelLoaded) {
-            setStatus("3D 모델을 준비하는 중입니다…");
-          } else {
-            setStatus("이미지를 카메라로 비춰 주세요.");
-          }
-          return;
-        }
+        videos.forEach((video) => {
+          video.style.setProperty("z-index", "0", "important");
+          video.style.setProperty("display", "block", "important");
+          video.style.setProperty("visibility", "visible", "important");
+          video.style.setProperty("opacity", "1", "important");
+        });
 
-        if (modelLoaded) {
-          loadingImage.setAttribute("visible", false);
-          model.setAttribute("visible", true);
-          setStatus("", false);
-        } else {
-          loadingImage.setAttribute("visible", true);
-          model.setAttribute("visible", false);
-          setStatus(
-            modelFailed
-              ? "3D 모델 로딩에 실패했습니다."
-              : "3D 모델을 불러오는 중입니다…"
-          );
+        if (canvas) {
+          canvas.style.setProperty("z-index", "1", "important");
+          canvas.style.setProperty("background", "transparent", "important");
         }
       }
 
-      model.addEventListener("model-loaded", () => {
-        console.log("1.glb 로딩 완료");
-        modelLoaded = true;
-        modelFailed = false;
-        renderState();
+      const observer = new MutationObserver(fixCameraLayers);
+      observer.observe(document.body, {
+        childList: true,
+        subtree: true
       });
 
-      model.addEventListener("model-error", (event) => {
-        console.error("1.glb 로딩 실패", event.detail || event);
-        modelLoaded = false;
-        modelFailed = true;
-        renderState();
-      });
-
-      anchor.addEventListener("targetFound", () => {
-        console.log("타겟 발견");
-        targetFound = true;
-        renderState();
-      });
-
-      anchor.addEventListener("targetLost", () => {
-        console.log("타겟 놓침");
-        targetFound = false;
-        renderState();
+      scene.addEventListener("renderstart", () => {
+        fixCameraLayers();
       });
 
       scene.addEventListener("arReady", () => {
-        console.log("MindAR 준비 완료");
-        renderState();
+        fixCameraLayers();
+        setStatus("인식 이미지를 카메라로 비춰 주세요.");
       });
 
       scene.addEventListener("arError", (event) => {
         console.error("MindAR 오류", event);
-        setStatus("카메라 권한 또는 1.mind 파일을 확인해 주세요.");
+        setStatus("카메라 또는 1.mind 파일을 확인해 주세요.");
       });
 
-      /* 이벤트 등록 전에 GLB가 이미 로드됐을 가능성도 처리 */
-      if (model.getObject3D("mesh")) {
-        modelLoaded = true;
-      }
+      model.addEventListener("model-loaded", () => {
+        console.log("1.glb 로딩 완료");
+      });
 
-      renderState();
+      model.addEventListener("model-error", (event) => {
+        console.error("1.glb 로딩 실패", event.detail || event);
+        setStatus("1.glb 모델을 불러오지 못했습니다.");
+      });
+
+      anchor.addEventListener("targetFound", () => {
+        setStatus("", false);
+      });
+
+      anchor.addEventListener("targetLost", () => {
+        setStatus("인식 이미지를 카메라로 비춰 주세요.");
+      });
+
+      window.addEventListener("resize", () => {
+        requestAnimationFrame(fixCameraLayers);
+      });
+
+      /* 카메라 video가 조금 늦게 생성되는 모바일 브라우저 대비 */
+      [0, 100, 300, 700, 1500, 3000].forEach((delay) => {
+        window.setTimeout(fixCameraLayers, delay);
+      });
     });
   </script>
 </body>
