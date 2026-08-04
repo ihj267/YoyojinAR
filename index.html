@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- A-Frame 및 MindAR 코어 라이브러리 -->
+    <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.2/dist/mindar-image-aframe.prod.js"></script>
+    <!-- 터치(이동 및 크기 조절) 제스처 라이브러리 -->
+    <script src="https://raw.githack.com/fcor/arjs-gestures/master/dist/gestures.js"></script>
+  </head>
+  <body>
+    <!-- 방금 만든 targets.mind 파일을 읽어오도록 설정 -->
+    <a-scene mindar-image="imageTargetSrc: ./targets.mind;" color-space="sRGB" gesture-detector>
+      
+      <a-assets>
+        <!-- 폴더에 있는 3D 모델 불러오기 -->
+        <a-asset-item id="my-model" src="./1.glb"></a-asset-item>
+      </a-assets>
+
+      <a-camera position="0 0 0" look-controls="enabled: false" raycaster="objects: .clickable"></a-camera>
+
+      <a-entity mindar-image-target="targetIndex: 0">
+        <!-- 
+          요청하신 조건: 초기 크기 2배 (scale="2 2 2"), 
+          손가락 조절 가능 (gesture-handler), 
+          최대 크기 6배 제한 (maxScale: 6 - 초기 2배의 3배) 
+        -->
+        <a-entity 
+          gltf-model="#my-model" 
+          class="clickable" 
+          scale="2 2 2"
+          gesture-handler="minScale: 1; maxScale: 6">
+        </a-entity>
+      </a-entity>
+      
+    </a-scene>
+  </body>
+</html>
