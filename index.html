@@ -5,9 +5,7 @@
     <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.2/dist/mindar-image-aframe.prod.js"></script>
     <script src="https://raw.githack.com/fcor/arjs-gestures/master/dist/gestures.js"></script>
-    <style>
-      .mindar-ui-scanning { display: none !important; }
-    </style>
+    <!-- 스캔 UI를 숨기던 코드를 삭제했습니다 -->
   </head>
   <body>
     <a-scene mindar-image="imageTargetSrc: ./1.mind;" color-space="sRGB" renderer="colorManagement: true, physicallyCorrectLights" gesture-detector>
@@ -21,7 +19,6 @@
 
       <a-entity id="target-anchor" mindar-image-target="targetIndex: 0">
         
-        <!-- 로딩 중에 띄워둘 2D 이미지 -->
         <a-image 
           id="ar-image"
           src="#test-img" 
@@ -30,7 +27,6 @@
           visible="false">
         </a-image>
 
-        <!-- 3D 모델 (fit-scale 코드가 알아서 크기를 맞춰줍니다) -->
         <a-entity 
           id="ar-model"
           gltf-model="#my-model"
@@ -45,7 +41,6 @@
     </a-scene>
 
     <script>
-      // ★ 핵심: 3D 모델의 실제 크기를 실측해서 지정한 사이즈로 자동 조절해주는 컴포넌트
       AFRAME.registerComponent('fit-scale', {
         schema: {targetSize: {type: 'number', default: 2}},
         init: function () {
@@ -53,16 +48,13 @@
             const obj = this.el.getObject3D('mesh');
             if (!obj) return;
             
-            // 모델의 바운딩 박스(테두리) 사이즈 측정
             const box = new THREE.Box3().setFromObject(obj);
             const size = new THREE.Vector3();
             box.getSize(size);
             
-            // X, Y, Z축 중 가장 긴 부분을 기준으로 스케일 비율 계산
             const maxDim = Math.max(size.x, size.y, size.z);
             const scale = this.data.targetSize / maxDim;
             
-            // 계산된 완벽한 비율로 자동 스케일 적용
             this.el.setAttribute('scale', `${scale} ${scale} ${scale}`);
           });
         }
@@ -72,36 +64,29 @@
       const arImage = document.querySelector('#ar-image');
       const arModel = document.querySelector('#ar-model');
       let isTriggered = false;
-      let isModelLoaded = false; // 25MB 파일 다운로드 완료 여부 체크
+      let isModelLoaded = false; 
 
-      // 3D 모델 다운로드가 완전히 끝났을 때를 감지
       arModel.addEventListener('model-loaded', () => {
         isModelLoaded = true;
-        
-        // 만약 관람객이 이미 이미지를 보고 있는 상태에서 로딩이 끝났다면? -> 3D로 즉시 교체
         if (isTriggered) {
           arImage.setAttribute('visible', false);
           arModel.setAttribute('visible', true);
         }
       });
 
-      // 이미지가 디텍트 되었을 때
       anchor.addEventListener("targetFound", event => {
         if (isTriggered) return;
         isTriggered = true;
 
         if (isModelLoaded) {
-          // 이미 3D 로딩이 끝난 상태라면 바로 3D 출력
           arImage.setAttribute('visible', false);
           arModel.setAttribute('visible', true);
         } else {
-          // 아직 25MB를 다운받는 중이라면 AR 공간에 2D 로딩 이미지를 출력
           arImage.setAttribute('visible', true);
           arModel.setAttribute('visible', false);
         }
       });
 
-      // 타겟을 놓쳤을 때 리셋
       anchor.addEventListener("targetLost", event => {
         isTriggered = false;
         arImage.setAttribute('visible', false);
