@@ -5,7 +5,8 @@
     <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.2/dist/mindar-image-aframe.prod.js"></script>
     <script src="https://raw.githack.com/fcor/arjs-gestures/master/dist/gestures.js"></script>
-    <!-- 스캔 UI를 숨기던 코드를 삭제했습니다 -->
+    <!-- 3D 모델 애니메이션 라이브러리 -->
+    <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.0.0/dist/aframe-extras.min.js"></script>
   </head>
   <body>
     <a-scene mindar-image="imageTargetSrc: ./1.mind;" color-space="sRGB" renderer="colorManagement: true, physicallyCorrectLights" gesture-detector>
@@ -19,14 +20,17 @@
 
       <a-entity id="target-anchor" mindar-image-target="targetIndex: 0">
         
+        <!-- 로딩 2D 이미지 -->
         <a-image 
           id="ar-image"
           src="#test-img" 
-          position="0 0 0" 
+          position="0 0 0"
+          height="1"
+          width="1"
           scale="2 2 2"
           visible="false">
         </a-image>
-
+        <!-- 3D 모델 -->
         <a-entity 
           id="ar-model"
           gltf-model="#my-model"
@@ -34,63 +38,76 @@
           position="0 0 0" 
           visible="false"
           fit-scale="targetSize: 2" 
-          gesture-handler="minScale: 0.5; maxScale: 3">
+          gesture-handler="minScale: 0.5; maxScale: 3"
+          animation-mixer="clip: *; loop: repeat;">
         </a-entity>
 
       </a-entity>
     </a-scene>
 
-    <script>
+    <script type="text/javascript">
+      // 3D 모델 자동 크기 조절
       AFRAME.registerComponent('fit-scale', {
         schema: {targetSize: {type: 'number', default: 2}},
         init: function () {
           this.el.addEventListener('model-loaded', () => {
-            const obj = this.el.getObject3D('mesh');
-            if (!obj) return;
-            
-            const box = new THREE.Box3().setFromObject(obj);
-            const size = new THREE.Vector3();
-            box.getSize(size);
-            
-            const maxDim = Math.max(size.x, size.y, size.z);
-            const scale = this.data.targetSize / maxDim;
-            
-            this.el.setAttribute('scale', `${scale} ${scale} ${scale}`);
+            // 안정적인 계산을 위해 다음 틱에서 실행
+            setTimeout(() => {
+              const obj = this.el.getObject3D('mesh');
+              if (!obj) return;
+              
+              const box = new THREE.Box3().setFromObject(obj);
+              const size = new THREE.Vector3();
+              box.getSize(size);
+              
+              const maxDim = Math.max(size.x, size.y, size.z);
+              if (maxDim === 0) return; // 크기가 0인 경우 나누기 오류 방지
+
+              const scale = this.data.targetSize / maxDim;
+              
+              this.el.setAttribute('scale', `${scale} ${scale} ${scale}`);
+            }, 0);
           });
         }
       });
 
-      const anchor = document.querySelector('#target-anchor');
-      const arImage = document.querySelector('#ar-image');
-      const arModel = document.querySelector('#ar-model');
-      let isTriggered = false;
-      let isModelLoaded = false; 
+      document.addEventListener('DOMContentLoaded', () => {
+        const anchor = document.querySelector('#target-anchor');
+        const arImage = document.querySelector('#ar-image');
+        const arModel = document.querySelector('#ar-model');
+        
+        let isTargetFound = false;
+        let isModelLoaded = false; 
 
-      arModel.addEventListener('model-loaded', () => {
-        isModelLoaded = true;
-        if (isTriggered) {
-          arImage.setAttribute('visible', false);
-          arModel.setAttribute('visible', true);
+        const updateVisibility = () => {
+          if (isTargetFound) {
+            if (isModelLoaded) {
+              arImage.setAttribute('visible', false);
+              arModel.setAttribute('visible', true);
+            } else {
+              arImage.setAttribute('visible', true);
+              arModel.setAttribute('visible', false);
+            }
+          } else {
+            arImage.setAttribute('visible', false);
+            arModel.setAttribute('visible', false);
+          }
         }
-      });
 
-      anchor.addEventListener("targetFound", event => {
-        if (isTriggered) return;
-        isTriggered = true;
+        arModel.addEventListener('model-loaded', () => {
+          isModelLoaded = true;
+          updateVisibility();
+        });
 
-        if (isModelLoaded) {
-          arImage.setAttribute('visible', false);
-          arModel.setAttribute('visible', true);
-        } else {
-          arImage.setAttribute('visible', true);
-          arModel.setAttribute('visible', false);
-        }
-      });
+        anchor.addEventListener("targetFound", () => {
+          isTargetFound = true;
+          updateVisibility();
+        });
 
-      anchor.addEventListener("targetLost", event => {
-        isTriggered = false;
-        arImage.setAttribute('visible', false);
-        arModel.setAttribute('visible', false);
+        anchor.addEventListener("targetLost", () => {
+          isTargetFound = false;
+          updateVisibility();
+        });
       });
     </script>
   </body>
