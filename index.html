@@ -2,18 +2,19 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-
   <meta
     name="viewport"
     content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
   />
+  <title>MindAR GLB</title>
 
-  <!-- MindAR 공식 문서 기준 조합 -->
+  <!-- MindAR 공식 권장 조합 -->
   <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
 
-  <!-- 손가락 확대/회전 -->
-  <script src="https://raw.githack.com/fcor/arjs-gestures/master/dist/gestures.js"></script>
+  <!-- GLB 안의 애니메이션 재생용 -->
+  <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v7.0.0/dist/aframe-extras.min.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
 
   <style>
     html,
@@ -25,115 +26,74 @@
       background: #000;
     }
 
-    /* MindAR 기본 스캔 UI 숨기기 */
     .mindar-ui-scanning {
       display: none !important;
     }
 
-    /* 현재 상태 확인용 텍스트 */
     #status {
-      display: none;
       position: fixed;
       left: 50%;
-      bottom: 28px;
+      bottom: 24px;
       transform: translateX(-50%);
       z-index: 9999;
-
+      max-width: calc(100vw - 40px);
       padding: 9px 14px;
-      border-radius: 20px;
-
-      background: rgba(0, 0, 0, 0.68);
-      color: white;
-
-      font-family: Arial, sans-serif;
-      font-size: 14px;
-      white-space: nowrap;
+      border-radius: 18px;
+      background: rgba(0, 0, 0, 0.72);
+      color: #fff;
+      font: 14px/1.35 Arial, sans-serif;
+      text-align: center;
       pointer-events: none;
     }
   </style>
 
   <script>
     /*
-      모델의 크기와 중심을 자동으로 맞추는 컴포넌트
-
-      targetSize: 1
-      = 모델의 가장 긴 축을 타겟 이미지 너비와 비슷한 크기로 맞춤
+      첨부된 GLB는 원본 단위가 매우 크므로,
+      로드 후 바운딩 박스를 계산해 자동 축소하고 중심을 맞춥니다.
     */
     AFRAME.registerComponent("fit-model", {
       schema: {
-        targetSize: {
-          type: "number",
-          default: 1
-        }
+        targetSize: { type: "number", default: 0.9 }
       },
 
       init: function () {
         this.el.addEventListener("model-loaded", () => {
           const model = this.el.getObject3D("mesh");
-
-          if (!model) {
-            console.error("모델 mesh를 찾지 못했습니다.");
-            return;
-          }
-
-          /*
-            계산 전에 기존 위치와 크기를 초기화합니다.
-            그래야 이전 계산값이 다시 반영되지 않습니다.
-          */
-          this.el.object3D.position.set(0, 0, 0);
-          this.el.object3D.scale.set(1, 1, 1);
+          if (!model) return;
 
           model.updateMatrixWorld(true);
 
           const box = new THREE.Box3().setFromObject(model);
-
           if (box.isEmpty()) {
-            console.error("모델 Bounding Box가 비어 있습니다.");
+            console.error("GLB 바운딩 박스를 계산하지 못했습니다.");
             return;
           }
 
           const size = new THREE.Vector3();
           const center = new THREE.Vector3();
-
           box.getSize(size);
           box.getCenter(center);
 
-          const maxDimension = Math.max(
-            size.x,
-            size.y,
-            size.z
-          );
+          const maxDimension = Math.max(size.x, size.y, size.z);
+          if (!Number.isFinite(maxDimension) || maxDimension <= 0) return;
 
-          if (!Number.isFinite(maxDimension) || maxDimension <= 0) {
-            console.error("모델 크기를 계산할 수 없습니다.", size);
-            return;
-          }
-
-          const fittedScale =
-            this.data.targetSize / maxDimension;
+          const fittedScale = this.data.targetSize / maxDimension;
 
           /*
-            모델 크기 자동 조절
+            월드 좌표 중심을 이 엔티티의 로컬 좌표로 바꾼 뒤
+            GLB 루트만 이동합니다. 엔티티의 position 값은 유지됩니다.
           */
-          this.el.object3D.scale.set(
-            fittedScale,
-            fittedScale,
-            fittedScale
-          );
+          const localCenter = this.el.object3D.worldToLocal(center.clone());
+          model.position.sub(localCenter);
 
-          /*
-            모델 원점이 멀리 떨어져 있어도
-            타겟 가운데로 이동하도록 중심 보정
-          */
-          this.el.object3D.position.set(
-            -center.x * fittedScale,
-            -center.y * fittedScale,
-            -center.z * fittedScale
-          );
+          /* 엔티티에서 전체 크기를 조절 */
+          this.el.object3D.scale.setScalar(fittedScale);
+          model.updateMatrixWorld(true);
 
-          console.log("모델 자동 크기 조절 완료", {
-            originalSize: size,
-            center,
+          console.log("모델 자동 맞춤 완료", {
+            size: size.toArray(),
+            center: center.toArray(),
             fittedScale
           });
         });
@@ -143,12 +103,12 @@
 </head>
 
 <body>
-  <div id="status">3D 모델을 불러오는 중입니다…</div>
+  <div id="status">카메라를 준비하는 중입니다…</div>
 
   <a-scene
     id="ar-scene"
     mindar-image="
-      imageTargetSrc: ./1.mind;
+      imageTargetSrc: ./1.mind?v=20260805-1;
       autoStart: true;
       uiLoading: no;
       uiScanning: no;
@@ -156,245 +116,140 @@
       warmupTolerance: 3;
       missTolerance: 5;
     "
+    gltf-model="dracoDecoderPath: https://www.gstatic.com/draco/versioned/decoders/1.5.7/;"
     color-space="sRGB"
-    renderer="
-      colorManagement: true;
-      physicallyCorrectLights: true;
-      antialias: true;
-    "
+    renderer="colorManagement: true; physicallyCorrectLights: true; antialias: true;"
     vr-mode-ui="enabled: false"
     device-orientation-permission-ui="enabled: false"
-    gesture-detector
   >
-
-    <!--
-      작은 로딩 이미지만 preload합니다.
-      25MB GLB는 절대 여기에 넣지 않습니다.
-    -->
-    <a-assets timeout="3000">
-      <img
-        id="loading-image"
-        src="./detected.png"
-        crossorigin="anonymous"
-      />
-    </a-assets>
-
     <a-camera
       position="0 0 0"
       look-controls="enabled: false"
-      raycaster="objects: .clickable"
     ></a-camera>
 
-    <!-- 모델이 어둡게 나오지 않도록 조명 추가 -->
-    <a-light
-      type="ambient"
-      intensity="1.4"
-    ></a-light>
-
-    <a-light
-      type="directional"
-      intensity="1.5"
-      position="1 2 3"
-    ></a-light>
+    <a-light type="ambient" intensity="1.6"></a-light>
+    <a-light type="directional" intensity="1.8" position="1 2 3"></a-light>
 
     <a-entity
       id="target-anchor"
       mindar-image-target="targetIndex: 0"
     >
-
-      <!-- 모델 다운로드 중 표시되는 2D 이미지 -->
+      <!-- GLB가 준비되지 않았을 때만 보이는 이미지 -->
       <a-image
-        id="ar-loading-image"
-        src="#loading-image"
+        id="loading-image"
+        src="./detected.png?v=20260805-1"
         position="0 0 0.01"
         width="1"
         height="1"
+        material="shader: flat; transparent: true; side: double"
         visible="false"
       ></a-image>
 
       <!--
-        바깥 엔티티:
-        손가락 확대/축소와 회전을 담당합니다.
+        274KB GLB를 HTML에서 직접 로드합니다.
+        scene의 loaded 이벤트를 기다리지 않으므로 로딩 함수가 누락되지 않습니다.
       -->
       <a-entity
-        id="model-controller"
-        class="clickable"
+        id="ar-model"
+        gltf-model="url(./1.glb?v=20260805-1)"
+        animation-mixer="clip: *; loop: repeat"
+        fit-model="targetSize: 0.9"
         position="0 0 0.05"
+        rotation="0 0 0"
         visible="false"
-        gesture-handler="
-          minScale: 0.5;
-          maxScale: 3;
-        "
-      >
-
-        <!--
-          안쪽 엔티티:
-          실제 GLB 모델과 자동 크기 조절을 담당합니다.
-
-          주의:
-          gltf-model은 자바스크립트로 나중에 넣습니다.
-        -->
-        <a-entity
-          id="ar-model"
-          fit-model="targetSize: 1"
-        ></a-entity>
-
-      </a-entity>
+      ></a-entity>
     </a-entity>
   </a-scene>
 
   <script>
-    const scene = document.querySelector("#ar-scene");
-    const anchor = document.querySelector("#target-anchor");
+    document.addEventListener("DOMContentLoaded", () => {
+      const scene = document.querySelector("#ar-scene");
+      const anchor = document.querySelector("#target-anchor");
+      const model = document.querySelector("#ar-model");
+      const loadingImage = document.querySelector("#loading-image");
+      const status = document.querySelector("#status");
 
-    const loadingImage =
-      document.querySelector("#ar-loading-image");
+      let targetFound = false;
+      let modelLoaded = Boolean(model.getObject3D("mesh"));
+      let modelFailed = false;
 
-    const modelController =
-      document.querySelector("#model-controller");
-
-    const modelEntity =
-      document.querySelector("#ar-model");
-
-    const status =
-      document.querySelector("#status");
-
-    let targetVisible = false;
-    let modelLoaded = false;
-    let modelLoadingStarted = false;
-    let modelError = false;
-
-    /*
-      로딩 이미지 또는 3D 모델 표시 상태를 한곳에서 관리합니다.
-    */
-    function updateDisplay() {
-      if (!targetVisible) {
-        loadingImage.setAttribute("visible", false);
-        modelController.setAttribute("visible", false);
-        status.style.display = "none";
-        return;
+      function setStatus(message, show = true) {
+        status.textContent = message;
+        status.style.display = show ? "block" : "none";
       }
 
-      if (modelLoaded) {
-        loadingImage.setAttribute("visible", false);
-        modelController.setAttribute("visible", true);
-        status.style.display = "none";
-        return;
+      function renderState() {
+        if (!targetFound) {
+          loadingImage.setAttribute("visible", false);
+          model.setAttribute("visible", false);
+
+          if (modelFailed) {
+            setStatus("3D 모델을 불러오지 못했습니다.");
+          } else if (!modelLoaded) {
+            setStatus("3D 모델을 준비하는 중입니다…");
+          } else {
+            setStatus("이미지를 카메라로 비춰 주세요.");
+          }
+          return;
+        }
+
+        if (modelLoaded) {
+          loadingImage.setAttribute("visible", false);
+          model.setAttribute("visible", true);
+          setStatus("", false);
+        } else {
+          loadingImage.setAttribute("visible", true);
+          model.setAttribute("visible", false);
+          setStatus(
+            modelFailed
+              ? "3D 모델 로딩에 실패했습니다."
+              : "3D 모델을 불러오는 중입니다…"
+          );
+        }
       }
 
-      loadingImage.setAttribute("visible", true);
-      modelController.setAttribute("visible", false);
-      status.style.display = "block";
-
-      if (modelError) {
-        status.textContent =
-          "3D 모델을 불러오지 못했습니다.";
-      } else {
-        status.textContent =
-          "3D 모델을 불러오는 중입니다…";
-      }
-    }
-
-    /*
-      중요:
-      AR 장면 초기화가 끝난 다음 GLB 다운로드를 시작합니다.
-
-      이렇게 해야 25MB 파일 때문에
-      카메라와 이미지 추적이 막히지 않습니다.
-    */
-    function startModelLoading() {
-      if (modelLoadingStarted) return;
-
-      modelLoadingStarted = true;
-
-      console.log("GLB 백그라운드 로딩 시작");
-
-      /*
-        브라우저가 이전 파일을 강하게 캐시한다면
-        ./1.glb?v=2처럼 숫자를 변경하세요.
-      */
-      modelEntity.setAttribute(
-        "gltf-model",
-        "url(./1.glb)"
-      );
-    }
-
-    /*
-      A-Frame 장면 초기화 완료
-    */
-    scene.addEventListener("loaded", () => {
-      console.log("A-Frame 장면 초기화 완료");
-
-      /*
-        먼저 장면을 한 프레임 렌더링한 다음
-        무거운 GLB를 로딩합니다.
-      */
-      requestAnimationFrame(() => {
-        startModelLoading();
+      model.addEventListener("model-loaded", () => {
+        console.log("1.glb 로딩 완료");
+        modelLoaded = true;
+        modelFailed = false;
+        renderState();
       });
-    });
 
-    /*
-      MindAR 카메라와 추적 엔진 준비 완료
-    */
-    scene.addEventListener("arReady", () => {
-      console.log("MindAR 준비 완료");
-    });
+      model.addEventListener("model-error", (event) => {
+        console.error("1.glb 로딩 실패", event.detail || event);
+        modelLoaded = false;
+        modelFailed = true;
+        renderState();
+      });
 
-    /*
-      카메라 권한이나 브라우저 호환성 오류
-    */
-    scene.addEventListener("arError", event => {
-      console.error("MindAR 실행 오류", event);
+      anchor.addEventListener("targetFound", () => {
+        console.log("타겟 발견");
+        targetFound = true;
+        renderState();
+      });
 
-      status.textContent =
-        "카메라 또는 AR을 시작할 수 없습니다.";
+      anchor.addEventListener("targetLost", () => {
+        console.log("타겟 놓침");
+        targetFound = false;
+        renderState();
+      });
 
-      status.style.display = "block";
-    });
+      scene.addEventListener("arReady", () => {
+        console.log("MindAR 준비 완료");
+        renderState();
+      });
 
-    /*
-      GLB 다운로드 + 압축 해제 + 파싱 완료
-    */
-    modelEntity.addEventListener("model-loaded", event => {
-      console.log("GLB 모델 로딩 완료", event);
+      scene.addEventListener("arError", (event) => {
+        console.error("MindAR 오류", event);
+        setStatus("카메라 권한 또는 1.mind 파일을 확인해 주세요.");
+      });
 
-      modelLoaded = true;
-      modelError = false;
+      /* 이벤트 등록 전에 GLB가 이미 로드됐을 가능성도 처리 */
+      if (model.getObject3D("mesh")) {
+        modelLoaded = true;
+      }
 
-      updateDisplay();
-    });
-
-    /*
-      GLB 경로, 서버 또는 파일 자체에 문제가 있을 때
-    */
-    modelEntity.addEventListener("model-error", event => {
-      console.error("GLB 모델 로딩 실패", event);
-
-      modelLoaded = false;
-      modelError = true;
-
-      updateDisplay();
-    });
-
-    /*
-      이미지 타겟 발견
-    */
-    anchor.addEventListener("targetFound", () => {
-      console.log("타겟 발견");
-
-      targetVisible = true;
-      updateDisplay();
-    });
-
-    /*
-      이미지 타겟을 놓침
-    */
-    anchor.addEventListener("targetLost", () => {
-      console.log("타겟 놓침");
-
-      targetVisible = false;
-      updateDisplay();
+      renderState();
     });
   </script>
 </body>
