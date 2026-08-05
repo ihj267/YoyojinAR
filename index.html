@@ -7,7 +7,7 @@
     content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
   />
   <meta name="theme-color" content="#000000" />
-  <title>이미지 AR</title>
+  <title>이미지 AR · TOUCH PHOTO V8</title>
 
   <script type="importmap">
   {
@@ -106,6 +106,20 @@
     #toolbar[hidden],
     #photo-preview[hidden] {
       display: none !important;
+    }
+
+    #version-badge {
+      display: inline-flex;
+      align-items: center;
+      min-height: 30px;
+      padding: 5px 11px;
+      border: 1px solid rgba(255,255,255,0.28);
+      border-radius: 999px;
+      color: #fff;
+      background: rgba(255,255,255,0.1);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
     }
 
     #start-screen h1 {
@@ -289,9 +303,10 @@
   <div id="ar-container" aria-label="AR camera view"></div>
 
   <section id="start-screen">
+    <div id="version-badge">TOUCH · PHOTO · V8</div>
     <h1>이미지 AR</h1>
     <p>
-      3D 모델과 인식 파일을 확인한 다음 카메라를 시작합니다.
+      손가락 이동·확대·회전, 타깃 이탈 후 5초 유지, AR 사진 촬영 버전입니다.
       카메라 권한 창이 뜨면 허용해 주세요.
     </p>
     <button id="start-button" type="button" disabled>준비 중…</button>
@@ -324,6 +339,8 @@
     import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
     import { DRACOLoader } from "three/addons/loaders/DRACOLoader.js";
     import { MindARThree } from "mindar-image-three";
+
+    console.info("AR BUILD: TOUCH_PHOTO_V8_20260805");
 
     const CONFIG = Object.freeze({
       targetUrl: "./1.mind",
@@ -1157,7 +1174,7 @@
         const targetBlobUrl = await loadTargetAsBlobUrl(CONFIG.targetUrl);
         state.targetBlobUrl = targetBlobUrl;
 
-        const gltf = await loadGLB(`${CONFIG.modelUrl}?v=20260805-touch-1`);
+        const gltf = await loadGLB(`${CONFIG.modelUrl}?v=20260805-touch-photo-v8`);
 
         const mindar = new MindARThree({
           container,
