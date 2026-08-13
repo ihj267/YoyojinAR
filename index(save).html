@@ -1,0 +1,787 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
+  />
+  <meta name="theme-color" content="#000000" />
+  <title>이미지 AR</title>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/",
+      "mindar-image-three": "https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-three.prod.js"
+    }
+  }
+  </script>
+
+  <style>
+    :root {
+      color-scheme: dark;
+      font-family: Arial, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+      background: #000;
+      overscroll-behavior: none;
+    }
+
+    #ar-container {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      isolation: isolate;
+      background: transparent;
+    }
+
+    #ar-container > video {
+      position: absolute !important;
+      inset: 0 auto auto 0 !important;
+      z-index: 0 !important;
+      display: block !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+      object-fit: cover !important;
+      background: transparent !important;
+    }
+
+    #ar-container > canvas {
+      position: absolute !important;
+      z-index: 1 !important;
+      background: transparent !important;
+      pointer-events: none;
+    }
+
+    .panel {
+      position: fixed;
+      z-index: 20;
+      color: #fff;
+      background: rgba(12, 12, 12, 0.76);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.25);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    #start-screen {
+      position: fixed;
+      inset: 0;
+      z-index: 30;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      padding: 28px;
+      color: #fff;
+      text-align: center;
+      background: #0b0b0b;
+    }
+
+    #start-screen[hidden] {
+      display: none !important;
+    }
+
+    #start-screen h1 {
+      margin: 0;
+      font-size: 22px;
+    }
+
+    #start-screen p {
+      max-width: 420px;
+      margin: 0;
+      color: rgba(255, 255, 255, 0.72);
+      font-size: 14px;
+      line-height: 1.55;
+    }
+
+    #start-button {
+      min-width: 190px;
+      min-height: 50px;
+      margin-top: 8px;
+      padding: 0 22px;
+      border: 0;
+      border-radius: 999px;
+      color: #000;
+      background: #fff;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    #start-button:disabled {
+      opacity: 0.48;
+      cursor: default;
+    }
+
+    #boot-status {
+      min-height: 20px;
+      max-width: 420px;
+      color: rgba(255, 255, 255, 0.78);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    #debug-detail {
+      min-height: 18px;
+      max-width: 420px;
+      color: rgba(255, 170, 170, 0.9);
+      font-size: 11px;
+      line-height: 1.4;
+      word-break: break-word;
+    }
+
+    #status {
+      left: 50%;
+      top: max(18px, env(safe-area-inset-top));
+      transform: translateX(-50%);
+      max-width: calc(100vw - 32px);
+      padding: 9px 14px;
+      border-radius: 999px;
+      font-size: 14px;
+      line-height: 1.3;
+      text-align: center;
+      white-space: normal;
+      pointer-events: none;
+    }
+
+    #controls {
+      left: 12px;
+      right: 12px;
+      bottom: max(12px, env(safe-area-inset-bottom));
+      padding: 12px 14px;
+      border-radius: 18px;
+    }
+
+    #controls[hidden],
+    #status[hidden] {
+      display: none !important;
+    }
+
+    .control-row {
+      display: grid;
+      grid-template-columns: 54px minmax(0, 1fr) 52px;
+      align-items: center;
+      gap: 10px;
+      min-height: 34px;
+    }
+
+    .control-row + .control-row {
+      margin-top: 6px;
+    }
+
+    .control-row label,
+    .control-value {
+      font-size: 13px;
+    }
+
+    .control-value {
+      color: rgba(255, 255, 255, 0.72);
+      text-align: right;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: #fff;
+    }
+
+    #reset-button {
+      width: 100%;
+      min-height: 34px;
+      margin-top: 9px;
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      border-radius: 10px;
+      color: #fff;
+      background: rgba(255, 255, 255, 0.08);
+      font-size: 13px;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="ar-container" aria-label="AR camera view"></div>
+
+  <section id="start-screen">
+    <h1>이미지 AR</h1>
+    <p>
+      3D 모델과 인식 파일을 확인한 다음 카메라를 시작합니다.
+      카메라 권한 창이 뜨면 허용해 주세요.
+    </p>
+    <button id="start-button" type="button" disabled>준비 중…</button>
+    <div id="boot-status">파일을 확인하는 중입니다…</div>
+    <div id="debug-detail"></div>
+  </section>
+
+  <div id="status" class="panel" hidden>인식 이미지를 비춰 주세요.</div>
+
+  <section id="controls" class="panel" hidden>
+    <div class="control-row">
+      <label for="size-control">크기</label>
+      <input id="size-control" type="range" min="0.25" max="3" step="0.05" value="1" />
+      <span id="size-value" class="control-value">100%</span>
+    </div>
+
+    <div class="control-row">
+      <label for="height-control">높이</label>
+      <input id="height-control" type="range" min="-0.7" max="0.7" step="0.01" value="0" />
+      <span id="height-value" class="control-value">0.00</span>
+    </div>
+
+    <div class="control-row">
+      <label for="rotation-control">회전</label>
+      <input id="rotation-control" type="range" min="-180" max="180" step="5" value="0" />
+      <span id="rotation-value" class="control-value">0°</span>
+    </div>
+
+    <button id="reset-button" type="button">크기·위치·회전 초기화</button>
+  </section>
+
+  <script type="module">
+    import * as THREE from "three";
+    import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+    import { DRACOLoader } from "three/addons/loaders/DRACOLoader.js";
+    import { MindARThree } from "mindar-image-three";
+
+    const CONFIG = Object.freeze({
+      targetUrl: "./1.mind",
+      modelUrl: "./1.glb",
+      fitHeight: 1.0,
+      baseOffsetX: 0,
+      baseOffsetY: 0,
+      baseOffsetZ: 0.025,
+      rotationX: 0,
+      rotationY: 0,
+      rotationZ: 0,
+      cameraTimeoutMs: 15000,
+      arTimeoutMs: 35000
+    });
+
+    const container = document.querySelector("#ar-container");
+    const startScreen = document.querySelector("#start-screen");
+    const startButton = document.querySelector("#start-button");
+    const bootStatus = document.querySelector("#boot-status");
+    const debugDetail = document.querySelector("#debug-detail");
+    const status = document.querySelector("#status");
+    const controls = document.querySelector("#controls");
+
+    const sizeControl = document.querySelector("#size-control");
+    const heightControl = document.querySelector("#height-control");
+    const rotationControl = document.querySelector("#rotation-control");
+    const sizeValue = document.querySelector("#size-value");
+    const heightValue = document.querySelector("#height-value");
+    const rotationValue = document.querySelector("#rotation-value");
+    const resetButton = document.querySelector("#reset-button");
+
+    const state = {
+      started: false,
+      starting: false,
+      modelReady: false,
+      baseScale: 1,
+      userScale: 1,
+      userOffsetY: 0,
+      userRotationY: 0,
+      modelHolder: null,
+      mixer: null,
+      mindar: null,
+      anchor: null,
+      targetBlobUrl: null
+    };
+
+    function setBootMessage(message) {
+      bootStatus.textContent = message;
+    }
+
+    function setDebug(message = "") {
+      debugDetail.textContent = message;
+    }
+
+    function setStatus(message, visible = true) {
+      status.textContent = message;
+      status.hidden = !visible;
+    }
+
+    function describeError(error) {
+      if (!error) return "알 수 없는 오류";
+      const name = error.name ? `${error.name}: ` : "";
+      return `${name}${error.message || String(error)}`;
+    }
+
+    function withTimeout(promise, milliseconds, message) {
+      let timeoutId;
+      const timeout = new Promise((_, reject) => {
+        timeoutId = window.setTimeout(() => {
+          const error = new Error(message);
+          error.name = "TimeoutError";
+          reject(error);
+        }, milliseconds);
+      });
+
+      return Promise.race([promise, timeout]).finally(() => {
+        window.clearTimeout(timeoutId);
+      });
+    }
+
+    function stopCameraTracks() {
+      const video = state.mindar?.video;
+      const stream = video?.srcObject;
+      if (stream && typeof stream.getTracks === "function") {
+        stream.getTracks().forEach((track) => track.stop());
+      }
+    }
+
+    function fixCameraLayers() {
+      const video = container.querySelector("video");
+      const canvases = container.querySelectorAll("canvas");
+
+      if (video) {
+        video.style.setProperty("z-index", "0", "important");
+        video.style.setProperty("display", "block", "important");
+        video.style.setProperty("visibility", "visible", "important");
+        video.style.setProperty("opacity", "1", "important");
+        video.style.setProperty("object-fit", "cover", "important");
+      }
+
+      canvases.forEach((canvas) => {
+        canvas.style.setProperty("z-index", "1", "important");
+        canvas.style.setProperty("background", "transparent", "important");
+      });
+    }
+
+    function waitForLiveVideo(video, timeoutMs) {
+      return new Promise((resolve, reject) => {
+        let settled = false;
+        let animationFrameId = 0;
+        let timeoutId = 0;
+
+        const cleanup = () => {
+          window.cancelAnimationFrame(animationFrameId);
+          window.clearTimeout(timeoutId);
+          video.removeEventListener("loadedmetadata", check);
+          video.removeEventListener("loadeddata", check);
+          video.removeEventListener("canplay", check);
+          video.removeEventListener("playing", check);
+        };
+
+        const finish = () => {
+          if (settled) return;
+          settled = true;
+          cleanup();
+          resolve();
+        };
+
+        const fail = () => {
+          if (settled) return;
+          settled = true;
+          cleanup();
+          const error = new Error("카메라 스트림은 허용됐지만 영상 크기를 받지 못했습니다.");
+          error.name = "VideoMetadataTimeout";
+          reject(error);
+        };
+
+        function check() {
+          if (video.videoWidth > 0 && video.videoHeight > 0 && video.readyState >= 1) {
+            finish();
+            return;
+          }
+          animationFrameId = window.requestAnimationFrame(check);
+        }
+
+        video.addEventListener("loadedmetadata", check);
+        video.addEventListener("loadeddata", check);
+        video.addEventListener("canplay", check);
+        video.addEventListener("playing", check);
+        timeoutId = window.setTimeout(fail, timeoutMs);
+        check();
+      });
+    }
+
+    /*
+      MindAR 1.2.5 기본 구현은 loadedmetadata 이벤트만 기다립니다.
+      모바일에서 그 이벤트가 누락돼도 진행되도록 play()와 영상 크기 폴링을 함께 사용합니다.
+    */
+    async function startVideoRobust(mindar) {
+      const video = document.createElement("video");
+      mindar.video = video;
+
+      video.autoplay = true;
+      video.muted = true;
+      video.playsInline = true;
+      video.setAttribute("autoplay", "");
+      video.setAttribute("muted", "");
+      video.setAttribute("playsinline", "");
+      video.setAttribute("webkit-playsinline", "");
+      video.style.position = "absolute";
+      video.style.top = "0";
+      video.style.left = "0";
+      video.style.zIndex = "0";
+
+      container.appendChild(video);
+
+      if (!navigator.mediaDevices?.getUserMedia) {
+        const error = new Error("이 브라우저는 카메라 API를 지원하지 않습니다.");
+        error.name = "NotSupportedError";
+        throw error;
+      }
+
+      const constraints = {
+        audio: false,
+        video: {
+          facingMode: { ideal: "environment" },
+          width: { ideal: 1280 },
+          height: { ideal: 720 }
+        }
+      };
+
+      setBootMessage("카메라 권한을 확인하고 있습니다…");
+      const stream = await withTimeout(
+        navigator.mediaDevices.getUserMedia(constraints),
+        CONFIG.cameraTimeoutMs,
+        "카메라 권한 응답 시간이 초과됐습니다."
+      );
+
+      video.srcObject = stream;
+
+      try {
+        await video.play();
+      } catch (error) {
+        console.warn("video.play() was not immediately available", error);
+      }
+
+      await waitForLiveVideo(video, CONFIG.cameraTimeoutMs);
+
+      video.width = video.videoWidth;
+      video.height = video.videoHeight;
+      video.setAttribute("width", String(video.videoWidth));
+      video.setAttribute("height", String(video.videoHeight));
+
+      fixCameraLayers();
+
+      /* 카메라가 실제로 연결되는 즉시 검은 시작 화면을 제거합니다. */
+      startScreen.hidden = true;
+      setStatus("카메라 연결 완료 · 이미지 인식 엔진을 준비하고 있습니다…");
+    }
+
+    function updateModelTransform() {
+      if (!state.modelHolder) return;
+
+      const finalScale = state.baseScale * state.userScale;
+      state.modelHolder.scale.setScalar(finalScale);
+      state.modelHolder.position.set(
+        CONFIG.baseOffsetX,
+        CONFIG.baseOffsetY + state.userOffsetY,
+        CONFIG.baseOffsetZ
+      );
+      state.modelHolder.rotation.set(
+        THREE.MathUtils.degToRad(CONFIG.rotationX),
+        THREE.MathUtils.degToRad(CONFIG.rotationY + state.userRotationY),
+        THREE.MathUtils.degToRad(CONFIG.rotationZ)
+      );
+    }
+
+    function connectControls() {
+      const sync = () => {
+        state.userScale = Number(sizeControl.value);
+        state.userOffsetY = Number(heightControl.value);
+        state.userRotationY = Number(rotationControl.value);
+
+        sizeValue.textContent = `${Math.round(state.userScale * 100)}%`;
+        heightValue.textContent = state.userOffsetY.toFixed(2);
+        rotationValue.textContent = `${Math.round(state.userRotationY)}°`;
+
+        updateModelTransform();
+      };
+
+      sizeControl.addEventListener("input", sync);
+      heightControl.addEventListener("input", sync);
+      rotationControl.addEventListener("input", sync);
+
+      resetButton.addEventListener("click", () => {
+        sizeControl.value = "1";
+        heightControl.value = "0";
+        rotationControl.value = "0";
+        sync();
+      });
+
+      sync();
+    }
+
+    async function loadTargetAsBlobUrl(url) {
+      setBootMessage("1.mind 파일을 확인하는 중입니다…");
+      const response = await fetch(url, { cache: "no-store" });
+
+      if (!response.ok) {
+        throw new Error(`1.mind 파일을 찾지 못했습니다. HTTP ${response.status}`);
+      }
+
+      const data = await response.arrayBuffer();
+      if (data.byteLength < 32) {
+        throw new Error("1.mind 파일이 비어 있거나 올바르지 않습니다.");
+      }
+
+      return URL.createObjectURL(
+        new Blob([data], { type: "application/octet-stream" })
+      );
+    }
+
+    function loadGLB(url) {
+      return new Promise((resolve, reject) => {
+        const dracoLoader = new DRACOLoader();
+        dracoLoader.setDecoderPath(
+          "https://www.gstatic.com/draco/versioned/decoders/1.5.7/"
+        );
+
+        const loader = new GLTFLoader();
+        loader.setDRACOLoader(dracoLoader);
+
+        loader.load(
+          url,
+          (gltf) => {
+            dracoLoader.dispose();
+            resolve(gltf);
+          },
+          (event) => {
+            if (!event.total) return;
+            const percentage = Math.round((event.loaded / event.total) * 100);
+            setBootMessage(`1.glb를 불러오는 중입니다… ${percentage}%`);
+          },
+          (error) => {
+            dracoLoader.dispose();
+            reject(error);
+          }
+        );
+      });
+    }
+
+    function prepareModel(gltf) {
+      const root = gltf.scene;
+
+      root.traverse((object) => {
+        if (!object.isMesh) return;
+        object.frustumCulled = false;
+
+        const materials = Array.isArray(object.material)
+          ? object.material
+          : [object.material];
+
+        materials.filter(Boolean).forEach((material) => {
+          if ("metalness" in material) material.metalness = Math.min(material.metalness, 0.15);
+          if ("roughness" in material) material.roughness = Math.max(material.roughness, 0.65);
+          material.needsUpdate = true;
+        });
+      });
+
+      if (gltf.animations.length > 0) {
+        state.mixer = new THREE.AnimationMixer(root);
+        const action = state.mixer.clipAction(gltf.animations[0]);
+        action.reset().play();
+        state.mixer.setTime(0);
+      }
+
+      root.updateMatrixWorld(true);
+
+      const box = new THREE.Box3().setFromObject(root, true);
+      if (box.isEmpty()) {
+        throw new Error("GLB의 표시 영역을 계산할 수 없습니다.");
+      }
+
+      const size = box.getSize(new THREE.Vector3());
+      const center = box.getCenter(new THREE.Vector3());
+
+      if (!Number.isFinite(size.y) || size.y <= 0) {
+        throw new Error("GLB 높이 계산값이 올바르지 않습니다.");
+      }
+
+      state.baseScale = CONFIG.fitHeight / size.y;
+
+      root.position.x -= center.x;
+      root.position.y -= center.y;
+      root.position.z -= box.min.z;
+
+      const holder = new THREE.Group();
+      holder.name = "ARModelHolder";
+      holder.add(root);
+
+      state.modelHolder = holder;
+      updateModelTransform();
+
+      console.info("AR model fitted", {
+        measuredSize: size.toArray(),
+        measuredCenter: center.toArray(),
+        baseScale: state.baseScale,
+        animations: gltf.animations.length
+      });
+
+      return holder;
+    }
+
+    async function initialize() {
+      try {
+        if (!window.isSecureContext && location.hostname !== "localhost") {
+          throw new Error("카메라는 HTTPS 주소에서만 실행할 수 있습니다.");
+        }
+
+        setDebug("");
+
+        /* 시작 전에 1.mind와 1.glb를 모두 실제로 확인합니다. */
+        const targetBlobUrl = await loadTargetAsBlobUrl(CONFIG.targetUrl);
+        state.targetBlobUrl = targetBlobUrl;
+
+        const gltf = await loadGLB(`${CONFIG.modelUrl}?v=20260805-6`);
+
+        const mindar = new MindARThree({
+          container,
+          imageTargetSrc: targetBlobUrl,
+          maxTrack: 1,
+          uiLoading: "no",
+          uiScanning: "no",
+          uiError: "no",
+          warmupTolerance: 3,
+          missTolerance: 5,
+          filterMinCF: 0.001,
+          filterBeta: 1000
+        });
+
+        state.mindar = mindar;
+
+        const { renderer, scene } = mindar;
+        renderer.setClearColor(0x000000, 0);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+        renderer.outputColorSpace = THREE.SRGBColorSpace;
+
+        scene.add(new THREE.HemisphereLight(0xffffff, 0x555555, 2.4));
+
+        const keyLight = new THREE.DirectionalLight(0xffffff, 2.6);
+        keyLight.position.set(1.5, 2.5, 3);
+        scene.add(keyLight);
+
+        const fillLight = new THREE.DirectionalLight(0xffffff, 1.2);
+        fillLight.position.set(-2, 1, 1.5);
+        scene.add(fillLight);
+
+        const anchor = mindar.addAnchor(0);
+        state.anchor = anchor;
+
+        const holder = prepareModel(gltf);
+        anchor.group.add(holder);
+
+        anchor.onTargetFound = () => {
+          setStatus("", false);
+        };
+
+        anchor.onTargetLost = () => {
+          setStatus("인식 이미지를 비춰 주세요.");
+        };
+
+        connectControls();
+        state.modelReady = true;
+        startButton.disabled = false;
+        startButton.textContent = "카메라 시작";
+        setBootMessage("1.mind와 1.glb 확인 완료");
+      } catch (error) {
+        console.error(error);
+        startButton.disabled = true;
+        startButton.textContent = "시작할 수 없음";
+        setBootMessage("시작 파일을 준비하지 못했습니다.");
+        setDebug(describeError(error));
+      }
+    }
+
+    async function startAR() {
+      if (state.started || state.starting || !state.modelReady || !state.mindar) return;
+
+      state.starting = true;
+      startButton.disabled = true;
+      startButton.textContent = "카메라 여는 중…";
+      setDebug("");
+
+      try {
+        /* MindAR의 기본 카메라 함수 대신 모바일 대응 함수를 사용합니다. */
+        await startVideoRobust(state.mindar);
+
+        setStatus("카메라 연결 완료 · 1.mind를 초기화하고 있습니다…");
+
+        await withTimeout(
+          state.mindar._startAR(),
+          CONFIG.arTimeoutMs,
+          "카메라는 연결됐지만 1.mind 인식 엔진 초기화가 완료되지 않았습니다."
+        );
+
+        state.started = true;
+        state.starting = false;
+
+        fixCameraLayers();
+        window.setTimeout(fixCameraLayers, 100);
+        window.setTimeout(fixCameraLayers, 500);
+
+        controls.hidden = false;
+        setStatus("인식 이미지를 비춰 주세요.");
+
+        const clock = new THREE.Clock();
+        const { renderer, scene, camera } = state.mindar;
+
+        renderer.setAnimationLoop(() => {
+          const delta = Math.min(clock.getDelta(), 0.05);
+          if (state.mixer) state.mixer.update(delta);
+          renderer.render(scene, camera);
+        });
+      } catch (error) {
+        console.error("AR start failed", error);
+        state.starting = false;
+        stopCameraTracks();
+
+        startScreen.hidden = false;
+        startButton.disabled = false;
+        startButton.textContent = "다시 시작";
+        setStatus("", false);
+
+        if (error?.name === "NotAllowedError") {
+          setBootMessage("카메라 권한이 차단되었습니다.");
+        } else if (error?.name === "NotFoundError") {
+          setBootMessage("사용할 수 있는 카메라를 찾지 못했습니다.");
+        } else if (error?.name === "NotReadableError") {
+          setBootMessage("다른 앱이 카메라를 사용 중이거나 카메라를 열 수 없습니다.");
+        } else if (error?.name === "VideoMetadataTimeout") {
+          setBootMessage("권한은 허용됐지만 카메라 영상 연결이 완료되지 않았습니다.");
+        } else if (error?.name === "TimeoutError") {
+          setBootMessage("카메라 또는 이미지 인식 엔진의 준비 시간이 초과됐습니다.");
+        } else {
+          setBootMessage("AR 시작 중 오류가 발생했습니다.");
+        }
+
+        setDebug(describeError(error));
+      }
+    }
+
+    startButton.addEventListener("click", startAR);
+
+    window.addEventListener("resize", () => {
+      window.requestAnimationFrame(fixCameraLayers);
+    });
+
+    window.addEventListener("pagehide", stopCameraTracks);
+
+    window.addEventListener("unhandledrejection", (event) => {
+      console.error("Unhandled promise rejection", event.reason);
+      setDebug(describeError(event.reason));
+    });
+
+    initialize();
+  </script>
+</body>
+</html>
