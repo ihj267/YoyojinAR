@@ -7,7 +7,7 @@
     content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
   />
   <meta name="theme-color" content="#000000" />
-  <title>이미지 AR · TOUCH PHOTO V9</title>
+  <title>이미지 AR · TOUCH PHOTO V10</title>
 
   <script type="importmap">
   {
@@ -104,6 +104,7 @@
     #start-screen[hidden],
     #status[hidden],
     #toolbar[hidden],
+    #rotation-pad[hidden],
     #photo-preview[hidden] {
       display: none !important;
     }
@@ -190,31 +191,11 @@
       left: 50%;
       bottom: max(14px, env(safe-area-inset-bottom));
       transform: translateX(-50%);
-      display: grid;
-      grid-template-columns: 104px 72px 94px;
+      display: flex;
       align-items: center;
-      gap: 12px;
-      padding: 10px 12px;
-      border-radius: 24px;
-    }
-
-    .tool-button {
-      min-height: 44px;
-      padding: 7px 10px;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 14px;
-      color: #fff;
-      background: rgba(255, 255, 255, 0.08);
-      font-size: 12px;
-      font-weight: 700;
-      line-height: 1.25;
-      cursor: pointer;
-    }
-
-    .tool-button.active {
-      color: #0a0a0a;
-      background: #fff;
-      border-color: #fff;
+      justify-content: center;
+      padding: 8px;
+      border-radius: 999px;
     }
 
     #capture-button {
@@ -243,52 +224,114 @@
       transform: scale(0.86);
     }
 
-    #capture-button:disabled,
-    .tool-button:disabled {
+    #capture-button:disabled {
       opacity: 0.48;
       cursor: default;
     }
 
-    #rotation-gizmo {
-      position: fixed;
-      z-index: 18;
-      width: 118px;
-      height: 118px;
-      border: 1px solid rgba(255, 255, 255, 0.62);
-      border-radius: 50%;
-      pointer-events: none;
-      transform: translate(-50%, -50%);
-      opacity: 0;
-      transition: opacity 90ms ease;
+    #rotation-pad {
+      right: max(16px, env(safe-area-inset-right));
+      bottom: max(108px, calc(env(safe-area-inset-bottom) + 96px));
+      width: 152px;
+      height: 152px;
+      border-radius: 28px;
+      touch-action: none;
+      user-select: none;
+      -webkit-user-select: none;
+      overflow: hidden;
     }
 
-    #rotation-gizmo::before,
-    #rotation-gizmo::after {
+    #rotation-pad.active {
+      background: rgba(18, 18, 18, 0.84);
+      border-color: rgba(255, 255, 255, 0.24);
+    }
+
+    #rotation-pad-ring,
+    #rotation-pad-cross {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+
+    #rotation-pad-ring {
+      width: 108px;
+      height: 108px;
+      border: 1px solid rgba(255, 255, 255, 0.38);
+      border-radius: 50%;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.06);
+    }
+
+    #rotation-pad-cross {
+      width: 90px;
+      height: 90px;
+    }
+
+    #rotation-pad-cross::before,
+    #rotation-pad-cross::after {
       content: "";
       position: absolute;
       left: 50%;
       top: 50%;
+      background: rgba(255,255,255,0.18);
+      transform: translate(-50%, -50%);
+    }
+
+    #rotation-pad-cross::before {
+      width: 1px;
+      height: 90px;
+    }
+
+    #rotation-pad-cross::after {
+      width: 90px;
+      height: 1px;
+    }
+
+    .rotation-arrow {
+      position: absolute;
+      color: rgba(255,255,255,0.88);
+      font-size: 13px;
+      font-weight: 800;
+      line-height: 1;
+      pointer-events: none;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.4);
+    }
+
+    .rotation-arrow.up { left: 50%; top: 14px; transform: translateX(-50%); }
+    .rotation-arrow.down { left: 50%; bottom: 14px; transform: translateX(-50%); }
+    .rotation-arrow.left { left: 14px; top: 50%; transform: translateY(-50%); }
+    .rotation-arrow.right { right: 14px; top: 50%; transform: translateY(-50%); }
+    .rotation-arrow.up-left { left: 23px; top: 23px; }
+    .rotation-arrow.up-right { right: 23px; top: 23px; }
+    .rotation-arrow.down-left { left: 23px; bottom: 23px; }
+    .rotation-arrow.down-right { right: 23px; bottom: 23px; }
+
+    #rotation-pad-handle {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 34px;
+      height: 34px;
       border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.8);
+      background: rgba(255,255,255,0.18);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.28);
       transform: translate(-50%, -50%);
       pointer-events: none;
+      transition: transform 80ms ease;
     }
 
-    #rotation-gizmo::before {
-      width: 82px;
-      height: 118px;
-      border-left: 1px solid rgba(255, 255, 255, 0.42);
-      border-right: 1px solid rgba(255, 255, 255, 0.42);
-    }
-
-    #rotation-gizmo::after {
-      width: 118px;
-      height: 54px;
-      border-top: 1px solid rgba(255, 255, 255, 0.42);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.42);
-    }
-
-    #rotation-gizmo.visible {
-      opacity: 1;
+    #rotation-pad-note {
+      position: absolute;
+      left: 50%;
+      bottom: 6px;
+      transform: translateX(-50%);
+      font-size: 10px;
+      font-weight: 700;
+      color: rgba(255,255,255,0.72);
+      letter-spacing: 0.04em;
+      pointer-events: none;
     }
 
     #photo-preview {
@@ -345,10 +388,10 @@
   <div id="ar-container" aria-label="AR camera view"></div>
 
   <section id="start-screen">
-    <div id="version-badge">TOUCH · PHOTO · V9</div>
+    <div id="version-badge">TOUCH · PHOTO · V10</div>
     <h1>이미지 AR</h1>
     <p>
-      한 손가락 이동/3D 회전 · 두 손가락 확대/축소, 타깃 이탈 후 5초 유지, AR 사진 촬영 버전입니다.
+      한 손가락 이동 · 두 손가락 확대/축소 · 오른쪽 회전 패드, 타깃 이탈 후 5초 유지, AR 사진 촬영 버전입니다.
       카메라 권한 창이 뜨면 허용해 주세요.
     </p>
     <button id="start-button" type="button" disabled>준비 중…</button>
@@ -357,16 +400,24 @@
   </section>
 
   <div id="status" class="panel" hidden>인식 이미지를 비춰 주세요.</div>
-  <div id="rotation-gizmo" aria-hidden="true"></div>
+
+  <aside id="rotation-pad" class="panel" aria-label="회전 컨트롤" hidden>
+    <div id="rotation-pad-ring"></div>
+    <div id="rotation-pad-cross"></div>
+    <div class="rotation-arrow up">▲</div>
+    <div class="rotation-arrow down">▼</div>
+    <div class="rotation-arrow left">◀</div>
+    <div class="rotation-arrow right">▶</div>
+    <div class="rotation-arrow up-left">↖</div>
+    <div class="rotation-arrow up-right">↗</div>
+    <div class="rotation-arrow down-left">↙</div>
+    <div class="rotation-arrow down-right">↘</div>
+    <div id="rotation-pad-handle"></div>
+    <div id="rotation-pad-note">ROTATE</div>
+  </aside>
 
   <nav id="toolbar" class="panel" aria-label="AR controls" hidden>
-    <button id="interaction-mode-button" class="tool-button" type="button" aria-pressed="false">
-      조작 모드<br />이동
-    </button>
     <button id="capture-button" type="button" aria-label="사진 촬영"></button>
-    <button id="reset-button" class="tool-button" type="button">
-      처음으로<br />리셋
-    </button>
   </nav>
 
   <section id="photo-preview" hidden>
@@ -383,7 +434,7 @@
     import { DRACOLoader } from "three/addons/loaders/DRACOLoader.js";
     import { MindARThree } from "mindar-image-three";
 
-    console.info("AR BUILD: TOUCH_PHOTO_V9_20260814");
+    console.info("AR BUILD: TOUCH_PHOTO_V10_20260814");
 
     const CONFIG = Object.freeze({
       targetUrl: "./1.mind",
@@ -415,9 +466,8 @@
     const debugDetail = document.querySelector("#debug-detail");
     const status = document.querySelector("#status");
     const toolbar = document.querySelector("#toolbar");
-    const interactionModeButton = document.querySelector("#interaction-mode-button");
-    const rotationGizmo = document.querySelector("#rotation-gizmo");
-    const resetButton = document.querySelector("#reset-button");
+    const rotationPad = document.querySelector("#rotation-pad");
+    const rotationPadHandle = document.querySelector("#rotation-pad-handle");
     const captureButton = document.querySelector("#capture-button");
     const photoPreview = document.querySelector("#photo-preview");
     const previewImage = document.querySelector("#preview-image");
@@ -434,7 +484,6 @@
       userOffsetY: 0,
       userRotationX: 0,
       userRotationY: 0,
-      interactionMode: "move",
       smoothingEnabled: true,
       hasPose: false,
       targetSeenOnce: false,
@@ -444,6 +493,7 @@
       modelHolder: null,
       displayRoot: null,
       mixer: null,
+      primaryAction: null,
       mindar: null,
       anchor: null,
       targetBlobUrl: null,
@@ -467,10 +517,16 @@
       startCentroidX: 0,
       startCentroidY: 0,
       startDistance: 1,
-      startAngle: 0,
       startOffsetX: 0,
       startOffsetY: 0,
-      startScale: 1,
+      startScale: 1
+    };
+
+    const rotationPadState = {
+      active: false,
+      pointerId: null,
+      startClientX: 0,
+      startClientY: 0,
       startRotationX: 0,
       startRotationY: 0
     };
@@ -698,29 +754,23 @@
       }, duration);
     }
 
-    function updateInteractionModeButton() {
-      const rotating = state.interactionMode === "rotate";
-      interactionModeButton.classList.toggle("active", rotating);
-      interactionModeButton.setAttribute("aria-pressed", String(rotating));
-      interactionModeButton.innerHTML = rotating
-        ? "조작 모드<br />회전"
-        : "조작 모드<br />이동";
+    function resetRotationPadHandle() {
+      rotationPadHandle.style.transform = "translate(-50%, -50%)";
     }
 
-    function setInteractionMode(mode) {
-      state.interactionMode = mode === "rotate" ? "rotate" : "move";
-      updateInteractionModeButton();
-      rotationGizmo.classList.remove("visible");
-      showTemporaryStatus(
-        state.interactionMode === "rotate"
-          ? "회전 모드 · 한 손가락으로 상하좌우 360° 회전"
-          : "이동 모드 · 한 손가락으로 위치 이동",
-        1400
+    function syncRotationPadVisibility() {
+      const visible = Boolean(
+        state.started &&
+        state.displayRoot?.visible &&
+        photoPreview.hidden
       );
-    }
-
-    function toggleInteractionMode() {
-      setInteractionMode(state.interactionMode === "move" ? "rotate" : "move");
+      rotationPad.hidden = !visible;
+      if (!visible) {
+        rotationPad.classList.remove("active");
+        rotationPadState.active = false;
+        rotationPadState.pointerId = null;
+        resetRotationPadHandle();
+      }
     }
 
     function prepareGestureBaseline() {
@@ -729,8 +779,6 @@
       gesture.startOffsetX = state.userOffsetX;
       gesture.startOffsetY = state.userOffsetY;
       gesture.startScale = state.userScale;
-      gesture.startRotationX = state.userRotationX;
-      gesture.startRotationY = state.userRotationY;
 
       if (points.length === 1) {
         gesture.startCentroidX = points[0].x;
@@ -744,7 +792,6 @@
         gesture.startCentroidX = (first.x + second.x) / 2;
         gesture.startCentroidY = (first.y + second.y) / 2;
         gesture.startDistance = Math.max(1, Math.hypot(second.x - first.x, second.y - first.y));
-        gesture.startAngle = Math.atan2(second.y - first.y, second.x - first.x);
       }
     }
 
@@ -761,29 +808,16 @@
         const dx = point.x - gesture.startCentroidX;
         const dy = point.y - gesture.startCentroidY;
 
-        if (state.interactionMode === "rotate") {
-          state.userRotationY = normalizeAngleDegrees(
-            gesture.startRotationY + dx * CONFIG.rotationDegreesPerPixel
-          );
-          state.userRotationX = normalizeAngleDegrees(
-            gesture.startRotationX + dy * CONFIG.rotationDegreesPerPixel
-          );
-          rotationGizmo.style.left = `${point.x}px`;
-          rotationGizmo.style.top = `${point.y}px`;
-          rotationGizmo.classList.add("visible");
-        } else {
-          state.userOffsetX = clamp(
-            gesture.startOffsetX + dx * movementUnit,
-            -CONFIG.moveRange,
-            CONFIG.moveRange
-          );
-          state.userOffsetY = clamp(
-            gesture.startOffsetY - dy * movementUnit,
-            -CONFIG.moveRange,
-            CONFIG.moveRange
-          );
-        }
-
+        state.userOffsetX = clamp(
+          gesture.startOffsetX + dx * movementUnit,
+          -CONFIG.moveRange,
+          CONFIG.moveRange
+        );
+        state.userOffsetY = clamp(
+          gesture.startOffsetY - dy * movementUnit,
+          -CONFIG.moveRange,
+          CONFIG.moveRange
+        );
         updateModelTransform();
         return;
       }
@@ -794,16 +828,82 @@
         const distance = Math.max(1, Math.hypot(second.x - first.x, second.y - first.y));
         const scaleRatio = distance / gesture.startDistance;
 
-        // 두 손가락은 확대/축소만 담당한다.
         state.userScale = clamp(
           gesture.startScale * scaleRatio,
           CONFIG.minUserScale,
           CONFIG.maxUserScale
         );
-
-        rotationGizmo.classList.remove("visible");
         updateModelTransform();
       }
+    }
+
+    function updateRotationPadHandle(clientX, clientY) {
+      const rect = rotationPad.getBoundingClientRect();
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
+      const rawX = clientX - centerX;
+      const rawY = clientY - centerY;
+      const maxRadius = 42;
+      const distance = Math.hypot(rawX, rawY);
+      const ratio = distance > maxRadius ? maxRadius / distance : 1;
+      const x = rawX * ratio;
+      const y = rawY * ratio;
+      rotationPadHandle.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`;
+    }
+
+    function connectRotationPad() {
+      const releaseRotationPad = (event) => {
+        if (event && rotationPadState.pointerId !== event.pointerId) return;
+        rotationPadState.active = false;
+        rotationPadState.pointerId = null;
+        rotationPad.classList.remove("active");
+        resetRotationPadHandle();
+      };
+
+      rotationPad.addEventListener("pointerdown", (event) => {
+        if (!state.started || !state.displayRoot?.visible || photoPreview.hidden === false) return;
+        event.preventDefault();
+        event.stopPropagation();
+        rotationPad.setPointerCapture?.(event.pointerId);
+        rotationPadState.active = true;
+        rotationPadState.pointerId = event.pointerId;
+        rotationPadState.startClientX = event.clientX;
+        rotationPadState.startClientY = event.clientY;
+        rotationPadState.startRotationX = state.userRotationX;
+        rotationPadState.startRotationY = state.userRotationY;
+        rotationPad.classList.add("active");
+        updateRotationPadHandle(event.clientX, event.clientY);
+        showTemporaryStatus("회전 패드 · 캐릭터 중심으로 회전", 1000);
+      });
+
+      rotationPad.addEventListener("pointermove", (event) => {
+        if (!rotationPadState.active || rotationPadState.pointerId !== event.pointerId) return;
+        event.preventDefault();
+        event.stopPropagation();
+
+        const dx = event.clientX - rotationPadState.startClientX;
+        const dy = event.clientY - rotationPadState.startClientY;
+        state.userRotationY = normalizeAngleDegrees(
+          rotationPadState.startRotationY + dx * CONFIG.rotationDegreesPerPixel
+        );
+        state.userRotationX = normalizeAngleDegrees(
+          rotationPadState.startRotationX + dy * CONFIG.rotationDegreesPerPixel
+        );
+        updateModelTransform();
+        updateRotationPadHandle(event.clientX, event.clientY);
+      });
+
+      rotationPad.addEventListener("pointerup", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        releaseRotationPad(event);
+      });
+      rotationPad.addEventListener("pointercancel", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        releaseRotationPad(event);
+      });
+      rotationPad.addEventListener("lostpointercapture", releaseRotationPad);
     }
 
     function connectGestures() {
@@ -813,11 +913,6 @@
         container.setPointerCapture?.(event.pointerId);
         gesture.pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
         prepareGestureBaseline();
-        if (state.interactionMode === "rotate" && gesture.pointers.size === 1) {
-          rotationGizmo.style.left = `${event.clientX}px`;
-          rotationGizmo.style.top = `${event.clientY}px`;
-          rotationGizmo.classList.add("visible");
-        }
       });
 
       container.addEventListener("pointermove", (event) => {
@@ -831,7 +926,6 @@
         if (!gesture.pointers.has(event.pointerId)) return;
         event.preventDefault();
         gesture.pointers.delete(event.pointerId);
-        if (gesture.pointers.size === 0) rotationGizmo.classList.remove("visible");
         prepareGestureBaseline();
       };
 
@@ -873,9 +967,14 @@
 
         const loader = new GLTFLoader(manager);
         loader.setDRACOLoader(dracoLoader);
+        loader.setCrossOrigin("anonymous");
+
+        const resolvedUrl = new URL(url, window.location.href);
+        const resourceBase = resolvedUrl.href.slice(0, resolvedUrl.href.lastIndexOf("/") + 1);
+        loader.setResourcePath(resourceBase);
 
         loader.load(
-          url,
+          resolvedUrl.href,
           (gltf) => {
             dracoLoader.dispose();
             resolve(gltf);
@@ -905,19 +1004,22 @@
           : [object.material];
 
         materials.filter(Boolean).forEach((material) => {
-          // GLB 안의 원본 재질/맵핑을 변경하지 않고 그대로 사용한다.
-          if (material.map) material.map.colorSpace = THREE.SRGBColorSpace;
-          if (material.emissiveMap) material.emissiveMap.colorSpace = THREE.SRGBColorSpace;
+          const colorMaps = [material.map, material.emissiveMap].filter(Boolean);
+          colorMaps.forEach((texture) => {
+            texture.colorSpace = THREE.SRGBColorSpace;
+            texture.flipY = false;
+            texture.needsUpdate = true;
+          });
 
           [
-            material.map,
-            material.emissiveMap,
             material.normalMap,
             material.roughnessMap,
             material.metalnessMap,
             material.aoMap,
-            material.alphaMap
+            material.alphaMap,
+            material.bumpMap
           ].filter(Boolean).forEach((texture) => {
+            texture.flipY = false;
             texture.needsUpdate = true;
           });
 
@@ -931,16 +1033,27 @@
         const materials = Array.isArray(object.material) ? object.material : [object.material];
         const maps = materials.filter(Boolean).flatMap((material) => [
           material.map, material.normalMap, material.roughnessMap, material.metalnessMap,
-          material.emissiveMap, material.aoMap, material.alphaMap
+          material.emissiveMap, material.aoMap, material.alphaMap, material.bumpMap
         ]).filter(Boolean);
         if (maps.length > 0) mappedMeshes.push({ name: object.name || "(unnamed)", maps: maps.length });
       });
       console.info("GLB texture mapping:", mappedMeshes.length > 0 ? mappedMeshes : "No texture maps found in GLB");
+      if (mappedMeshes.length === 0) {
+        setDebug("GLB 안에서 텍스처 맵을 찾지 못했습니다. Blender에서 텍스처를 GLB에 포함(Embed)해 내보냈는지 확인해 주세요.");
+      }
 
       if (gltf.animations.length > 0) {
         state.mixer = new THREE.AnimationMixer(root);
         const action = state.mixer.clipAction(gltf.animations[0]);
-        action.reset().play();
+        action.reset();
+        action.enabled = true;
+        action.clampWhenFinished = false;
+        action.setLoop(THREE.LoopPingPong, Infinity);
+        action.repetitions = Infinity;
+        action.zeroSlopeAtStart = true;
+        action.zeroSlopeAtEnd = true;
+        action.play();
+        state.primaryAction = action;
         state.mixer.setTime(0);
       }
 
@@ -1186,6 +1299,7 @@
         state.currentPhotoUrl = URL.createObjectURL(blob);
         previewImage.src = state.currentPhotoUrl;
         photoPreview.hidden = false;
+        syncRotationPadVisibility();
         setStatus("", false);
       } catch (error) {
         console.error("Photo capture failed", error);
@@ -1234,6 +1348,7 @@
 
     function closePhotoPreview() {
       photoPreview.hidden = true;
+      syncRotationPadVisibility();
       if (state.anchor?.visible) {
         setStatus("", false);
       } else if (performance.now() < state.holdUntil) {
@@ -1254,7 +1369,7 @@
         const targetBlobUrl = await loadTargetAsBlobUrl(CONFIG.targetUrl);
         state.targetBlobUrl = targetBlobUrl;
 
-        const gltf = await loadGLB(`${CONFIG.modelUrl}?v=20260814-touch-photo-v9`);
+        const gltf = await loadGLB(`${CONFIG.modelUrl}?v=20260814-touch-photo-v10`);
 
         const mindar = new MindARThree({
           container,
@@ -1309,7 +1424,7 @@
 
           if (wasNeverSeen) {
             showTemporaryStatus(
-              "한 손가락 이동 · 버튼으로 회전 전환 · 두 손가락 확대/축소",
+              "한 손가락 이동 · 두 손가락 스케일 · 오른쪽 회전 패드",
               3000
             );
           } else {
@@ -1323,10 +1438,8 @@
         };
 
         connectGestures();
-        updateInteractionModeButton();
+        connectRotationPad();
 
-        interactionModeButton.addEventListener("click", toggleInteractionMode);
-        resetButton.addEventListener("click", resetModelTransform);
         captureButton.addEventListener("click", capturePhoto);
         closePreviewButton.addEventListener("click", closePhotoPreview);
         savePhotoButton.addEventListener("click", saveOrSharePhoto);
@@ -1371,6 +1484,7 @@
         window.setTimeout(fixCameraLayers, 500);
 
         toolbar.hidden = false;
+        syncRotationPadVisibility();
         setStatus("인식 이미지를 비춰 주세요.");
 
         const clock = new THREE.Clock();
@@ -1383,6 +1497,7 @@
 
           if (state.mixer) state.mixer.update(delta);
           updateTrackedPose(delta, now);
+          syncRotationPadVisibility();
 
           if (
             state.targetSeenOnce &&
