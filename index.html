@@ -7,7 +7,7 @@
     content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
   />
   <meta name="theme-color" content="#000000" />
-  <title>이미지 AR · TOUCH PHOTO V10</title>
+  <title>이미지 AR · TOUCH PHOTO V11</title>
 
   <script type="importmap">
   {
@@ -246,6 +246,7 @@
       border-color: rgba(255, 255, 255, 0.24);
     }
 
+    #rotation-pad-z-ring,
     #rotation-pad-ring,
     #rotation-pad-cross {
       position: absolute;
@@ -253,6 +254,18 @@
       top: 50%;
       transform: translate(-50%, -50%);
       pointer-events: none;
+    }
+
+    #rotation-pad-z-ring {
+      width: 138px;
+      height: 138px;
+      border: 2px dashed rgba(255, 255, 255, 0.34);
+      border-radius: 50%;
+    }
+
+    #rotation-pad.z-active #rotation-pad-z-ring {
+      border-style: solid;
+      border-color: rgba(255, 255, 255, 0.92);
     }
 
     #rotation-pad-ring {
@@ -322,6 +335,35 @@
       transition: transform 80ms ease;
     }
 
+    #rotation-pad-axis-label {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 10px;
+      font-weight: 800;
+      color: rgba(255,255,255,0.64);
+      pointer-events: none;
+    }
+
+    #rotation-pad-z-label {
+      position: absolute;
+      right: 9px;
+      top: 9px;
+      padding: 3px 5px;
+      border-radius: 999px;
+      font-size: 9px;
+      font-weight: 800;
+      color: rgba(255,255,255,0.82);
+      background: rgba(0,0,0,0.28);
+      pointer-events: none;
+    }
+
+    #rotation-pad.z-active #rotation-pad-z-label {
+      color: #000;
+      background: #fff;
+    }
+
     #rotation-pad-note {
       position: absolute;
       left: 50%;
@@ -388,10 +430,10 @@
   <div id="ar-container" aria-label="AR camera view"></div>
 
   <section id="start-screen">
-    <div id="version-badge">TOUCH · PHOTO · V10</div>
+    <div id="version-badge">TOUCH · PHOTO · V11</div>
     <h1>이미지 AR</h1>
     <p>
-      한 손가락 이동 · 두 손가락 확대/축소 · 오른쪽 회전 패드, 타깃 이탈 후 5초 유지, AR 사진 촬영 버전입니다.
+      한 손가락 이동 · 두 손가락 확대/축소 · 오른쪽 XYZ 회전 패드, 타깃 이탈 후 5초 유지, AR 사진 촬영 버전입니다.
       카메라 권한 창이 뜨면 허용해 주세요.
     </p>
     <button id="start-button" type="button" disabled>준비 중…</button>
@@ -401,7 +443,8 @@
 
   <div id="status" class="panel" hidden>인식 이미지를 비춰 주세요.</div>
 
-  <aside id="rotation-pad" class="panel" aria-label="회전 컨트롤" hidden>
+  <aside id="rotation-pad" class="panel" aria-label="XYZ 회전 컨트롤" hidden>
+    <div id="rotation-pad-z-ring"></div>
     <div id="rotation-pad-ring"></div>
     <div id="rotation-pad-cross"></div>
     <div class="rotation-arrow up">▲</div>
@@ -413,7 +456,9 @@
     <div class="rotation-arrow down-left">↙</div>
     <div class="rotation-arrow down-right">↘</div>
     <div id="rotation-pad-handle"></div>
-    <div id="rotation-pad-note">ROTATE</div>
+    <div id="rotation-pad-axis-label">X · Y</div>
+    <div id="rotation-pad-z-label">Z ↻</div>
+    <div id="rotation-pad-note">XYZ ROTATE</div>
   </aside>
 
   <nav id="toolbar" class="panel" aria-label="AR controls" hidden>
@@ -434,7 +479,7 @@
     import { DRACOLoader } from "three/addons/loaders/DRACOLoader.js";
     import { MindARThree } from "mindar-image-three";
 
-    console.info("AR BUILD: TOUCH_PHOTO_V10_20260814");
+    console.info("AR BUILD: TOUCH_PHOTO_V11_20260814");
 
     const CONFIG = Object.freeze({
       targetUrl: "./1.mind",
@@ -484,6 +529,7 @@
       userOffsetY: 0,
       userRotationX: 0,
       userRotationY: 0,
+      userRotationZ: 0,
       smoothingEnabled: true,
       hasPose: false,
       targetSeenOnce: false,
@@ -525,10 +571,15 @@
     const rotationPadState = {
       active: false,
       pointerId: null,
+      mode: "xy",
+      centerX: 0,
+      centerY: 0,
       startClientX: 0,
       startClientY: 0,
+      startAngle: 0,
       startRotationX: 0,
-      startRotationY: 0
+      startRotationY: 0,
+      startRotationZ: 0
     };
 
     function setBootMessage(message) {
@@ -724,7 +775,7 @@
       state.modelHolder.rotation.set(
         THREE.MathUtils.degToRad(CONFIG.rotationX + state.userRotationX),
         THREE.MathUtils.degToRad(CONFIG.rotationY + state.userRotationY),
-        THREE.MathUtils.degToRad(CONFIG.rotationZ)
+        THREE.MathUtils.degToRad(CONFIG.rotationZ + state.userRotationZ)
       );
     }
 
@@ -734,6 +785,7 @@
       state.userOffsetY = 0;
       state.userRotationX = 0;
       state.userRotationY = 0;
+      state.userRotationZ = 0;
       updateModelTransform();
       showTemporaryStatus("크기·위치·회전을 처음 상태로 되돌렸습니다.", 1300);
     }
@@ -766,7 +818,7 @@
       );
       rotationPad.hidden = !visible;
       if (!visible) {
-        rotationPad.classList.remove("active");
+        rotationPad.classList.remove("active", "z-active");
         rotationPadState.active = false;
         rotationPadState.pointerId = null;
         resetRotationPadHandle();
@@ -837,14 +889,23 @@
       }
     }
 
-    function updateRotationPadHandle(clientX, clientY) {
+    function updateRotationPadHandle(clientX, clientY, mode = rotationPadState.mode) {
       const rect = rotationPad.getBoundingClientRect();
       const centerX = rect.left + rect.width / 2;
       const centerY = rect.top + rect.height / 2;
       const rawX = clientX - centerX;
       const rawY = clientY - centerY;
+      const distance = Math.max(0.001, Math.hypot(rawX, rawY));
+
+      if (mode === "z") {
+        const radius = 64;
+        const x = (rawX / distance) * radius;
+        const y = (rawY / distance) * radius;
+        rotationPadHandle.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`;
+        return;
+      }
+
       const maxRadius = 42;
-      const distance = Math.hypot(rawX, rawY);
       const ratio = distance > maxRadius ? maxRadius / distance : 1;
       const x = rawX * ratio;
       const y = rawY * ratio;
@@ -856,7 +917,7 @@
         if (event && rotationPadState.pointerId !== event.pointerId) return;
         rotationPadState.active = false;
         rotationPadState.pointerId = null;
-        rotationPad.classList.remove("active");
+        rotationPad.classList.remove("active", "z-active");
         resetRotationPadHandle();
       };
 
@@ -864,16 +925,37 @@
         if (!state.started || !state.displayRoot?.visible || photoPreview.hidden === false) return;
         event.preventDefault();
         event.stopPropagation();
+
+        const rect = rotationPad.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+        const dxCenter = event.clientX - centerX;
+        const dyCenter = event.clientY - centerY;
+        const radiusFromCenter = Math.hypot(dxCenter, dyCenter);
+        const mode = radiusFromCenter >= 54 ? "z" : "xy";
+
         rotationPad.setPointerCapture?.(event.pointerId);
         rotationPadState.active = true;
         rotationPadState.pointerId = event.pointerId;
+        rotationPadState.mode = mode;
+        rotationPadState.centerX = centerX;
+        rotationPadState.centerY = centerY;
         rotationPadState.startClientX = event.clientX;
         rotationPadState.startClientY = event.clientY;
+        rotationPadState.startAngle = Math.atan2(dyCenter, dxCenter);
         rotationPadState.startRotationX = state.userRotationX;
         rotationPadState.startRotationY = state.userRotationY;
+        rotationPadState.startRotationZ = state.userRotationZ;
+
         rotationPad.classList.add("active");
-        updateRotationPadHandle(event.clientX, event.clientY);
-        showTemporaryStatus("회전 패드 · 캐릭터 중심으로 회전", 1000);
+        rotationPad.classList.toggle("z-active", mode === "z");
+        updateRotationPadHandle(event.clientX, event.clientY, mode);
+        showTemporaryStatus(
+          mode === "z"
+            ? "Z축 회전 · 바깥 링을 원형으로 돌리세요"
+            : "X/Y축 회전 · 안쪽 패드를 상하좌우로 움직이세요",
+          1100
+        );
       });
 
       rotationPad.addEventListener("pointermove", (event) => {
@@ -881,16 +963,30 @@
         event.preventDefault();
         event.stopPropagation();
 
-        const dx = event.clientX - rotationPadState.startClientX;
-        const dy = event.clientY - rotationPadState.startClientY;
-        state.userRotationY = normalizeAngleDegrees(
-          rotationPadState.startRotationY + dx * CONFIG.rotationDegreesPerPixel
-        );
-        state.userRotationX = normalizeAngleDegrees(
-          rotationPadState.startRotationX + dy * CONFIG.rotationDegreesPerPixel
-        );
+        if (rotationPadState.mode === "z") {
+          const currentAngle = Math.atan2(
+            event.clientY - rotationPadState.centerY,
+            event.clientX - rotationPadState.centerX
+          );
+          let angleDelta = THREE.MathUtils.radToDeg(currentAngle - rotationPadState.startAngle);
+          if (angleDelta > 180) angleDelta -= 360;
+          if (angleDelta < -180) angleDelta += 360;
+          state.userRotationZ = normalizeAngleDegrees(
+            rotationPadState.startRotationZ + angleDelta
+          );
+        } else {
+          const dx = event.clientX - rotationPadState.startClientX;
+          const dy = event.clientY - rotationPadState.startClientY;
+          state.userRotationY = normalizeAngleDegrees(
+            rotationPadState.startRotationY + dx * CONFIG.rotationDegreesPerPixel
+          );
+          state.userRotationX = normalizeAngleDegrees(
+            rotationPadState.startRotationX + dy * CONFIG.rotationDegreesPerPixel
+          );
+        }
+
         updateModelTransform();
-        updateRotationPadHandle(event.clientX, event.clientY);
+        updateRotationPadHandle(event.clientX, event.clientY, rotationPadState.mode);
       });
 
       rotationPad.addEventListener("pointerup", (event) => {
@@ -1369,7 +1465,7 @@
         const targetBlobUrl = await loadTargetAsBlobUrl(CONFIG.targetUrl);
         state.targetBlobUrl = targetBlobUrl;
 
-        const gltf = await loadGLB(`${CONFIG.modelUrl}?v=20260814-touch-photo-v10`);
+        const gltf = await loadGLB(`${CONFIG.modelUrl}?v=20260814-touch-photo-v11`);
 
         const mindar = new MindARThree({
           container,
@@ -1424,7 +1520,7 @@
 
           if (wasNeverSeen) {
             showTemporaryStatus(
-              "한 손가락 이동 · 두 손가락 스케일 · 오른쪽 회전 패드",
+              "한 손가락 이동 · 두 손가락 스케일 · 오른쪽 XYZ 회전 패드",
               3000
             );
           } else {
