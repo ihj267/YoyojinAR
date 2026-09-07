@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>YOYOJIN targets.mind 만들기</title>
+  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image.prod.js"></script>
+  <style>
+    body{font-family:Arial,"Noto Sans KR",sans-serif;max-width:680px;margin:0 auto;padding:28px;background:#111;color:#fff;line-height:1.6}
+    button{width:100%;min-height:54px;border:0;border-radius:14px;font-size:16px;font-weight:800;margin:14px 0;cursor:pointer}
+    pre{white-space:pre-wrap;background:#1c1c1c;padding:14px;border-radius:12px;color:#ddd}
+    .bar{height:10px;background:#292929;border-radius:99px;overflow:hidden}.bar>div{height:100%;width:0;background:#fff;transition:width .15s}
+  </style>
+</head>
+<body>
+  <h1>targets.mind 만들기</h1>
+  <p>이 페이지는 현재 테스트용 타깃 3개를 아래 순서로 컴파일합니다.</p>
+  <pre>0 → 1.jpg
+1 → 2.jpg
+2 → 3.png</pre>
+  <button id="go">targets.mind 생성</button>
+  <div class="bar"><div id="fill"></div></div>
+  <p id="status">대기 중</p>
+  <script>
+    const paths=["1.jpg","2.jpg","3.png"];
+    const status=document.querySelector("#status");
+    const fill=document.querySelector("#fill");
+    const button=document.querySelector("#go");
+
+    async function loadImage(url){
+      return new Promise((resolve,reject)=>{
+        const img=new Image();
+        img.onload=()=>resolve(img);
+        img.onerror=()=>reject(new Error(url+" 로딩 실패"));
+        img.src=url+"?v="+Date.now();
+      });
+    }
+
+    button.addEventListener("click",async()=>{
+      button.disabled=true;
+      try{
+        if(!window.MINDAR?.IMAGE?.Compiler) throw new Error("MindAR Compiler를 불러오지 못했습니다.");
+        status.textContent="타깃 이미지를 읽는 중…";
+        const images=[];
+        for(const path of paths) images.push(await loadImage(path));
+        const compiler=new window.MINDAR.IMAGE.Compiler();
+        status.textContent="컴파일 중…";
+        await compiler.compileImageTargets(images,(progress)=>{
+          const p=Math.max(0,Math.min(100,Number(progress)||0));
+          fill.style.width=p+"%";
+          status.textContent=`컴파일 중… ${p.toFixed(1)}%`;
+        });
+        const buffer=await compiler.exportData();
+        const blob=new Blob([buffer],{type:"application/octet-stream"});
+        const a=document.createElement("a");
+        a.href=URL.createObjectURL(blob);
+        a.download="targets.mind";
+        a.click();
+        setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+        fill.style.width="100%";
+        status.textContent="완료. 다운로드된 targets.mind를 GitHub의 index.html 옆에 올리세요.";
+      }catch(error){
+        console.error(error);
+        status.textContent="오류: "+(error.message||error);
+        button.disabled=false;
+      }
+    });
+  </script>
+</body>
+</html>

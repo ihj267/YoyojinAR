@@ -2,473 +2,166 @@
 <html lang="ko">
 <head>
   <meta charset="utf-8" />
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
-  />
-  <meta name="theme-color" content="#080808" />
-  <title>YOYOJIN AR · Image Compare</title>
-  <!-- A-Frame classic build: import-map/module 없이 모바일 호환성 우선 -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#050505" />
+  <title>YOYOJIN · ULSAN 2026 AR</title>
+
+  <!-- MindAR 공식 A-Frame 방식: GitHub Pages 같은 정적 호스팅에서 사용 가능 -->
   <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
 
   <style>
     :root {
       color-scheme: dark;
-      font-family: Inter, Arial, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+      font-family: Inter, Pretendard, Arial, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
       --safe-top: max(14px, env(safe-area-inset-top));
       --safe-bottom: max(14px, env(safe-area-inset-bottom));
+      --viewer-h: min(70dvh, 690px);
     }
 
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html, body { width:100%; height:100%; margin:0; overflow:hidden; background:#000; overscroll-behavior:none; }
+    body { touch-action:none; }
+    button { font:inherit; }
+    [hidden] { display:none !important; }
 
-    html, body {
-      width: 100%;
-      height: 100%;
-      margin: 0;
-      overflow: hidden;
-      background: #000;
-      overscroll-behavior: none;
-    }
-
-    button { font: inherit; }
-
-    #ar-container {
-      position: fixed;
-      inset: 0;
-      overflow: hidden;
-      background: #000;
-      isolation: isolate;
-    }
-
-    #ar-container a-scene {
-      position: absolute !important;
-      inset: 0 !important;
-      width: 100% !important;
-      height: 100% !important;
-      z-index: 1 !important;
-    }
-
-    #ar-container video,
-    #ar-container > video {
-      position: absolute !important;
-      inset: 0 auto auto 0 !important;
-      z-index: 0 !important;
-      display: block !important;
-      visibility: visible !important;
-      opacity: 1 !important;
-      object-fit: cover !important;
-      background: #000 !important;
-    }
-
-    #ar-container canvas,
-    #ar-container > canvas {
-      position: absolute !important;
-      z-index: 1 !important;
-      pointer-events: none !important;
-      background: transparent !important;
-    }
-
-    [hidden] { display: none !important; }
-
-    .glass {
-      color: #fff;
-      background: rgba(12, 12, 12, 0.72);
-      border: 1px solid rgba(255,255,255,0.16);
-      box-shadow: 0 12px 40px rgba(0,0,0,0.30);
-      backdrop-filter: blur(15px);
-      -webkit-backdrop-filter: blur(15px);
-    }
+    /* ---------- AR / CAMERA ---------- */
+    #ar-wrap { position:fixed; inset:0; overflow:hidden; background:#000; isolation:isolate; }
+    #ar-scene { position:absolute !important; inset:0 !important; width:100% !important; height:100% !important; z-index:1 !important; }
+    #ar-wrap video { position:absolute !important; z-index:0 !important; display:block !important; visibility:visible !important; opacity:1 !important; object-fit:cover !important; background:#000 !important; }
+    #ar-wrap canvas { position:absolute !important; z-index:1 !important; pointer-events:none !important; background:transparent !important; }
 
     /* ---------- START ---------- */
     #start-screen {
-      position: fixed;
-      inset: 0;
-      z-index: 100;
-      display: grid;
-      place-items: center;
-      padding: 28px;
-      background:
-        radial-gradient(circle at 50% 35%, rgba(255,255,255,0.08), transparent 38%),
-        #080808;
-      color: #fff;
+      position:fixed; inset:0; z-index:1000; display:grid; place-items:center;
+      padding:26px; color:#fff; text-align:center;
+      background:radial-gradient(circle at 50% 32%, #202020 0, #0d0d0d 36%, #050505 72%);
     }
-
-    #start-card {
-      width: min(100%, 460px);
-      text-align: center;
-    }
-
-    #brand {
-      margin-bottom: 16px;
-      font-size: 12px;
-      font-weight: 800;
-      letter-spacing: 0.18em;
-      opacity: 0.72;
-    }
-
-    #start-card h1 {
-      margin: 0 0 10px;
-      font-size: clamp(26px, 7vw, 38px);
-      line-height: 1.08;
-    }
-
-    #start-card p {
-      margin: 0 auto 22px;
-      max-width: 390px;
-      color: rgba(255,255,255,0.70);
-      font-size: 14px;
-      line-height: 1.65;
-    }
-
+    #start-card { width:min(100%, 440px); }
+    .brand { margin-bottom:18px; font-size:11px; font-weight:850; letter-spacing:.22em; color:rgba(255,255,255,.63); }
+    #start-card h1 { margin:0 0 12px; font-size:clamp(29px, 8vw, 42px); line-height:1.08; letter-spacing:-.035em; }
+    #start-card p { margin:0 auto 24px; max-width:360px; color:rgba(255,255,255,.69); font-size:14px; line-height:1.65; }
     #start-button {
-      width: min(100%, 300px);
-      min-height: 54px;
-      border: 0;
-      border-radius: 999px;
-      background: #fff;
-      color: #000;
-      font-size: 16px;
-      font-weight: 850;
-      cursor: pointer;
+      width:min(100%, 310px); min-height:56px; border:0; border-radius:999px;
+      color:#050505; background:#fff; font-size:16px; font-weight:900; cursor:pointer;
+      box-shadow:0 12px 32px rgba(0,0,0,.34);
     }
+    #start-button:disabled { opacity:.35; cursor:default; }
+    #boot-status { min-height:18px; margin-top:14px; font-size:12px; line-height:1.5; color:rgba(255,255,255,.66); }
+    #debug-detail { min-height:16px; margin-top:7px; color:#ffaaaa; font-size:11px; line-height:1.45; word-break:break-word; }
 
-    #start-button:disabled { opacity: 0.4; cursor: default; }
-
-    #boot-status {
-      min-height: 20px;
-      margin-top: 14px;
-      color: rgba(255,255,255,0.72);
-      font-size: 12px;
-      line-height: 1.45;
-    }
-
-    #debug-detail {
-      margin-top: 6px;
-      color: #ffabab;
-      font-size: 11px;
-      line-height: 1.4;
-      word-break: break-word;
-    }
-
-    /* ---------- CAMERA HUD ---------- */
-    #hud {
-      position: fixed;
-      inset: 0;
-      z-index: 10;
-      pointer-events: none;
-    }
-
+    /* ---------- HUD ---------- */
+    #hud { position:fixed; inset:0; z-index:20; pointer-events:none; transition:opacity .2s ease; }
     #status-pill {
-      position: absolute;
-      left: 50%;
-      top: var(--safe-top);
-      transform: translateX(-50%);
-      width: max-content;
-      max-width: calc(100vw - 28px);
-      padding: 9px 14px;
-      border-radius: 999px;
-      color: #fff;
-      background: rgba(0,0,0,0.58);
-      border: 1px solid rgba(255,255,255,0.16);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      font-size: 12px;
-      font-weight: 700;
-      text-align: center;
-      white-space: normal;
+      position:absolute; left:50%; top:var(--safe-top); transform:translateX(-50%);
+      max-width:calc(100vw - 28px); padding:9px 13px; border-radius:999px;
+      color:#fff; background:rgba(0,0,0,.56); border:1px solid rgba(255,255,255,.13);
+      backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
+      font-size:12px; font-weight:800; text-align:center; white-space:normal;
     }
-
     #scan-frame {
-      position: absolute;
-      left: 50%;
-      top: 42%;
-      width: min(66vw, 330px);
-      aspect-ratio: 1 / 1;
-      transform: translate(-50%, -50%);
-      opacity: 0.80;
-      transition: opacity 180ms ease, transform 180ms ease;
+      position:absolute; left:50%; top:45%; width:min(68vw, 320px); aspect-ratio:1/1;
+      transform:translate(-50%,-50%); transition:top .28s ease,width .28s ease,opacity .2s ease,transform .2s ease;
     }
-
-    #scan-frame.detected {
-      opacity: 0.24;
-      transform: translate(-50%, -50%) scale(1.03);
+    .scan-corner { position:absolute; width:36px; height:36px; border-style:solid; border-color:#fff; filter:drop-shadow(0 2px 5px rgba(0,0,0,.45)); }
+    .scan-corner.tl { left:0; top:0; border-width:3px 0 0 3px; border-radius:13px 0 0 0; }
+    .scan-corner.tr { right:0; top:0; border-width:3px 3px 0 0; border-radius:0 13px 0 0; }
+    .scan-corner.bl { left:0; bottom:0; border-width:0 0 3px 3px; border-radius:0 0 0 13px; }
+    .scan-corner.br { right:0; bottom:0; border-width:0 3px 3px 0; border-radius:0 0 13px 0; }
+    #scan-note {
+      position:absolute; left:50%; bottom:calc(var(--safe-bottom) + 5px); transform:translateX(-50%);
+      width:max-content; max-width:calc(100vw - 34px); padding:8px 12px; border-radius:999px;
+      background:rgba(0,0,0,.46); color:rgba(255,255,255,.87); font-size:11px; text-align:center;
+      transition:opacity .2s ease;
     }
-
-    .corner {
-      position: absolute;
-      width: 34px;
-      height: 34px;
-      border-color: rgba(255,255,255,0.94);
-      border-style: solid;
-    }
-    .corner.tl { left:0; top:0; border-width:3px 0 0 3px; border-radius:12px 0 0 0; }
-    .corner.tr { right:0; top:0; border-width:3px 3px 0 0; border-radius:0 12px 0 0; }
-    .corner.bl { left:0; bottom:0; border-width:0 0 3px 3px; border-radius:0 0 0 12px; }
-    .corner.br { right:0; bottom:0; border-width:0 3px 3px 0; border-radius:0 0 12px 0; }
-
-    #scan-caption {
-      position: absolute;
-      left: 50%;
-      bottom: calc(var(--safe-bottom) + 6px);
-      transform: translateX(-50%);
-      width: max-content;
-      max-width: calc(100vw - 32px);
-      padding: 9px 13px;
-      border-radius: 999px;
-      background: rgba(0,0,0,0.45);
-      color: rgba(255,255,255,0.88);
-      font-size: 12px;
-      text-align: center;
-    }
+    body.viewer-open #scan-frame { top:15%; width:min(31vw, 132px); opacity:.72; }
+    body.viewer-open #scan-note { opacity:0; }
 
     /* ---------- VIEWER ---------- */
     #viewer {
-      position: fixed;
-      left: 10px;
-      right: 10px;
-      bottom: calc(8px + env(safe-area-inset-bottom));
-      z-index: 50;
-      height: min(76dvh, 760px);
-      min-height: 430px;
-      overflow: hidden;
-      border-radius: 26px;
-      transform: translateY(calc(100% + 40px));
-      opacity: 0;
-      pointer-events: none;
-      transition: transform 300ms cubic-bezier(.2,.75,.2,1), opacity 220ms ease;
+      position:fixed; left:8px; right:8px; bottom:calc(7px + env(safe-area-inset-bottom));
+      z-index:100; height:var(--viewer-h); overflow:hidden; border-radius:26px;
+      background:rgba(14,14,14,.97); border:1px solid rgba(255,255,255,.14);
+      box-shadow:0 -12px 48px rgba(0,0,0,.48); backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px);
+      transform:translateY(calc(100% + 40px)); opacity:0; pointer-events:none;
+      transition:transform .3s cubic-bezier(.2,.78,.2,1),opacity .2s ease,height .25s ease;
     }
+    #viewer.open { transform:translateY(0); opacity:1; pointer-events:auto; }
+    #viewer.expanded { height:calc(100dvh - var(--safe-top) - 8px); }
 
-    #viewer.open {
-      transform: translateY(0);
-      opacity: 1;
-      pointer-events: auto;
-    }
-
+    #sheet-handle { width:44px; height:4px; margin:8px auto 0; border-radius:999px; background:rgba(255,255,255,.28); }
     #viewer-header {
-      height: 68px;
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
-      align-items: center;
-      gap: 12px;
-      padding: 12px 14px 10px 17px;
-      border-bottom: 1px solid rgba(255,255,255,0.10);
+      height:62px; display:flex; align-items:center; justify-content:space-between; gap:10px;
+      padding:6px 11px 8px 15px; border-bottom:1px solid rgba(255,255,255,.09);
     }
-
-    #viewer-kicker {
-      margin-bottom: 2px;
-      color: rgba(255,255,255,0.52);
-      font-size: 10px;
-      font-weight: 800;
-      letter-spacing: 0.16em;
+    #viewer-heading { min-width:0; }
+    #viewer-kicker { margin-bottom:2px; color:rgba(255,255,255,.48); font-size:9px; font-weight:900; letter-spacing:.15em; }
+    #viewer-title { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:#fff; font-size:16px; font-weight:900; }
+    #header-actions { display:flex; gap:6px; }
+    .round-btn {
+      width:40px; height:40px; padding:0; border-radius:50%; border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.07); color:#fff; display:grid; place-items:center; cursor:pointer; font-weight:800;
     }
+    #close-viewer { font-size:22px; }
+    #expand-viewer { font-size:17px; }
 
-    #viewer-title {
-      overflow: hidden;
-      color: #fff;
-      font-size: 16px;
-      font-weight: 850;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    #close-viewer {
-      width: 42px;
-      height: 42px;
-      padding: 0;
-      border: 1px solid rgba(255,255,255,0.13);
-      border-radius: 50%;
-      background: rgba(255,255,255,0.08);
-      color: #fff;
-      font-size: 24px;
-      line-height: 1;
-      cursor: pointer;
-    }
-
-    #viewer-main {
-      position: relative;
-      height: calc(100% - 68px - 76px);
-      overflow: hidden;
-      background: rgba(0,0,0,0.66);
-    }
-
-    #slides {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      width: 200%;
-      height: 100%;
-      transform: translateX(-50%);
-      transition: transform 260ms cubic-bezier(.2,.8,.2,1);
-      will-change: transform;
-    }
-
-    #slides.show-original { transform: translateX(0); }
-    #slides.show-result { transform: translateX(-50%); }
-
-    .slide {
-      position: relative;
-      width: 50%;
-      height: 100%;
-      flex: 0 0 50%;
-      overflow: hidden;
-    }
-
+    #viewer-body { height:calc(100% - 74px - 64px); min-height:0; position:relative; background:#0a0a0a; overflow:hidden; }
+    #slides { position:absolute; inset:0; display:flex; width:200%; height:100%; transform:translateX(0); transition:transform .25s cubic-bezier(.2,.8,.2,1); }
+    #slides.show-marker { transform:translateX(-50%); }
+    .slide { position:relative; flex:0 0 50%; width:50%; height:100%; overflow:hidden; }
     .slide-label {
-      position: absolute;
-      left: 12px;
-      top: 12px;
-      z-index: 5;
-      padding: 7px 10px;
-      border-radius: 999px;
-      color: #fff;
-      background: rgba(0,0,0,0.48);
-      border: 1px solid rgba(255,255,255,0.12);
-      font-size: 11px;
-      font-weight: 800;
-      pointer-events: none;
+      position:absolute; top:11px; left:11px; z-index:4; padding:6px 9px; border-radius:999px;
+      color:#fff; background:rgba(0,0,0,.58); border:1px solid rgba(255,255,255,.13);
+      font-size:10px; font-weight:850; pointer-events:none;
     }
-
-    .image-stage {
-      position: absolute;
-      inset: 0;
-      overflow: hidden;
-      touch-action: none;
-      user-select: none;
-      -webkit-user-select: none;
-      cursor: grab;
-    }
-
-    .image-stage:active { cursor: grabbing; }
-
+    .image-stage { position:absolute; inset:0; overflow:hidden; touch-action:none; user-select:none; -webkit-user-select:none; }
     .zoom-image {
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      display: block;
-      max-width: 92%;
-      max-height: 92%;
-      width: auto;
-      height: auto;
-      object-fit: contain;
-      transform: translate(-50%, -50%);
-      transform-origin: center center;
-      will-change: transform;
-      pointer-events: none;
-      -webkit-user-drag: none;
-      filter: drop-shadow(0 12px 28px rgba(0,0,0,0.30));
+      position:absolute; left:50%; top:50%; display:block; width:auto; height:auto; max-width:94%; max-height:93%;
+      object-fit:contain; transform:translate(-50%,-50%); transform-origin:center center; will-change:transform;
+      pointer-events:none; -webkit-user-drag:none; opacity:0; transition:opacity .15s ease;
+      filter:drop-shadow(0 10px 28px rgba(0,0,0,.32));
     }
-
-    .image-error {
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      width: min(84%, 360px);
-      transform: translate(-50%, -50%);
-      color: rgba(255,255,255,0.70);
-      font-size: 13px;
-      line-height: 1.55;
-      text-align: center;
+    .loader { position:absolute; left:50%; top:50%; width:32px; height:32px; margin:-16px; border:3px solid rgba(255,255,255,.18); border-top-color:#fff; border-radius:50%; animation:spin .8s linear infinite; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+    .image-error { position:absolute; left:50%; top:50%; width:min(82%,360px); transform:translate(-50%,-50%); color:#ffb4b4; font-size:12px; line-height:1.55; text-align:center; white-space:pre-line; }
+    #gesture-hint {
+      position:absolute; left:50%; bottom:10px; z-index:5; transform:translateX(-50%); padding:6px 9px;
+      border-radius:999px; background:rgba(0,0,0,.55); color:rgba(255,255,255,.72); font-size:9px; white-space:nowrap; pointer-events:none;
+      transition:opacity .3s ease;
     }
 
     #viewer-footer {
-      height: 76px;
-      display: grid;
-      grid-template-columns: 1fr auto;
-      align-items: center;
-      gap: 12px;
-      padding: 11px 13px 12px;
-      border-top: 1px solid rgba(255,255,255,0.10);
+      height:64px; display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:center; gap:8px;
+      padding:9px 10px; border-top:1px solid rgba(255,255,255,.09);
     }
-
-    #tabs {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 4px;
-      min-width: 0;
-      padding: 4px;
-      border-radius: 999px;
-      background: rgba(255,255,255,0.07);
-    }
-
-    .tab {
-      min-width: 0;
-      height: 38px;
-      padding: 0 14px;
-      border: 0;
-      border-radius: 999px;
-      background: transparent;
-      color: rgba(255,255,255,0.64);
-      font-size: 12px;
-      font-weight: 850;
-      cursor: pointer;
-    }
-
-    .tab.active { background: #fff; color: #000; }
-
-    #reset-zoom {
-      height: 42px;
-      padding: 0 14px;
-      border: 1px solid rgba(255,255,255,0.12);
-      border-radius: 999px;
-      background: rgba(255,255,255,0.07);
-      color: #fff;
-      font-size: 12px;
-      font-weight: 800;
-      cursor: pointer;
-    }
-
-    #gesture-hint {
-      position: absolute;
-      left: 50%;
-      bottom: 10px;
-      z-index: 7;
-      transform: translateX(-50%);
-      padding: 6px 9px;
-      border-radius: 999px;
-      background: rgba(0,0,0,0.42);
-      color: rgba(255,255,255,0.72);
-      font-size: 10px;
-      white-space: nowrap;
-      pointer-events: none;
-      transition: opacity 300ms ease;
-    }
+    #tabs { min-width:0; display:grid; grid-template-columns:1fr 1fr; gap:3px; padding:4px; border-radius:999px; background:rgba(255,255,255,.07); }
+    .tab { min-width:0; height:38px; padding:0 9px; border:0; border-radius:999px; background:transparent; color:rgba(255,255,255,.6); font-size:11px; font-weight:900; cursor:pointer; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .tab.active { color:#000; background:#fff; }
+    #reset-zoom { height:44px; padding:0 12px; border-radius:999px; border:1px solid rgba(255,255,255,.12); color:#fff; background:rgba(255,255,255,.07); font-size:11px; font-weight:850; cursor:pointer; }
 
     #target-toast {
-      position: fixed;
-      left: 50%;
-      top: calc(var(--safe-top) + 48px);
-      z-index: 70;
-      transform: translate(-50%, -12px);
-      padding: 9px 13px;
-      border-radius: 999px;
-      color: #000;
-      background: #fff;
-      font-size: 12px;
-      font-weight: 850;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 160ms ease, transform 160ms ease;
+      position:fixed; left:50%; top:calc(var(--safe-top) + 45px); z-index:300; transform:translate(-50%,-10px);
+      padding:8px 12px; border-radius:999px; color:#000; background:#fff; font-size:11px; font-weight:900;
+      opacity:0; pointer-events:none; transition:opacity .16s ease,transform .16s ease;
+    }
+    #target-toast.show { opacity:1; transform:translate(-50%,0); }
+
+    @media (orientation: landscape) and (max-height: 620px) {
+      :root { --viewer-h:min(82dvh,520px); }
+      body.viewer-open #scan-frame { top:18%; width:min(18vw,110px); }
+      #viewer { left:50%; right:auto; width:min(760px,calc(100vw - 16px)); transform:translate(-50%,calc(100% + 40px)); }
+      #viewer.open { transform:translate(-50%,0); }
     }
 
-    #target-toast.show { opacity: 1; transform: translate(-50%, 0); }
-
     @media (min-width: 760px) {
-      #viewer {
-        left: 50%;
-        right: auto;
-        width: min(760px, calc(100vw - 36px));
-        transform: translate(-50%, calc(100% + 40px));
-      }
-      #viewer.open { transform: translate(-50%, 0); }
-      #viewer-main { height: calc(100% - 68px - 80px); }
-      #viewer-footer { height: 80px; }
+      #viewer { left:50%; right:auto; width:min(780px,calc(100vw - 28px)); transform:translate(-50%,calc(100% + 40px)); }
+      #viewer.open { transform:translate(-50%,0); }
+      body.viewer-open #scan-frame { width:135px; }
     }
   </style>
 </head>
-
 <body>
-  <div id="ar-container" aria-label="AR camera view">
+  <div id="ar-wrap">
     <a-scene
       id="ar-scene"
       embedded
@@ -477,766 +170,451 @@
       renderer="colorManagement: true; alpha: true; antialias: true;"
       vr-mode-ui="enabled: false"
       device-orientation-permission-ui="enabled: false"
-      loading-screen="enabled: false"
-    >
+      loading-screen="enabled: false">
       <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
     </a-scene>
   </div>
 
   <section id="start-screen">
     <div id="start-card">
-      <div id="brand">YOYOJIN · ULSAN 2026</div>
-      <h1>그림을 비춰 보세요</h1>
-      <p>
-        작품을 인식하면 연결된 이미지를 보여줍니다.<br>
-        좌우 전환 · 두 손가락 확대/축소 · 확대 후 한 손가락 이동
-      </p>
+      <div class="brand">YOYOJIN · ULSAN 2026</div>
+      <h1>벽화 속 친구를<br>찾아보세요</h1>
+      <p>벽화의 캐릭터를 카메라로 비추면<br>그 캐릭터가 태어난 아이의 원본 그림을 볼 수 있습니다.</p>
       <button id="start-button" type="button" disabled>준비 중…</button>
-      <div id="boot-status">타깃 정보를 확인하고 있습니다…</div>
+      <div id="boot-status">AR을 준비하고 있습니다…</div>
       <div id="debug-detail"></div>
     </div>
   </section>
 
   <div id="hud" hidden>
-    <div id="status-pill">그림을 프레임 안에 비춰 주세요</div>
+    <div id="status-pill">벽화의 캐릭터를 비춰 주세요</div>
     <div id="scan-frame" aria-hidden="true">
-      <span class="corner tl"></span>
-      <span class="corner tr"></span>
-      <span class="corner bl"></span>
-      <span class="corner br"></span>
+      <span class="scan-corner tl"></span><span class="scan-corner tr"></span>
+      <span class="scan-corner bl"></span><span class="scan-corner br"></span>
     </div>
-    <div id="scan-caption">다른 그림을 비추면 자동으로 다음 작품으로 바뀝니다</div>
+    <div id="scan-note">다른 캐릭터를 비추면 자동으로 다음 그림으로 바뀝니다</div>
   </div>
 
   <div id="target-toast">새 작품을 찾았습니다</div>
 
-  <section id="viewer" class="glass" aria-label="작품 비교 뷰어">
+  <section id="viewer" aria-label="작품 비교 뷰어">
+    <div id="sheet-handle"></div>
     <header id="viewer-header">
-      <div>
-        <div id="viewer-kicker">IMAGE INTERACTION</div>
+      <div id="viewer-heading">
+        <div id="viewer-kicker">WALL MURAL ↔ ORIGINAL DRAWING</div>
         <div id="viewer-title">작품</div>
       </div>
-      <button id="close-viewer" type="button" aria-label="뷰어 닫기">×</button>
+      <div id="header-actions">
+        <button id="expand-viewer" class="round-btn" type="button" aria-label="뷰어 확대">↗</button>
+        <button id="close-viewer" class="round-btn" type="button" aria-label="뷰어 닫기">×</button>
+      </div>
     </header>
 
-    <main id="viewer-main">
-      <div id="slides" class="show-result">
-        <section class="slide" data-slide="original">
-          <div class="slide-label">원본 · ORIGINAL</div>
-          <div class="image-stage" id="stage-original">
-            <img id="image-original" class="zoom-image" alt="원본 이미지" draggable="false" />
-            <div id="error-original" class="image-error" hidden></div>
+    <main id="viewer-body">
+      <div id="slides" class="show-artwork">
+        <section class="slide" data-slide="artwork">
+          <div class="slide-label">아이의 원본 그림</div>
+          <div class="image-stage" id="stage-artwork">
+            <div id="loader-artwork" class="loader" hidden></div>
+            <img id="image-artwork" class="zoom-image" alt="아이의 원본 그림" draggable="false" />
+            <div id="error-artwork" class="image-error" hidden></div>
           </div>
         </section>
-
-        <section class="slide" data-slide="result">
-          <div class="slide-label">변환 이미지 · RESULT</div>
-          <div class="image-stage" id="stage-result">
-            <img id="image-result" class="zoom-image" alt="변환 이미지" draggable="false" />
-            <div id="error-result" class="image-error" hidden></div>
+        <section class="slide" data-slide="marker">
+          <div class="slide-label">벽화 속 캐릭터</div>
+          <div class="image-stage" id="stage-marker">
+            <div id="loader-marker" class="loader" hidden></div>
+            <img id="image-marker" class="zoom-image" alt="벽화 속 캐릭터" draggable="false" />
+            <div id="error-marker" class="image-error" hidden></div>
           </div>
         </section>
       </div>
-      <div id="gesture-hint">↔ 좌우 전환 · 두 손가락 확대 · 더블탭 초기화</div>
+      <div id="gesture-hint">두 손가락 확대 · 확대 후 이동 · 좌우 스와이프</div>
     </main>
 
     <footer id="viewer-footer">
-      <div id="tabs" role="tablist" aria-label="이미지 선택">
-        <button class="tab" id="tab-original" type="button">원본</button>
-        <button class="tab active" id="tab-result" type="button">변환 이미지</button>
+      <div id="tabs">
+        <button id="tab-artwork" class="tab active" type="button">원본 그림</button>
+        <button id="tab-marker" class="tab" type="button">벽화 캐릭터</button>
       </div>
       <button id="reset-zoom" type="button">크기 초기화</button>
     </footer>
   </section>
 
   <script>
-    console.info("YOYOJIN AR BUILD: MULTI_IMAGE_COMPARE_AFRAME_V2_20260907");
+    (() => {
+      "use strict";
 
-    const CONFIG = Object.freeze({
-      manifestUrl: "./targets.json",
-      targetUrl: "./targets.mind",
-      fallbackTargetCount: 3,
-      cameraTimeoutMs: 15000,
-      arTimeoutMs: 45000,
-      maxTrack: 1,
-      maxZoom: 5,
-      minZoom: 1,
-      swipeThresholdPx: 46,
-      targetSwitchDebounceMs: 220
-    });
+      const BUILD = "YOYOJIN_ULSAN_AR_V3_20260907";
+      console.info(BUILD);
 
-    const $ = (selector) => document.querySelector(selector);
-
-    const container = $("#ar-container");
-    const sceneEl = $("#ar-scene");
-    const startScreen = $("#start-screen");
-    const startButton = $("#start-button");
-    const bootStatus = $("#boot-status");
-    const debugDetail = $("#debug-detail");
-    const hud = $("#hud");
-    const statusPill = $("#status-pill");
-    const scanFrame = $("#scan-frame");
-    const viewer = $("#viewer");
-    const viewerTitle = $("#viewer-title");
-    const closeViewerButton = $("#close-viewer");
-    const slides = $("#slides");
-    const tabOriginal = $("#tab-original");
-    const tabResult = $("#tab-result");
-    const resetZoomButton = $("#reset-zoom");
-    const gestureHint = $("#gesture-hint");
-    const targetToast = $("#target-toast");
-
-    const originalImg = $("#image-original");
-    const resultImg = $("#image-result");
-    const originalError = $("#error-original");
-    const resultError = $("#error-result");
-    const originalStage = $("#stage-original");
-    const resultStage = $("#stage-result");
-
-    const state = {
-      manifest: [],
-      arSystem: null,
-      anchors: [],
-      sceneReady: false,
-      started: false,
-      starting: false,
-      ready: false,
-      targetBlobUrl: null,
-      activeIndex: -1,
-      activeId: null,
-      currentSlide: "result",
-      lastSwitchAt: 0,
-      toastTimer: 0,
-      hintTimer: 0
-    };
-
-    function setBoot(message) { bootStatus.textContent = message; }
-    function setDebug(message = "") { debugDetail.textContent = message; }
-    function setStatus(message) { statusPill.textContent = message; }
-
-    function describeError(error) {
-      if (!error) return "알 수 없는 오류";
-      return `${error.name ? `${error.name}: ` : ""}${error.message || String(error)}`;
-    }
-
-    function clamp(value, min, max) {
-      return Math.min(max, Math.max(min, value));
-    }
-
-    function withTimeout(promise, milliseconds, message) {
-      let timeoutId;
-      const timeout = new Promise((_, reject) => {
-        timeoutId = setTimeout(() => {
-          const error = new Error(message);
-          error.name = "TimeoutError";
-          reject(error);
-        }, milliseconds);
+      const CONFIG = Object.freeze({
+        manifestUrl: "./targets.json",
+        targetUrl: "./targets.mind",
+        maxZoom: 6,
+        minZoom: 1,
+        swipeThresholdPx: 48,
+        targetSwitchDebounceMs: 180,
+        sceneTimeoutMs: 16000,
+        arTimeoutMs: 45000
       });
-      return Promise.race([promise, timeout]).finally(() => clearTimeout(timeoutId));
-    }
 
-    function numericId(value) {
-      const match = String(value ?? "").match(/\d+/);
-      return match ? Number(match[0]) : Number.MAX_SAFE_INTEGER;
-    }
+      const FALLBACK_ITEMS = [
+        { id:"1", targetIndex:0, marker:"1.jpg", artwork:"1.jpeg", title:"작품 1" },
+        { id:"2", targetIndex:1, marker:"2.jpg", artwork:"2.jpeg", title:"작품 2" },
+        { id:"3", targetIndex:2, marker:"3.png", artwork:"3.jpeg", title:"작품 3" }
+      ];
 
-    function fallbackManifest() {
-      return Array.from({ length: CONFIG.fallbackTargetCount }, (_, index) => {
-        const id = String(index + 1);
-        return { id, target: `${id}.JPG`, result: `${id}.PNG`, title: `작품 #${id}` };
-      });
-    }
+      const $ = (s) => document.querySelector(s);
+      const sceneEl = $("#ar-scene");
+      const arWrap = $("#ar-wrap");
+      const startScreen = $("#start-screen");
+      const startButton = $("#start-button");
+      const bootStatus = $("#boot-status");
+      const debugDetail = $("#debug-detail");
+      const hud = $("#hud");
+      const statusPill = $("#status-pill");
+      const scanFrame = $("#scan-frame");
+      const viewer = $("#viewer");
+      const viewerTitle = $("#viewer-title");
+      const closeViewerButton = $("#close-viewer");
+      const expandViewerButton = $("#expand-viewer");
+      const slides = $("#slides");
+      const tabArtwork = $("#tab-artwork");
+      const tabMarker = $("#tab-marker");
+      const resetZoomButton = $("#reset-zoom");
+      const targetToast = $("#target-toast");
+      const gestureHint = $("#gesture-hint");
 
-    async function loadManifest() {
-      try {
-        const response = await fetch(`${CONFIG.manifestUrl}?v=20260907`, { cache: "no-store" });
-        if (!response.ok) throw new Error(`targets.json HTTP ${response.status}`);
-        const json = await response.json();
-        const rawItems = Array.isArray(json) ? json : json.items;
-        if (!Array.isArray(rawItems) || rawItems.length === 0) {
-          throw new Error("targets.json에 items가 없습니다.");
+      const artworkImg = $("#image-artwork");
+      const markerImg = $("#image-marker");
+      const artworkError = $("#error-artwork");
+      const markerError = $("#error-marker");
+      const artworkLoader = $("#loader-artwork");
+      const markerLoader = $("#loader-marker");
+      const artworkStage = $("#stage-artwork");
+      const markerStage = $("#stage-marker");
+
+      const state = {
+        items: [],
+        anchors: [],
+        arSystem: null,
+        ready: false,
+        started: false,
+        starting: false,
+        activeIndex: -1,
+        currentSlide: "artwork",
+        lastSwitchAt: 0,
+        toastTimer: 0,
+        hintTimer: 0
+      };
+
+      function setBoot(text) { bootStatus.textContent = text; }
+      function setDebug(text="") { debugDetail.textContent = text; }
+      function setStatus(text) { statusPill.textContent = text; }
+      function clamp(v,min,max) { return Math.min(max,Math.max(min,v)); }
+      function describeError(error) { return `${error?.name ? error.name + ": " : ""}${error?.message || String(error || "알 수 없는 오류")}`; }
+
+      function fixCameraLayers() {
+        const video = arWrap.querySelector("video");
+        const canvases = arWrap.querySelectorAll("canvas");
+        if (video) {
+          video.style.setProperty("z-index","0","important");
+          video.style.setProperty("display","block","important");
+          video.style.setProperty("visibility","visible","important");
+          video.style.setProperty("opacity","1","important");
+          video.style.setProperty("object-fit","cover","important");
         }
+        canvases.forEach((canvas) => {
+          canvas.style.setProperty("z-index","1","important");
+          canvas.style.setProperty("pointer-events","none","important");
+          canvas.style.setProperty("background","transparent","important");
+        });
+      }
 
-        const items = rawItems
-          .map((item, order) => ({
+      async function fetchManifest() {
+        try {
+          const response = await fetch(`${CONFIG.manifestUrl}?v=${encodeURIComponent(BUILD)}`, { cache:"no-store" });
+          if (!response.ok) throw new Error(`targets.json HTTP ${response.status}`);
+          const data = await response.json();
+          const raw = Array.isArray(data) ? data : data.items;
+          if (!Array.isArray(raw) || raw.length === 0) throw new Error("targets.json의 items가 비어 있습니다.");
+          const items = raw.map((item, order) => ({
             id: String(item.id ?? order + 1),
-            target: item.target || `${item.id ?? order + 1}.JPG`,
-            result: item.result || `${item.id ?? order + 1}.PNG`,
-            title: item.title || `작품 #${item.id ?? order + 1}`,
-            targetIndex: Number.isInteger(item.targetIndex) ? item.targetIndex : order
-          }))
-          .sort((a, b) => a.targetIndex - b.targetIndex);
-
-        // targetIndex는 0..N-1 연속이어야 합니다.
-        items.forEach((item, index) => {
-          if (item.targetIndex !== index) {
-            throw new Error(`targets.json targetIndex가 연속적이지 않습니다. index ${index}`);
-          }
-        });
-        return items;
-      } catch (error) {
-        console.warn("targets.json load failed; using fallback 1..3", error);
-        setDebug("targets.json을 못 찾아 임시로 1~3번 설정을 사용합니다. 실제 운영 전 targets.json을 넣어 주세요.");
-        return fallbackManifest();
-      }
-    }
-
-    async function loadTargetBlobUrl() {
-      setBoot("targets.mind를 불러오는 중입니다…");
-      const response = await fetch(`${CONFIG.targetUrl}?v=20260907`, { cache: "default" });
-      if (!response.ok) {
-        throw new Error(`targets.mind를 찾지 못했습니다. HTTP ${response.status}`);
-      }
-      const data = await response.arrayBuffer();
-      if (data.byteLength < 32) throw new Error("targets.mind 파일이 비어 있거나 올바르지 않습니다.");
-      return URL.createObjectURL(new Blob([data], { type: "application/octet-stream" }));
-    }
-
-    function fixCameraLayers() {
-      const video = container.querySelector("video");
-      const canvases = container.querySelectorAll("canvas");
-      if (video) {
-        video.style.setProperty("z-index", "0", "important");
-        video.style.setProperty("display", "block", "important");
-        video.style.setProperty("visibility", "visible", "important");
-        video.style.setProperty("opacity", "1", "important");
-        video.style.setProperty("object-fit", "cover", "important");
-      }
-      canvases.forEach((canvas) => {
-        canvas.style.setProperty("z-index", "1", "important");
-        canvas.style.setProperty("pointer-events", "none", "important");
-        canvas.style.setProperty("background", "transparent", "important");
-      });
-    }
-
-    function waitForLiveVideo(video, timeoutMs) {
-      return new Promise((resolve, reject) => {
-        let settled = false;
-        let raf = 0;
-        let timer = 0;
-
-        const cleanup = () => {
-          cancelAnimationFrame(raf);
-          clearTimeout(timer);
-          ["loadedmetadata", "loadeddata", "canplay", "playing"].forEach((name) => {
-            video.removeEventListener(name, check);
+            targetIndex: Number.isInteger(item.targetIndex) ? item.targetIndex : order,
+            marker: item.marker || item.target || `${order + 1}.jpg`,
+            artwork: item.artwork || item.result || `${order + 1}.jpeg`,
+            title: item.title || `작품 ${item.id ?? order + 1}`
+          })).sort((a,b) => a.targetIndex - b.targetIndex);
+          items.forEach((item,index) => {
+            if (item.targetIndex !== index) throw new Error(`targetIndex가 0부터 연속이어야 합니다. ${index}번째 항목을 확인하세요.`);
           });
-        };
-
-        const finish = () => {
-          if (settled) return;
-          settled = true;
-          cleanup();
-          resolve();
-        };
-
-        const fail = () => {
-          if (settled) return;
-          settled = true;
-          cleanup();
-          const error = new Error("카메라 권한은 허용됐지만 영상 연결이 완료되지 않았습니다.");
-          error.name = "VideoMetadataTimeout";
-          reject(error);
-        };
-
-        function check() {
-          if (video.videoWidth > 0 && video.videoHeight > 0 && video.readyState >= 1) {
-            finish();
-            return;
-          }
-          raf = requestAnimationFrame(check);
+          return items;
+        } catch (error) {
+          console.warn("manifest fallback", error);
+          setDebug("targets.json을 읽지 못해 현재 1~3번 테스트 설정으로 실행합니다.");
+          return FALLBACK_ITEMS.map((x) => ({...x}));
         }
+      }
 
-        ["loadedmetadata", "loadeddata", "canplay", "playing"].forEach((name) => {
-          video.addEventListener(name, check);
+      async function checkTargetsMind() {
+        let response;
+        try {
+          response = await fetch(`${CONFIG.targetUrl}?v=${encodeURIComponent(BUILD)}`, { method:"HEAD", cache:"no-store" });
+          if (response.ok) return;
+        } catch (_) {}
+        response = await fetch(`${CONFIG.targetUrl}?v=${encodeURIComponent(BUILD)}`, { cache:"no-store" });
+        if (!response.ok) throw new Error(`targets.mind를 찾지 못했습니다. HTTP ${response.status}`);
+        const buffer = await response.arrayBuffer();
+        if (buffer.byteLength < 32) throw new Error("targets.mind 파일이 비어 있거나 올바르지 않습니다.");
+      }
+
+      function waitForARSystem(timeoutMs=CONFIG.sceneTimeoutMs) {
+        return new Promise((resolve,reject) => {
+          const started = performance.now();
+          const tick = () => {
+            const system = sceneEl?.systems?.["mindar-image-system"];
+            if (window.AFRAME && system) { resolve(system); return; }
+            if (performance.now() - started > timeoutMs) {
+              reject(new Error("A-Frame/MindAR 초기화가 완료되지 않았습니다. 인터넷 연결 또는 CDN 차단을 확인해 주세요."));
+              return;
+            }
+            setTimeout(tick,100);
+          };
+          tick();
         });
-        timer = setTimeout(fail, timeoutMs);
-        check();
-      });
-    }
-
-    async function startVideoRobust(mindar) {
-      const video = document.createElement("video");
-      mindar.video = video;
-      video.autoplay = true;
-      video.muted = true;
-      video.playsInline = true;
-      video.setAttribute("autoplay", "");
-      video.setAttribute("muted", "");
-      video.setAttribute("playsinline", "");
-      video.setAttribute("webkit-playsinline", "");
-      video.style.position = "absolute";
-      video.style.left = "0";
-      video.style.top = "0";
-      container.appendChild(video);
-
-      if (!navigator.mediaDevices?.getUserMedia) {
-        const error = new Error("이 브라우저는 카메라 API를 지원하지 않습니다.");
-        error.name = "NotSupportedError";
-        throw error;
       }
 
-      const stream = await withTimeout(
-        navigator.mediaDevices.getUserMedia({
-          audio: false,
-          video: {
-            facingMode: { ideal: "environment" },
-            width: { ideal: 1280 },
-            height: { ideal: 720 }
-          }
-        }),
-        CONFIG.cameraTimeoutMs,
-        "카메라 권한 응답 시간이 초과됐습니다."
-      );
-
-      video.srcObject = stream;
-      try { await video.play(); } catch (error) { console.warn("video.play()", error); }
-      await waitForLiveVideo(video, CONFIG.cameraTimeoutMs);
-      video.width = video.videoWidth;
-      video.height = video.videoHeight;
-      fixCameraLayers();
-    }
-
-    function stopCameraTracks() {
-      try {
-        state.arSystem?.stop?.();
-      } catch (error) {
-        console.warn("AR stop warning", error);
-      }
-      document.querySelectorAll("video").forEach((video) => {
-        const stream = video.srcObject;
-        if (stream?.getTracks) stream.getTracks().forEach((track) => track.stop());
-      });
-    }
-
-    function showToast(text) {
-      clearTimeout(state.toastTimer);
-      targetToast.textContent = text;
-      targetToast.classList.add("show");
-      state.toastTimer = setTimeout(() => targetToast.classList.remove("show"), 1200);
-    }
-
-    function showGestureHint() {
-      clearTimeout(state.hintTimer);
-      gestureHint.style.opacity = "1";
-      state.hintTimer = setTimeout(() => { gestureHint.style.opacity = "0"; }, 3200);
-    }
-
-    function setSlide(name, { reset = false } = {}) {
-      state.currentSlide = name === "original" ? "original" : "result";
-      slides.classList.toggle("show-original", state.currentSlide === "original");
-      slides.classList.toggle("show-result", state.currentSlide === "result");
-      tabOriginal.classList.toggle("active", state.currentSlide === "original");
-      tabResult.classList.toggle("active", state.currentSlide === "result");
-      if (reset) resetCurrentZoom();
-    }
-
-    function clearImage(img, errorBox) {
-      img.removeAttribute("src");
-      img.style.opacity = "0";
-      errorBox.hidden = true;
-      errorBox.textContent = "";
-    }
-
-    function loadViewerImage(img, errorBox, url, label) {
-      clearImage(img, errorBox);
-      img.onload = () => {
-        img.style.opacity = "1";
-        errorBox.hidden = true;
-      };
-      img.onerror = () => {
-        img.style.opacity = "0";
-        errorBox.textContent = `${label} 파일을 불러오지 못했습니다.\n${url}`;
-        errorBox.hidden = false;
-      };
-      // 브라우저 캐시를 그대로 활용. 인식된 작품의 2장만 네트워크에서 요청합니다.
-      img.src = url;
-    }
-
-    function openViewerForTarget(index) {
-      const item = state.manifest[index];
-      if (!item) return;
-
-      const now = performance.now();
-      if (state.activeIndex === index && now - state.lastSwitchAt < CONFIG.targetSwitchDebounceMs) return;
-      state.lastSwitchAt = now;
-      state.activeIndex = index;
-      state.activeId = item.id;
-
-      viewerTitle.textContent = item.title || `작품 #${item.id}`;
-      loadViewerImage(originalImg, originalError, item.target, "원본 이미지");
-      loadViewerImage(resultImg, resultError, item.result, "변환 이미지");
-
-      zoomControllers.original.reset(false);
-      zoomControllers.result.reset(false);
-      setSlide("result");
-
-      viewer.classList.add("open");
-      scanFrame.classList.add("detected");
-      setStatus(`#${item.id} 인식 · 다른 그림을 비추면 자동 전환됩니다`);
-      showToast(`#${item.id} 작품을 찾았습니다`);
-      showGestureHint();
-    }
-
-    function handleTargetFound(index) {
-      openViewerForTarget(index);
-    }
-
-    function handleTargetLost(index) {
-      if (index !== state.activeIndex) return;
-      // 일부러 뷰어를 닫지 않습니다. 관람객이 손을 움직이거나 확대해도 계속 볼 수 있습니다.
-      scanFrame.classList.remove("detected");
-      setStatus(`#${state.activeId ?? ""} 표시 중 · 다음 그림을 비춰 주세요`);
-    }
-
-    function closeViewer() {
-      viewer.classList.remove("open");
-      scanFrame.classList.remove("detected");
-      setStatus("그림을 프레임 안에 비춰 주세요");
-    }
-
-    function createZoomController(stage, image, key) {
-      const z = {
-        scale: 1,
-        x: 0,
-        y: 0,
-        pointers: new Map(),
-        gestureMode: "none",
-        startScale: 1,
-        startX: 0,
-        startY: 0,
-        startDistance: 1,
-        startCenterX: 0,
-        startCenterY: 0,
-        singleStartX: 0,
-        singleStartY: 0,
-        lastTapAt: 0
-      };
-
-      function limitPan() {
-        if (z.scale <= 1.001) {
-          z.x = 0;
-          z.y = 0;
-          return;
-        }
-        const rect = stage.getBoundingClientRect();
-        const maxX = rect.width * 0.50 * (z.scale - 1) + 70;
-        const maxY = rect.height * 0.50 * (z.scale - 1) + 70;
-        z.x = clamp(z.x, -maxX, maxX);
-        z.y = clamp(z.y, -maxY, maxY);
+      function createTargetAnchors() {
+        state.anchors.forEach((el) => el.remove());
+        state.anchors = state.items.map((item,index) => {
+          const entity = document.createElement("a-entity");
+          entity.setAttribute("mindar-image-target", `targetIndex: ${index}`);
+          entity.dataset.targetIndex = String(index);
+          entity.addEventListener("targetFound", () => openTarget(index));
+          entity.addEventListener("targetLost", () => onTargetLost(index));
+          sceneEl.appendChild(entity);
+          return entity;
+        });
       }
 
-      function render(animated = false) {
-        image.style.transition = animated ? "transform 180ms ease" : "none";
-        image.style.transform = `translate(calc(-50% + ${z.x}px), calc(-50% + ${z.y}px)) scale(${z.scale})`;
-        if (animated) setTimeout(() => { image.style.transition = "none"; }, 190);
+      function clearImage(img,errorBox,loader) {
+        img.onload = null; img.onerror = null; img.removeAttribute("src"); img.style.opacity="0";
+        errorBox.hidden = true; errorBox.textContent=""; loader.hidden = false;
       }
 
-      function reset(animated = true) {
-        z.scale = 1;
-        z.x = 0;
-        z.y = 0;
-        render(animated);
+      function loadImage(img,errorBox,loader,url,label) {
+        clearImage(img,errorBox,loader);
+        img.onload = () => { loader.hidden=true; errorBox.hidden=true; img.style.opacity="1"; };
+        img.onerror = () => {
+          loader.hidden=true; img.style.opacity="0"; errorBox.hidden=false;
+          errorBox.textContent = `${label}을 불러오지 못했습니다.\n파일명 확인: ${url}`;
+        };
+        img.src = url;
       }
 
-      function prepareGesture() {
-        const pts = [...z.pointers.values()];
-        if (pts.length >= 2) {
-          z.gestureMode = "pinch";
-          const a = pts[0];
-          const b = pts[1];
-          z.startScale = z.scale;
-          z.startX = z.x;
-          z.startY = z.y;
-          z.startDistance = Math.max(1, Math.hypot(b.x - a.x, b.y - a.y));
-          z.startCenterX = (a.x + b.x) / 2;
-          z.startCenterY = (a.y + b.y) / 2;
-        } else if (pts.length === 1) {
-          z.gestureMode = z.scale > 1.01 ? "pan" : "swipe";
-          z.startX = z.x;
-          z.startY = z.y;
-          z.singleStartX = pts[0].x;
-          z.singleStartY = pts[0].y;
-        } else {
-          z.gestureMode = "none";
-        }
+      function showToast(text) {
+        clearTimeout(state.toastTimer); targetToast.textContent=text; targetToast.classList.add("show");
+        state.toastTimer=setTimeout(() => targetToast.classList.remove("show"),1100);
       }
 
-      stage.addEventListener("pointerdown", (event) => {
-        event.preventDefault();
-        stage.setPointerCapture?.(event.pointerId);
-        z.pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+      function showHint() {
+        clearTimeout(state.hintTimer); gestureHint.style.opacity="1";
+        state.hintTimer=setTimeout(() => { gestureHint.style.opacity="0"; },3000);
+      }
 
+      function setSlide(name,{reset=false}={}) {
+        state.currentSlide = name === "marker" ? "marker" : "artwork";
+        slides.classList.toggle("show-marker",state.currentSlide === "marker");
+        tabArtwork.classList.toggle("active",state.currentSlide === "artwork");
+        tabMarker.classList.toggle("active",state.currentSlide === "marker");
+        if (reset) resetCurrentZoom();
+      }
+
+      function openTarget(index) {
+        const item = state.items[index];
+        if (!item) return;
         const now = performance.now();
-        if (z.pointers.size === 1 && now - z.lastTapAt < 290) {
-          reset(true);
-          z.lastTapAt = 0;
-        } else if (z.pointers.size === 1) {
-          z.lastTapAt = now;
-        }
-        prepareGesture();
-      });
+        if (state.activeIndex === index && now - state.lastSwitchAt < CONFIG.targetSwitchDebounceMs) return;
+        state.lastSwitchAt = now;
+        state.activeIndex = index;
 
-      stage.addEventListener("pointermove", (event) => {
-        if (!z.pointers.has(event.pointerId)) return;
-        event.preventDefault();
-        z.pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
-        const pts = [...z.pointers.values()];
+        viewerTitle.textContent = `${item.title} · #${item.id}`;
+        loadImage(artworkImg,artworkError,artworkLoader,item.artwork,"원본 그림");
+        loadImage(markerImg,markerError,markerLoader,item.marker,"벽화 캐릭터 이미지");
+        zoomControllers.artwork.reset(false);
+        zoomControllers.marker.reset(false);
+        setSlide("artwork");
 
-        if (z.gestureMode === "pinch" && pts.length >= 2) {
-          const a = pts[0];
-          const b = pts[1];
-          const distance = Math.max(1, Math.hypot(b.x - a.x, b.y - a.y));
-          const centerX = (a.x + b.x) / 2;
-          const centerY = (a.y + b.y) / 2;
-          z.scale = clamp(z.startScale * (distance / z.startDistance), CONFIG.minZoom, CONFIG.maxZoom);
-          z.x = z.startX + (centerX - z.startCenterX);
-          z.y = z.startY + (centerY - z.startCenterY);
-          limitPan();
-          render(false);
-          return;
-        }
-
-        if (z.gestureMode === "pan" && pts.length === 1) {
-          z.x = z.startX + (pts[0].x - z.singleStartX);
-          z.y = z.startY + (pts[0].y - z.singleStartY);
-          limitPan();
-          render(false);
-        }
-      });
-
-      const finishPointer = (event) => {
-        if (!z.pointers.has(event.pointerId)) return;
-        event.preventDefault();
-        const point = z.pointers.get(event.pointerId);
-        const wasSwipe = z.gestureMode === "swipe" && z.pointers.size === 1;
-        const dx = point.x - z.singleStartX;
-        const dy = point.y - z.singleStartY;
-        z.pointers.delete(event.pointerId);
-
-        if (wasSwipe && Math.abs(dx) > CONFIG.swipeThresholdPx && Math.abs(dx) > Math.abs(dy) * 1.15) {
-          if (dx < 0) setSlide("result");
-          else setSlide("original");
-        }
-        prepareGesture();
-      };
-
-      stage.addEventListener("pointerup", finishPointer);
-      stage.addEventListener("pointercancel", finishPointer);
-      stage.addEventListener("lostpointercapture", (event) => {
-        if (z.pointers.has(event.pointerId)) {
-          z.pointers.delete(event.pointerId);
-          prepareGesture();
-        }
-      });
-
-      stage.addEventListener("wheel", (event) => {
-        event.preventDefault();
-        const factor = event.deltaY < 0 ? 1.12 : 0.89;
-        z.scale = clamp(z.scale * factor, CONFIG.minZoom, CONFIG.maxZoom);
-        limitPan();
-        render(false);
-      }, { passive: false });
-
-      return { reset, getState: () => ({ ...z }), key };
-    }
-
-    const zoomControllers = {
-      original: createZoomController(originalStage, originalImg, "original"),
-      result: createZoomController(resultStage, resultImg, "result")
-    };
-
-    function resetCurrentZoom() {
-      zoomControllers[state.currentSlide]?.reset(true);
-    }
-
-    function waitForSceneLoaded(timeoutMs = 15000) {
-      return new Promise((resolve, reject) => {
-        if (!window.AFRAME) {
-          reject(new Error("A-Frame 라이브러리를 불러오지 못했습니다. 네트워크 연결을 확인해 주세요."));
-          return;
-        }
-        if (!sceneEl) {
-          reject(new Error("AR scene을 찾지 못했습니다."));
-          return;
-        }
-        if (sceneEl.hasLoaded) {
-          resolve();
-          return;
-        }
-        let timer = 0;
-        const done = () => {
-          clearTimeout(timer);
-          sceneEl.removeEventListener("loaded", done);
-          resolve();
-        };
-        sceneEl.addEventListener("loaded", done, { once: true });
-        timer = setTimeout(() => {
-          sceneEl.removeEventListener("loaded", done);
-          reject(new Error("AR 라이브러리 초기화 시간이 초과됐습니다."));
-        }, timeoutMs);
-      });
-    }
-
-    function createTargetEntities() {
-      state.anchors.forEach((el) => el.remove());
-      state.anchors = state.manifest.map((item, index) => {
-        const entity = document.createElement("a-entity");
-        entity.setAttribute("mindar-image-target", `targetIndex: ${index}`);
-        entity.dataset.targetIndex = String(index);
-        entity.addEventListener("targetFound", () => handleTargetFound(index));
-        entity.addEventListener("targetLost", () => handleTargetLost(index));
-        sceneEl.appendChild(entity);
-        return entity;
-      });
-    }
-
-    async function checkTargetMindExists() {
-      // GitHub Pages에서 파일명/경로 실수를 시작 전에 잡아냅니다.
-      const response = await fetch(`${CONFIG.targetUrl}?v=20260907b`, { cache: "no-store" });
-      if (!response.ok) throw new Error(`targets.mind를 찾지 못했습니다. HTTP ${response.status}`);
-      const data = await response.arrayBuffer();
-      if (data.byteLength < 32) throw new Error("targets.mind 파일이 비어 있거나 올바르지 않습니다.");
-      return data.byteLength;
-    }
-
-    async function initialize() {
-      try {
-        if (!window.isSecureContext && location.hostname !== "localhost" && location.hostname !== "127.0.0.1") {
-          throw new Error("휴대폰 카메라는 HTTPS 주소에서만 실행할 수 있습니다.");
-        }
-
-        setDebug("");
-        setBoot("AR 라이브러리를 확인하고 있습니다…");
-        await waitForSceneLoaded();
-
-        const arSystem = sceneEl.systems?.["mindar-image-system"];
-        if (!arSystem) {
-          throw new Error("MindAR 이미지 인식 모듈을 시작하지 못했습니다. 페이지를 새로고침해 주세요.");
-        }
-        state.arSystem = arSystem;
-        state.sceneReady = true;
-
-        setBoot("작품 목록을 확인하고 있습니다…");
-        state.manifest = await loadManifest();
-
-        setBoot(`${state.manifest.length}개 작품 정보 확인 · targets.mind 확인 중…`);
-        const mindBytes = await checkTargetMindExists();
-        console.info("targets.mind bytes:", mindBytes);
-
-        createTargetEntities();
-
-        state.ready = true;
-        startButton.disabled = false;
-        startButton.textContent = "카메라 시작";
-        setBoot(`${state.manifest.length}개 작품 준비 완료 · 버튼을 눌러 주세요`);
-      } catch (error) {
-        console.error("Initialize failed", error);
-        state.ready = false;
-        startButton.disabled = true;
-        startButton.textContent = "시작할 수 없음";
-        setBoot("AR 파일을 준비하지 못했습니다.");
-        setDebug(describeError(error));
+        viewer.classList.add("open");
+        document.body.classList.add("viewer-open");
+        setStatus(`#${item.id} 인식 · 위쪽 카메라로 다른 캐릭터를 계속 찾을 수 있어요`);
+        showToast(`#${item.id} 원본 그림을 찾았습니다`);
+        showHint();
       }
-    }
 
-    async function startAR() {
-      if (!state.ready || state.started || state.starting || !state.arSystem) return;
+      function onTargetLost(index) {
+        if (index !== state.activeIndex) return;
+        const item = state.items[index];
+        setStatus(`#${item?.id ?? ""} 표시 중 · 다른 캐릭터를 비춰 주세요`);
+      }
 
-      state.starting = true;
-      startButton.disabled = true;
-      startButton.textContent = "카메라 여는 중…";
-      setBoot("카메라 권한을 요청하고 있습니다…");
-      setDebug("");
+      function closeViewer() {
+        viewer.classList.remove("open","expanded");
+        document.body.classList.remove("viewer-open");
+        expandViewerButton.textContent="↗";
+        setStatus("벽화의 캐릭터를 비춰 주세요");
+      }
 
-      let readyTimer = 0;
-      try {
-        const readyPromise = new Promise((resolve, reject) => {
-          const onReady = () => {
-            cleanup();
-            resolve();
-          };
-          const onError = (event) => {
-            cleanup();
-            const detail = event?.detail?.error || event?.detail || "카메라 또는 AR 엔진 오류";
-            reject(detail instanceof Error ? detail : new Error(String(detail)));
-          };
-          const cleanup = () => {
-            clearTimeout(readyTimer);
-            sceneEl.removeEventListener("arReady", onReady);
-            sceneEl.removeEventListener("arError", onError);
-          };
-          sceneEl.addEventListener("arReady", onReady, { once: true });
-          sceneEl.addEventListener("arError", onError, { once: true });
-          readyTimer = setTimeout(() => {
-            cleanup();
-            const error = new Error("카메라 또는 이미지 인식 엔진 준비 시간이 초과됐습니다.");
-            error.name = "TimeoutError";
-            reject(error);
-          }, CONFIG.arTimeoutMs);
+      function toggleExpand() {
+        const expanded = viewer.classList.toggle("expanded");
+        expandViewerButton.textContent = expanded ? "↙" : "↗";
+        setTimeout(() => {
+          zoomControllers.artwork.limitAndRender();
+          zoomControllers.marker.limitAndRender();
+        },270);
+      }
+
+      function createZoomController(stage,image,key) {
+        const z = { scale:1,x:0,y:0,pointers:new Map(),mode:"none",startScale:1,startX:0,startY:0,startDistance:1,startCenterX:0,startCenterY:0,singleStartX:0,singleStartY:0,lastTapAt:0 };
+
+        function limitPan() {
+          if (z.scale <= 1.001) { z.x=0; z.y=0; return; }
+          const rect=stage.getBoundingClientRect();
+          const maxX=rect.width*.55*(z.scale-1)+60;
+          const maxY=rect.height*.55*(z.scale-1)+60;
+          z.x=clamp(z.x,-maxX,maxX); z.y=clamp(z.y,-maxY,maxY);
+        }
+        function render(animated=false) {
+          image.style.transition=animated?"transform .18s ease":"none";
+          image.style.transform=`translate(calc(-50% + ${z.x}px), calc(-50% + ${z.y}px)) scale(${z.scale})`;
+          if (animated) setTimeout(() => { image.style.transition="none"; },190);
+        }
+        function reset(animated=true) { z.scale=1; z.x=0; z.y=0; render(animated); }
+        function prepare() {
+          const pts=[...z.pointers.values()];
+          if (pts.length>=2) {
+            z.mode="pinch"; const a=pts[0],b=pts[1];
+            z.startScale=z.scale; z.startX=z.x; z.startY=z.y;
+            z.startDistance=Math.max(1,Math.hypot(b.x-a.x,b.y-a.y));
+            z.startCenterX=(a.x+b.x)/2; z.startCenterY=(a.y+b.y)/2;
+          } else if (pts.length===1) {
+            z.mode=z.scale>1.01?"pan":"swipe"; z.startX=z.x; z.startY=z.y;
+            z.singleStartX=pts[0].x; z.singleStartY=pts[0].y;
+          } else z.mode="none";
+        }
+
+        stage.addEventListener("pointerdown",(e) => {
+          e.preventDefault(); stage.setPointerCapture?.(e.pointerId); z.pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
+          const now=performance.now();
+          if (z.pointers.size===1 && now-z.lastTapAt<290) { reset(true); z.lastTapAt=0; }
+          else if (z.pointers.size===1) z.lastTapAt=now;
+          prepare();
         });
 
-        // 반드시 사용자 버튼 클릭 안에서 실행 -> 모바일 카메라 권한 창이 정상적으로 뜹니다.
-        const maybePromise = state.arSystem.start();
-        if (maybePromise?.catch) maybePromise.catch((error) => console.warn("MindAR start promise", error));
-        await readyPromise;
+        stage.addEventListener("pointermove",(e) => {
+          if (!z.pointers.has(e.pointerId)) return; e.preventDefault(); z.pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
+          const pts=[...z.pointers.values()];
+          if (z.mode==="pinch" && pts.length>=2) {
+            const a=pts[0],b=pts[1]; const dist=Math.max(1,Math.hypot(b.x-a.x,b.y-a.y));
+            const cx=(a.x+b.x)/2, cy=(a.y+b.y)/2;
+            z.scale=clamp(z.startScale*(dist/z.startDistance),CONFIG.minZoom,CONFIG.maxZoom);
+            z.x=z.startX+(cx-z.startCenterX); z.y=z.startY+(cy-z.startCenterY); limitPan(); render();
+          } else if (z.mode==="pan" && pts.length===1) {
+            z.x=z.startX+(pts[0].x-z.singleStartX); z.y=z.startY+(pts[0].y-z.singleStartY); limitPan(); render();
+          }
+        });
 
-        state.started = true;
-        state.starting = false;
-        startScreen.hidden = true;
-        hud.hidden = false;
-        setStatus("그림을 프레임 안에 비춰 주세요");
-        fixCameraLayers();
-        setTimeout(fixCameraLayers, 100);
-        setTimeout(fixCameraLayers, 600);
-      } catch (error) {
-        clearTimeout(readyTimer);
-        console.error("AR start failed", error);
-        state.starting = false;
-        state.started = false;
-        stopCameraTracks();
-        startScreen.hidden = false;
-        startButton.disabled = false;
-        startButton.textContent = "다시 시작";
+        const finish=(e) => {
+          if (!z.pointers.has(e.pointerId)) return; e.preventDefault();
+          const p=z.pointers.get(e.pointerId); const wasSwipe=z.mode==="swipe"&&z.pointers.size===1;
+          const dx=p.x-z.singleStartX, dy=p.y-z.singleStartY; z.pointers.delete(e.pointerId);
+          if (wasSwipe && Math.abs(dx)>CONFIG.swipeThresholdPx && Math.abs(dx)>Math.abs(dy)*1.15) {
+            if (dx<0) setSlide("marker"); else setSlide("artwork");
+          }
+          prepare();
+        };
+        stage.addEventListener("pointerup",finish); stage.addEventListener("pointercancel",finish);
+        stage.addEventListener("lostpointercapture",(e)=>{ if(z.pointers.has(e.pointerId)){ z.pointers.delete(e.pointerId); prepare(); } });
+        stage.addEventListener("wheel",(e)=>{ e.preventDefault(); z.scale=clamp(z.scale*(e.deltaY<0?1.12:.89),CONFIG.minZoom,CONFIG.maxZoom); limitPan(); render(); },{passive:false});
 
-        if (error?.name === "NotAllowedError") setBoot("카메라 권한이 차단되었습니다. 브라우저 설정에서 카메라를 허용해 주세요.");
-        else if (error?.name === "NotFoundError") setBoot("사용할 수 있는 카메라를 찾지 못했습니다.");
-        else if (error?.name === "NotReadableError") setBoot("다른 앱이 카메라를 사용 중이거나 카메라를 열 수 없습니다.");
-        else if (error?.name === "TimeoutError") setBoot("카메라 또는 이미지 인식 엔진 준비 시간이 초과됐습니다.");
-        else setBoot("AR 시작 중 오류가 발생했습니다.");
-        setDebug(describeError(error));
+        return { reset, limitAndRender:() => { limitPan(); render(false); }, key };
       }
-    }
 
-    startButton.addEventListener("click", startAR);
-    closeViewerButton.addEventListener("click", closeViewer);
-    tabOriginal.addEventListener("click", () => setSlide("original"));
-    tabResult.addEventListener("click", () => setSlide("result"));
-    resetZoomButton.addEventListener("click", resetCurrentZoom);
+      const zoomControllers = {
+        artwork:createZoomController(artworkStage,artworkImg,"artwork"),
+        marker:createZoomController(markerStage,markerImg,"marker")
+      };
+      function resetCurrentZoom() { zoomControllers[state.currentSlide]?.reset(true); }
 
-    window.addEventListener("resize", () => requestAnimationFrame(fixCameraLayers));
-    window.addEventListener("pagehide", stopCameraTracks);
-    window.addEventListener("unhandledrejection", (event) => {
-      console.error("Unhandled rejection", event.reason);
-      setDebug(describeError(event.reason));
-    });
-
-    window.addEventListener("error", (event) => {
-      if (!state.ready && !state.started) {
-        const message = event?.message || "스크립트 로딩 오류";
-        setDebug(message);
+      async function initialize() {
+        try {
+          if (!window.isSecureContext && !["localhost","127.0.0.1"].includes(location.hostname)) {
+            throw new Error("휴대폰 카메라는 HTTPS 주소에서만 실행할 수 있습니다.");
+          }
+          setDebug(""); setBoot("AR 라이브러리를 확인하고 있습니다…");
+          state.arSystem = await waitForARSystem();
+          setBoot("작품 연결 정보를 확인하고 있습니다…");
+          state.items = await fetchManifest();
+          setBoot(`${state.items.length}개 작품 확인 · targets.mind를 확인하고 있습니다…`);
+          await checkTargetsMind();
+          createTargetAnchors();
+          state.ready=true; startButton.disabled=false; startButton.textContent="카메라 시작";
+          setBoot(`${state.items.length}개 작품 준비 완료`);
+        } catch (error) {
+          console.error("initialize",error); state.ready=false; startButton.disabled=true; startButton.textContent="시작할 수 없음";
+          setBoot("AR을 준비하지 못했습니다."); setDebug(describeError(error));
+        }
       }
-    });
 
-    // 외부 라이브러리가 실패해도 화면이 영원히 "준비 중"에 멈추지 않도록 안전장치.
-    setTimeout(() => {
-      if (!state.ready && startButton.textContent === "준비 중…") {
-        setBoot("초기화가 지연되고 있습니다.");
-        setDebug("페이지를 새로고침해도 같으면 A-Frame/MindAR 라이브러리 또는 targets.mind 경로를 확인해 주세요.");
+      function waitForARReady() {
+        return new Promise((resolve,reject) => {
+          let timer=0;
+          const cleanup=()=>{ clearTimeout(timer); sceneEl.removeEventListener("arReady",onReady); sceneEl.removeEventListener("arError",onError); };
+          const onReady=()=>{ cleanup(); resolve(); };
+          const onError=(e)=>{ cleanup(); const detail=e?.detail?.error||e?.detail||"카메라 또는 AR 엔진 오류"; reject(detail instanceof Error?detail:new Error(String(detail))); };
+          sceneEl.addEventListener("arReady",onReady,{once:true});
+          sceneEl.addEventListener("arError",onError,{once:true});
+          timer=setTimeout(()=>{ cleanup(); const err=new Error("카메라 또는 이미지 인식 엔진 준비 시간이 초과됐습니다."); err.name="TimeoutError"; reject(err); },CONFIG.arTimeoutMs);
+        });
       }
-    }, 12000);
 
-    initialize();
+      async function startAR() {
+        if (!state.ready || state.started || state.starting || !state.arSystem) return;
+        state.starting=true; startButton.disabled=true; startButton.textContent="카메라 여는 중…"; setBoot("카메라 권한을 요청하고 있습니다…"); setDebug("");
+        try {
+          const readyPromise=waitForARReady();
+          state.arSystem.start();
+          await readyPromise;
+          state.started=true; state.starting=false; startScreen.hidden=true; hud.hidden=false;
+          setStatus("벽화의 캐릭터를 비춰 주세요");
+          fixCameraLayers(); setTimeout(fixCameraLayers,100); setTimeout(fixCameraLayers,600);
+        } catch (error) {
+          console.error("startAR",error); state.starting=false; state.started=false;
+          try { state.arSystem.stop(); } catch(_) {}
+          startButton.disabled=false; startButton.textContent="다시 시작";
+          if (error?.name==="NotAllowedError") setBoot("카메라 권한이 차단되었습니다. Chrome 사이트 설정에서 카메라를 허용해 주세요.");
+          else if (error?.name==="NotFoundError") setBoot("사용 가능한 카메라를 찾지 못했습니다.");
+          else if (error?.name==="NotReadableError") setBoot("다른 앱이 카메라를 사용 중이거나 카메라를 열 수 없습니다.");
+          else if (error?.name==="TimeoutError") setBoot("카메라/AR 엔진 준비 시간이 초과됐습니다.");
+          else setBoot("카메라 시작 중 오류가 발생했습니다.");
+          setDebug(describeError(error));
+        }
+      }
+
+      startButton.addEventListener("click",startAR);
+      closeViewerButton.addEventListener("click",closeViewer);
+      expandViewerButton.addEventListener("click",toggleExpand);
+      tabArtwork.addEventListener("click",()=>setSlide("artwork"));
+      tabMarker.addEventListener("click",()=>setSlide("marker"));
+      resetZoomButton.addEventListener("click",resetCurrentZoom);
+      window.addEventListener("resize",()=>requestAnimationFrame(fixCameraLayers));
+      window.addEventListener("pagehide",()=>{ try{state.arSystem?.stop();}catch(_){} });
+      window.addEventListener("error",(e)=>{ if(!state.ready&&!state.started) setDebug(e.message||"스크립트 오류"); });
+      window.addEventListener("unhandledrejection",(e)=>{ console.error(e.reason); if(!state.started) setDebug(describeError(e.reason)); });
+
+      initialize();
+    })();
   </script>
 </body>
 </html>
