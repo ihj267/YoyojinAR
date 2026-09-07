@@ -6,14 +6,13 @@
     name="viewport"
     content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
   />
-  <meta name="theme-color" content="#000000" />
-  <title>이미지 AR · TOUCH PHOTO V11</title>
+  <meta name="theme-color" content="#080808" />
+  <title>YOYOJIN AR · Image Compare</title>
 
   <script type="importmap">
   {
     "imports": {
       "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
-      "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/",
       "mindar-image-three": "https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-three.prod.js"
     }
   }
@@ -22,16 +21,14 @@
   <style>
     :root {
       color-scheme: dark;
-      font-family: Arial, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+      font-family: Inter, Arial, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+      --safe-top: max(14px, env(safe-area-inset-top));
+      --safe-bottom: max(14px, env(safe-area-inset-bottom));
     }
 
-    * {
-      box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
-    }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
-    html,
-    body {
+    html, body {
       width: 100%;
       height: 100%;
       margin: 0;
@@ -40,21 +37,14 @@
       overscroll-behavior: none;
     }
 
-    button {
-      font: inherit;
-    }
+    button { font: inherit; }
 
     #ar-container {
       position: fixed;
       inset: 0;
-      width: 100%;
-      height: 100%;
       overflow: hidden;
+      background: #000;
       isolation: isolate;
-      background: transparent;
-      touch-action: none;
-      user-select: none;
-      -webkit-user-select: none;
     }
 
     #ar-container > video {
@@ -65,363 +55,410 @@
       visibility: visible !important;
       opacity: 1 !important;
       object-fit: cover !important;
-      background: transparent !important;
+      background: #000 !important;
     }
 
     #ar-container > canvas {
       position: absolute !important;
       z-index: 1 !important;
-      background: transparent !important;
       pointer-events: none !important;
+      background: transparent !important;
     }
 
-    .panel {
-      position: fixed;
-      z-index: 20;
+    [hidden] { display: none !important; }
+
+    .glass {
       color: #fff;
       background: rgba(12, 12, 12, 0.72);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.24);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.16);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.30);
+      backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
     }
 
+    /* ---------- START ---------- */
     #start-screen {
       position: fixed;
       inset: 0;
-      z-index: 30;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 14px;
+      z-index: 100;
+      display: grid;
+      place-items: center;
       padding: 28px;
+      background:
+        radial-gradient(circle at 50% 35%, rgba(255,255,255,0.08), transparent 38%),
+        #080808;
       color: #fff;
+    }
+
+    #start-card {
+      width: min(100%, 460px);
       text-align: center;
-      background: #0b0b0b;
     }
 
-    #start-screen[hidden],
-    #status[hidden],
-    #toolbar[hidden],
-    #rotation-pad[hidden],
-    #photo-preview[hidden] {
-      display: none !important;
-    }
-
-    #version-badge {
-      display: inline-flex;
-      align-items: center;
-      min-height: 30px;
-      padding: 5px 11px;
-      border: 1px solid rgba(255,255,255,0.28);
-      border-radius: 999px;
-      color: #fff;
-      background: rgba(255,255,255,0.1);
+    #brand {
+      margin-bottom: 16px;
       font-size: 12px;
       font-weight: 800;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.18em;
+      opacity: 0.72;
     }
 
-    #start-screen h1 {
-      margin: 0;
-      font-size: 22px;
+    #start-card h1 {
+      margin: 0 0 10px;
+      font-size: clamp(26px, 7vw, 38px);
+      line-height: 1.08;
     }
 
-    #start-screen p {
-      max-width: 420px;
-      margin: 0;
-      color: rgba(255, 255, 255, 0.72);
+    #start-card p {
+      margin: 0 auto 22px;
+      max-width: 390px;
+      color: rgba(255,255,255,0.70);
       font-size: 14px;
-      line-height: 1.55;
+      line-height: 1.65;
     }
 
     #start-button {
-      min-width: 190px;
-      min-height: 50px;
-      margin-top: 8px;
-      padding: 0 22px;
+      width: min(100%, 300px);
+      min-height: 54px;
       border: 0;
       border-radius: 999px;
-      color: #000;
       background: #fff;
+      color: #000;
       font-size: 16px;
-      font-weight: 700;
+      font-weight: 850;
       cursor: pointer;
     }
 
-    #start-button:disabled {
-      opacity: 0.48;
-      cursor: default;
-    }
+    #start-button:disabled { opacity: 0.4; cursor: default; }
 
     #boot-status {
       min-height: 20px;
-      max-width: 420px;
-      color: rgba(255, 255, 255, 0.78);
-      font-size: 13px;
-      line-height: 1.5;
+      margin-top: 14px;
+      color: rgba(255,255,255,0.72);
+      font-size: 12px;
+      line-height: 1.45;
     }
 
     #debug-detail {
-      min-height: 18px;
-      max-width: 420px;
-      color: rgba(255, 170, 170, 0.9);
+      margin-top: 6px;
+      color: #ffabab;
       font-size: 11px;
       line-height: 1.4;
       word-break: break-word;
     }
 
-    #status {
+    /* ---------- CAMERA HUD ---------- */
+    #hud {
+      position: fixed;
+      inset: 0;
+      z-index: 10;
+      pointer-events: none;
+    }
+
+    #status-pill {
+      position: absolute;
       left: 50%;
-      top: max(18px, env(safe-area-inset-top));
+      top: var(--safe-top);
       transform: translateX(-50%);
-      max-width: calc(100vw - 32px);
+      width: max-content;
+      max-width: calc(100vw - 28px);
       padding: 9px 14px;
       border-radius: 999px;
-      font-size: 13px;
-      line-height: 1.3;
+      color: #fff;
+      background: rgba(0,0,0,0.58);
+      border: 1px solid rgba(255,255,255,0.16);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      font-size: 12px;
+      font-weight: 700;
       text-align: center;
       white-space: normal;
-      pointer-events: none;
-      transition: opacity 160ms ease;
     }
 
-    #toolbar {
+    #scan-frame {
+      position: absolute;
       left: 50%;
-      bottom: max(14px, env(safe-area-inset-bottom));
-      transform: translateX(-50%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 8px;
-      border-radius: 999px;
+      top: 42%;
+      width: min(66vw, 330px);
+      aspect-ratio: 1 / 1;
+      transform: translate(-50%, -50%);
+      opacity: 0.80;
+      transition: opacity 180ms ease, transform 180ms ease;
     }
 
-    #capture-button {
-      position: relative;
-      width: 64px;
-      height: 64px;
+    #scan-frame.detected {
+      opacity: 0.24;
+      transform: translate(-50%, -50%) scale(1.03);
+    }
+
+    .corner {
+      position: absolute;
+      width: 34px;
+      height: 34px;
+      border-color: rgba(255,255,255,0.94);
+      border-style: solid;
+    }
+    .corner.tl { left:0; top:0; border-width:3px 0 0 3px; border-radius:12px 0 0 0; }
+    .corner.tr { right:0; top:0; border-width:3px 3px 0 0; border-radius:0 12px 0 0; }
+    .corner.bl { left:0; bottom:0; border-width:0 0 3px 3px; border-radius:0 0 0 12px; }
+    .corner.br { right:0; bottom:0; border-width:0 3px 3px 0; border-radius:0 0 12px 0; }
+
+    #scan-caption {
+      position: absolute;
+      left: 50%;
+      bottom: calc(var(--safe-bottom) + 6px);
+      transform: translateX(-50%);
+      width: max-content;
+      max-width: calc(100vw - 32px);
+      padding: 9px 13px;
+      border-radius: 999px;
+      background: rgba(0,0,0,0.45);
+      color: rgba(255,255,255,0.88);
+      font-size: 12px;
+      text-align: center;
+    }
+
+    /* ---------- VIEWER ---------- */
+    #viewer {
+      position: fixed;
+      left: 10px;
+      right: 10px;
+      bottom: calc(8px + env(safe-area-inset-bottom));
+      z-index: 50;
+      height: min(76dvh, 760px);
+      min-height: 430px;
+      overflow: hidden;
+      border-radius: 26px;
+      transform: translateY(calc(100% + 40px));
+      opacity: 0;
+      pointer-events: none;
+      transition: transform 300ms cubic-bezier(.2,.75,.2,1), opacity 220ms ease;
+    }
+
+    #viewer.open {
+      transform: translateY(0);
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    #viewer-header {
+      height: 68px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px 10px 17px;
+      border-bottom: 1px solid rgba(255,255,255,0.10);
+    }
+
+    #viewer-kicker {
+      margin-bottom: 2px;
+      color: rgba(255,255,255,0.52);
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.16em;
+    }
+
+    #viewer-title {
+      overflow: hidden;
+      color: #fff;
+      font-size: 16px;
+      font-weight: 850;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    #close-viewer {
+      width: 42px;
+      height: 42px;
       padding: 0;
-      justify-self: center;
-      border: 3px solid #fff;
+      border: 1px solid rgba(255,255,255,0.13);
       border-radius: 50%;
-      background: rgba(0, 0, 0, 0.25);
-      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
+      background: rgba(255,255,255,0.08);
+      color: #fff;
+      font-size: 24px;
+      line-height: 1;
       cursor: pointer;
     }
 
-    #capture-button::after {
-      content: "";
+    #viewer-main {
+      position: relative;
+      height: calc(100% - 68px - 76px);
+      overflow: hidden;
+      background: rgba(0,0,0,0.66);
+    }
+
+    #slides {
       position: absolute;
-      inset: 6px;
-      border-radius: 50%;
-      background: #fff;
-      transition: transform 100ms ease;
+      inset: 0;
+      display: flex;
+      width: 200%;
+      height: 100%;
+      transform: translateX(-50%);
+      transition: transform 260ms cubic-bezier(.2,.8,.2,1);
+      will-change: transform;
     }
 
-    #capture-button:active::after {
-      transform: scale(0.86);
-    }
+    #slides.show-original { transform: translateX(0); }
+    #slides.show-result { transform: translateX(-50%); }
 
-    #capture-button:disabled {
-      opacity: 0.48;
-      cursor: default;
-    }
-
-    #rotation-pad {
-      right: max(16px, env(safe-area-inset-right));
-      bottom: max(108px, calc(env(safe-area-inset-bottom) + 96px));
-      width: 152px;
-      height: 152px;
-      border-radius: 28px;
-      touch-action: none;
-      user-select: none;
-      -webkit-user-select: none;
+    .slide {
+      position: relative;
+      width: 50%;
+      height: 100%;
+      flex: 0 0 50%;
       overflow: hidden;
     }
 
-    #rotation-pad.active {
-      background: rgba(18, 18, 18, 0.84);
-      border-color: rgba(255, 255, 255, 0.24);
-    }
-
-    #rotation-pad-z-ring,
-    #rotation-pad-ring,
-    #rotation-pad-cross {
+    .slide-label {
       position: absolute;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%);
-      pointer-events: none;
-    }
-
-    #rotation-pad-z-ring {
-      width: 138px;
-      height: 138px;
-      border: 2px dashed rgba(255, 255, 255, 0.34);
-      border-radius: 50%;
-    }
-
-    #rotation-pad.z-active #rotation-pad-z-ring {
-      border-style: solid;
-      border-color: rgba(255, 255, 255, 0.92);
-    }
-
-    #rotation-pad-ring {
-      width: 108px;
-      height: 108px;
-      border: 1px solid rgba(255, 255, 255, 0.38);
-      border-radius: 50%;
-      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.06);
-    }
-
-    #rotation-pad-cross {
-      width: 90px;
-      height: 90px;
-    }
-
-    #rotation-pad-cross::before,
-    #rotation-pad-cross::after {
-      content: "";
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      background: rgba(255,255,255,0.18);
-      transform: translate(-50%, -50%);
-    }
-
-    #rotation-pad-cross::before {
-      width: 1px;
-      height: 90px;
-    }
-
-    #rotation-pad-cross::after {
-      width: 90px;
-      height: 1px;
-    }
-
-    .rotation-arrow {
-      position: absolute;
-      color: rgba(255,255,255,0.88);
-      font-size: 13px;
-      font-weight: 800;
-      line-height: 1;
-      pointer-events: none;
-      text-shadow: 0 1px 3px rgba(0,0,0,0.4);
-    }
-
-    .rotation-arrow.up { left: 50%; top: 14px; transform: translateX(-50%); }
-    .rotation-arrow.down { left: 50%; bottom: 14px; transform: translateX(-50%); }
-    .rotation-arrow.left { left: 14px; top: 50%; transform: translateY(-50%); }
-    .rotation-arrow.right { right: 14px; top: 50%; transform: translateY(-50%); }
-    .rotation-arrow.up-left { left: 23px; top: 23px; }
-    .rotation-arrow.up-right { right: 23px; top: 23px; }
-    .rotation-arrow.down-left { left: 23px; bottom: 23px; }
-    .rotation-arrow.down-right { right: 23px; bottom: 23px; }
-
-    #rotation-pad-handle {
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      width: 34px;
-      height: 34px;
-      border-radius: 50%;
-      border: 1px solid rgba(255,255,255,0.8);
-      background: rgba(255,255,255,0.18);
-      box-shadow: 0 4px 16px rgba(0,0,0,0.28);
-      transform: translate(-50%, -50%);
-      pointer-events: none;
-      transition: transform 80ms ease;
-    }
-
-    #rotation-pad-axis-label {
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%);
-      font-size: 10px;
-      font-weight: 800;
-      color: rgba(255,255,255,0.64);
-      pointer-events: none;
-    }
-
-    #rotation-pad-z-label {
-      position: absolute;
-      right: 9px;
-      top: 9px;
-      padding: 3px 5px;
+      left: 12px;
+      top: 12px;
+      z-index: 5;
+      padding: 7px 10px;
       border-radius: 999px;
-      font-size: 9px;
+      color: #fff;
+      background: rgba(0,0,0,0.48);
+      border: 1px solid rgba(255,255,255,0.12);
+      font-size: 11px;
       font-weight: 800;
-      color: rgba(255,255,255,0.82);
-      background: rgba(0,0,0,0.28);
       pointer-events: none;
     }
 
-    #rotation-pad.z-active #rotation-pad-z-label {
-      color: #000;
-      background: #fff;
+    .image-stage {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      touch-action: none;
+      user-select: none;
+      -webkit-user-select: none;
+      cursor: grab;
     }
 
-    #rotation-pad-note {
+    .image-stage:active { cursor: grabbing; }
+
+    .zoom-image {
       position: absolute;
       left: 50%;
-      bottom: 6px;
-      transform: translateX(-50%);
-      font-size: 10px;
-      font-weight: 700;
-      color: rgba(255,255,255,0.72);
-      letter-spacing: 0.04em;
-      pointer-events: none;
-    }
-
-    #photo-preview {
-      position: fixed;
-      inset: 0;
-      z-index: 50;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 14px;
-      padding: max(18px, env(safe-area-inset-top)) 18px max(18px, env(safe-area-inset-bottom));
-      background: rgba(0, 0, 0, 0.94);
-    }
-
-    #photo-preview img {
+      top: 50%;
       display: block;
-      max-width: 100%;
-      max-height: calc(100vh - 120px);
-      border-radius: 14px;
+      max-width: 92%;
+      max-height: 92%;
+      width: auto;
+      height: auto;
       object-fit: contain;
-      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.42);
+      transform: translate(-50%, -50%);
+      transform-origin: center center;
+      will-change: transform;
+      pointer-events: none;
+      -webkit-user-drag: none;
+      filter: drop-shadow(0 12px 28px rgba(0,0,0,0.30));
     }
 
-    #preview-actions {
-      display: flex;
-      gap: 10px;
-      width: min(100%, 420px);
+    .image-error {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: min(84%, 360px);
+      transform: translate(-50%, -50%);
+      color: rgba(255,255,255,0.70);
+      font-size: 13px;
+      line-height: 1.55;
+      text-align: center;
     }
 
-    #preview-actions button {
-      flex: 1;
-      min-height: 46px;
-      border-radius: 14px;
-      font-weight: 700;
+    #viewer-footer {
+      height: 76px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 12px;
+      padding: 11px 13px 12px;
+      border-top: 1px solid rgba(255,255,255,0.10);
+    }
+
+    #tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4px;
+      min-width: 0;
+      padding: 4px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.07);
+    }
+
+    .tab {
+      min-width: 0;
+      height: 38px;
+      padding: 0 14px;
+      border: 0;
+      border-radius: 999px;
+      background: transparent;
+      color: rgba(255,255,255,0.64);
+      font-size: 12px;
+      font-weight: 850;
       cursor: pointer;
     }
 
-    #save-photo-button {
-      border: 0;
-      color: #000;
-      background: #fff;
+    .tab.active { background: #fff; color: #000; }
+
+    #reset-zoom {
+      height: 42px;
+      padding: 0 14px;
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 999px;
+      background: rgba(255,255,255,0.07);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
     }
 
-    #close-preview-button {
-      border: 1px solid rgba(255, 255, 255, 0.24);
-      color: #fff;
-      background: rgba(255, 255, 255, 0.08);
+    #gesture-hint {
+      position: absolute;
+      left: 50%;
+      bottom: 10px;
+      z-index: 7;
+      transform: translateX(-50%);
+      padding: 6px 9px;
+      border-radius: 999px;
+      background: rgba(0,0,0,0.42);
+      color: rgba(255,255,255,0.72);
+      font-size: 10px;
+      white-space: nowrap;
+      pointer-events: none;
+      transition: opacity 300ms ease;
+    }
+
+    #target-toast {
+      position: fixed;
+      left: 50%;
+      top: calc(var(--safe-top) + 48px);
+      z-index: 70;
+      transform: translate(-50%, -12px);
+      padding: 9px 13px;
+      border-radius: 999px;
+      color: #000;
+      background: #fff;
+      font-size: 12px;
+      font-weight: 850;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 160ms ease, transform 160ms ease;
+    }
+
+    #target-toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+    @media (min-width: 760px) {
+      #viewer {
+        left: 50%;
+        right: auto;
+        width: min(760px, calc(100vw - 36px));
+        transform: translate(-50%, calc(100% + 40px));
+      }
+      #viewer.open { transform: translate(-50%, 0); }
+      #viewer-main { height: calc(100% - 68px - 80px); }
+      #viewer-footer { height: 80px; }
     }
   </style>
 </head>
@@ -430,215 +467,218 @@
   <div id="ar-container" aria-label="AR camera view"></div>
 
   <section id="start-screen">
-    <div id="version-badge">TOUCH · PHOTO · V11</div>
-    <h1>이미지 AR</h1>
-    <p>
-      한 손가락 이동 · 두 손가락 확대/축소 · 오른쪽 XYZ 회전 패드, 타깃 이탈 후 5초 유지, AR 사진 촬영 버전입니다.
-      카메라 권한 창이 뜨면 허용해 주세요.
-    </p>
-    <button id="start-button" type="button" disabled>준비 중…</button>
-    <div id="boot-status">파일을 확인하는 중입니다…</div>
-    <div id="debug-detail"></div>
+    <div id="start-card">
+      <div id="brand">YOYOJIN · ULSAN 2026</div>
+      <h1>그림을 비춰 보세요</h1>
+      <p>
+        작품을 인식하면 연결된 이미지를 보여줍니다.<br>
+        좌우 전환 · 두 손가락 확대/축소 · 확대 후 한 손가락 이동
+      </p>
+      <button id="start-button" type="button" disabled>준비 중…</button>
+      <div id="boot-status">타깃 정보를 확인하고 있습니다…</div>
+      <div id="debug-detail"></div>
+    </div>
   </section>
 
-  <div id="status" class="panel" hidden>인식 이미지를 비춰 주세요.</div>
-
-  <aside id="rotation-pad" class="panel" aria-label="XYZ 회전 컨트롤" hidden>
-    <div id="rotation-pad-z-ring"></div>
-    <div id="rotation-pad-ring"></div>
-    <div id="rotation-pad-cross"></div>
-    <div class="rotation-arrow up">▲</div>
-    <div class="rotation-arrow down">▼</div>
-    <div class="rotation-arrow left">◀</div>
-    <div class="rotation-arrow right">▶</div>
-    <div class="rotation-arrow up-left">↖</div>
-    <div class="rotation-arrow up-right">↗</div>
-    <div class="rotation-arrow down-left">↙</div>
-    <div class="rotation-arrow down-right">↘</div>
-    <div id="rotation-pad-handle"></div>
-    <div id="rotation-pad-axis-label">X · Y</div>
-    <div id="rotation-pad-z-label">Z ↻</div>
-    <div id="rotation-pad-note">XYZ ROTATE</div>
-  </aside>
-
-  <nav id="toolbar" class="panel" aria-label="AR controls" hidden>
-    <button id="capture-button" type="button" aria-label="사진 촬영"></button>
-  </nav>
-
-  <section id="photo-preview" hidden>
-    <img id="preview-image" alt="촬영한 AR 사진 미리보기" />
-    <div id="preview-actions">
-      <button id="close-preview-button" type="button">닫기</button>
-      <button id="save-photo-button" type="button">저장·공유</button>
+  <div id="hud" hidden>
+    <div id="status-pill">그림을 프레임 안에 비춰 주세요</div>
+    <div id="scan-frame" aria-hidden="true">
+      <span class="corner tl"></span>
+      <span class="corner tr"></span>
+      <span class="corner bl"></span>
+      <span class="corner br"></span>
     </div>
+    <div id="scan-caption">다른 그림을 비추면 자동으로 다음 작품으로 바뀝니다</div>
+  </div>
+
+  <div id="target-toast">새 작품을 찾았습니다</div>
+
+  <section id="viewer" class="glass" aria-label="작품 비교 뷰어">
+    <header id="viewer-header">
+      <div>
+        <div id="viewer-kicker">IMAGE INTERACTION</div>
+        <div id="viewer-title">작품</div>
+      </div>
+      <button id="close-viewer" type="button" aria-label="뷰어 닫기">×</button>
+    </header>
+
+    <main id="viewer-main">
+      <div id="slides" class="show-result">
+        <section class="slide" data-slide="original">
+          <div class="slide-label">원본 · ORIGINAL</div>
+          <div class="image-stage" id="stage-original">
+            <img id="image-original" class="zoom-image" alt="원본 이미지" draggable="false" />
+            <div id="error-original" class="image-error" hidden></div>
+          </div>
+        </section>
+
+        <section class="slide" data-slide="result">
+          <div class="slide-label">변환 이미지 · RESULT</div>
+          <div class="image-stage" id="stage-result">
+            <img id="image-result" class="zoom-image" alt="변환 이미지" draggable="false" />
+            <div id="error-result" class="image-error" hidden></div>
+          </div>
+        </section>
+      </div>
+      <div id="gesture-hint">↔ 좌우 전환 · 두 손가락 확대 · 더블탭 초기화</div>
+    </main>
+
+    <footer id="viewer-footer">
+      <div id="tabs" role="tablist" aria-label="이미지 선택">
+        <button class="tab" id="tab-original" type="button">원본</button>
+        <button class="tab active" id="tab-result" type="button">변환 이미지</button>
+      </div>
+      <button id="reset-zoom" type="button">크기 초기화</button>
+    </footer>
   </section>
 
   <script type="module">
     import * as THREE from "three";
-    import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
-    import { DRACOLoader } from "three/addons/loaders/DRACOLoader.js";
     import { MindARThree } from "mindar-image-three";
 
-    console.info("AR BUILD: TOUCH_PHOTO_V11_20260814");
+    console.info("YOYOJIN AR BUILD: MULTI_IMAGE_COMPARE_V1_20260907");
 
     const CONFIG = Object.freeze({
-      targetUrl: "./1.mind",
-      modelUrl: "./1.glb",
-      fitHeight: 1.0,
-      baseOffsetX: 0,
-      baseOffsetY: 0,
-      baseOffsetZ: 0.025,
-      rotationX: 0,
-      rotationY: 0,
-      rotationZ: 0,
-      minUserScale: 0.2,
-      maxUserScale: 4.0,
-      moveRange: 2.5,
-      targetHoldMs: 5000,
+      manifestUrl: "./targets.json",
+      targetUrl: "./targets.mind",
+      fallbackTargetCount: 3,
       cameraTimeoutMs: 15000,
-      arTimeoutMs: 35000,
-      captureMaxDimension: 1920,
-      smoothingPositionResponse: 8,
-      smoothingRotationResponse: 10,
-      smoothingScaleResponse: 8,
-      rotationDegreesPerPixel: 0.42
+      arTimeoutMs: 45000,
+      maxTrack: 1,
+      maxZoom: 5,
+      minZoom: 1,
+      swipeThresholdPx: 46,
+      targetSwitchDebounceMs: 220
     });
 
-    const container = document.querySelector("#ar-container");
-    const startScreen = document.querySelector("#start-screen");
-    const startButton = document.querySelector("#start-button");
-    const bootStatus = document.querySelector("#boot-status");
-    const debugDetail = document.querySelector("#debug-detail");
-    const status = document.querySelector("#status");
-    const toolbar = document.querySelector("#toolbar");
-    const rotationPad = document.querySelector("#rotation-pad");
-    const rotationPadHandle = document.querySelector("#rotation-pad-handle");
-    const captureButton = document.querySelector("#capture-button");
-    const photoPreview = document.querySelector("#photo-preview");
-    const previewImage = document.querySelector("#preview-image");
-    const closePreviewButton = document.querySelector("#close-preview-button");
-    const savePhotoButton = document.querySelector("#save-photo-button");
+    const $ = (selector) => document.querySelector(selector);
+
+    const container = $("#ar-container");
+    const startScreen = $("#start-screen");
+    const startButton = $("#start-button");
+    const bootStatus = $("#boot-status");
+    const debugDetail = $("#debug-detail");
+    const hud = $("#hud");
+    const statusPill = $("#status-pill");
+    const scanFrame = $("#scan-frame");
+    const viewer = $("#viewer");
+    const viewerTitle = $("#viewer-title");
+    const closeViewerButton = $("#close-viewer");
+    const slides = $("#slides");
+    const tabOriginal = $("#tab-original");
+    const tabResult = $("#tab-result");
+    const resetZoomButton = $("#reset-zoom");
+    const gestureHint = $("#gesture-hint");
+    const targetToast = $("#target-toast");
+
+    const originalImg = $("#image-original");
+    const resultImg = $("#image-result");
+    const originalError = $("#error-original");
+    const resultError = $("#error-result");
+    const originalStage = $("#stage-original");
+    const resultStage = $("#stage-result");
 
     const state = {
+      manifest: [],
+      mindar: null,
+      anchors: [],
       started: false,
       starting: false,
-      modelReady: false,
-      baseScale: 1,
-      userScale: 1,
-      userOffsetX: 0,
-      userOffsetY: 0,
-      userRotationX: 0,
-      userRotationY: 0,
-      userRotationZ: 0,
-      smoothingEnabled: true,
-      hasPose: false,
-      targetSeenOnce: false,
-      lastTargetSeenAt: 0,
-      holdUntil: 0,
-      trackingLastFrame: false,
-      modelHolder: null,
-      displayRoot: null,
-      mixer: null,
-      primaryAction: null,
-      mindar: null,
-      anchor: null,
+      ready: false,
       targetBlobUrl: null,
-      currentPhotoBlob: null,
-      currentPhotoUrl: null,
-      clock: null
+      activeIndex: -1,
+      activeId: null,
+      currentSlide: "result",
+      lastSwitchAt: 0,
+      toastTimer: 0,
+      hintTimer: 0
     };
 
-    const pose = {
-      targetPosition: new THREE.Vector3(),
-      targetQuaternion: new THREE.Quaternion(),
-      targetScale: new THREE.Vector3(),
-      currentPosition: new THREE.Vector3(),
-      currentQuaternion: new THREE.Quaternion(),
-      currentScale: new THREE.Vector3(1, 1, 1)
-    };
-
-    const gesture = {
-      pointers: new Map(),
-      mode: 0,
-      startCentroidX: 0,
-      startCentroidY: 0,
-      startDistance: 1,
-      startOffsetX: 0,
-      startOffsetY: 0,
-      startScale: 1
-    };
-
-    const rotationPadState = {
-      active: false,
-      pointerId: null,
-      mode: "xy",
-      centerX: 0,
-      centerY: 0,
-      startClientX: 0,
-      startClientY: 0,
-      startAngle: 0,
-      startRotationX: 0,
-      startRotationY: 0,
-      startRotationZ: 0
-    };
-
-    function setBootMessage(message) {
-      bootStatus.textContent = message;
-    }
-
-    function setDebug(message = "") {
-      debugDetail.textContent = message;
-    }
-
-    function setStatus(message, visible = true) {
-      status.textContent = message;
-      status.hidden = !visible;
-    }
+    function setBoot(message) { bootStatus.textContent = message; }
+    function setDebug(message = "") { debugDetail.textContent = message; }
+    function setStatus(message) { statusPill.textContent = message; }
 
     function describeError(error) {
       if (!error) return "알 수 없는 오류";
-      const name = error.name ? `${error.name}: ` : "";
-      return `${name}${error.message || String(error)}`;
+      return `${error.name ? `${error.name}: ` : ""}${error.message || String(error)}`;
     }
 
     function clamp(value, min, max) {
       return Math.min(max, Math.max(min, value));
     }
 
-    function normalizeAngleDegrees(value) {
-      let result = value % 360;
-      if (result > 180) result -= 360;
-      if (result < -180) result += 360;
-      return result;
-    }
-
     function withTimeout(promise, milliseconds, message) {
       let timeoutId;
       const timeout = new Promise((_, reject) => {
-        timeoutId = window.setTimeout(() => {
+        timeoutId = setTimeout(() => {
           const error = new Error(message);
           error.name = "TimeoutError";
           reject(error);
         }, milliseconds);
       });
+      return Promise.race([promise, timeout]).finally(() => clearTimeout(timeoutId));
+    }
 
-      return Promise.race([promise, timeout]).finally(() => {
-        window.clearTimeout(timeoutId);
+    function numericId(value) {
+      const match = String(value ?? "").match(/\d+/);
+      return match ? Number(match[0]) : Number.MAX_SAFE_INTEGER;
+    }
+
+    function fallbackManifest() {
+      return Array.from({ length: CONFIG.fallbackTargetCount }, (_, index) => {
+        const id = String(index + 1);
+        return { id, target: `${id}.JPG`, result: `${id}.PNG`, title: `작품 #${id}` };
       });
     }
 
-    function stopCameraTracks() {
-      const video = state.mindar?.video;
-      const stream = video?.srcObject;
-      if (stream && typeof stream.getTracks === "function") {
-        stream.getTracks().forEach((track) => track.stop());
+    async function loadManifest() {
+      try {
+        const response = await fetch(`${CONFIG.manifestUrl}?v=20260907`, { cache: "no-store" });
+        if (!response.ok) throw new Error(`targets.json HTTP ${response.status}`);
+        const json = await response.json();
+        const rawItems = Array.isArray(json) ? json : json.items;
+        if (!Array.isArray(rawItems) || rawItems.length === 0) {
+          throw new Error("targets.json에 items가 없습니다.");
+        }
+
+        const items = rawItems
+          .map((item, order) => ({
+            id: String(item.id ?? order + 1),
+            target: item.target || `${item.id ?? order + 1}.JPG`,
+            result: item.result || `${item.id ?? order + 1}.PNG`,
+            title: item.title || `작품 #${item.id ?? order + 1}`,
+            targetIndex: Number.isInteger(item.targetIndex) ? item.targetIndex : order
+          }))
+          .sort((a, b) => a.targetIndex - b.targetIndex);
+
+        // targetIndex는 0..N-1 연속이어야 합니다.
+        items.forEach((item, index) => {
+          if (item.targetIndex !== index) {
+            throw new Error(`targets.json targetIndex가 연속적이지 않습니다. index ${index}`);
+          }
+        });
+        return items;
+      } catch (error) {
+        console.warn("targets.json load failed; using fallback 1..3", error);
+        setDebug("targets.json을 못 찾아 임시로 1~3번 설정을 사용합니다. 실제 운영 전 targets.json을 넣어 주세요.");
+        return fallbackManifest();
       }
+    }
+
+    async function loadTargetBlobUrl() {
+      setBoot("targets.mind를 불러오는 중입니다…");
+      const response = await fetch(`${CONFIG.targetUrl}?v=20260907`, { cache: "default" });
+      if (!response.ok) {
+        throw new Error(`targets.mind를 찾지 못했습니다. HTTP ${response.status}`);
+      }
+      const data = await response.arrayBuffer();
+      if (data.byteLength < 32) throw new Error("targets.mind 파일이 비어 있거나 올바르지 않습니다.");
+      return URL.createObjectURL(new Blob([data], { type: "application/octet-stream" }));
     }
 
     function fixCameraLayers() {
       const video = container.querySelector("video");
       const canvases = container.querySelectorAll("canvas");
-
       if (video) {
         video.style.setProperty("z-index", "0", "important");
         video.style.setProperty("display", "block", "important");
@@ -646,27 +686,25 @@
         video.style.setProperty("opacity", "1", "important");
         video.style.setProperty("object-fit", "cover", "important");
       }
-
       canvases.forEach((canvas) => {
         canvas.style.setProperty("z-index", "1", "important");
-        canvas.style.setProperty("background", "transparent", "important");
         canvas.style.setProperty("pointer-events", "none", "important");
+        canvas.style.setProperty("background", "transparent", "important");
       });
     }
 
     function waitForLiveVideo(video, timeoutMs) {
       return new Promise((resolve, reject) => {
         let settled = false;
-        let animationFrameId = 0;
-        let timeoutId = 0;
+        let raf = 0;
+        let timer = 0;
 
         const cleanup = () => {
-          window.cancelAnimationFrame(animationFrameId);
-          window.clearTimeout(timeoutId);
-          video.removeEventListener("loadedmetadata", check);
-          video.removeEventListener("loadeddata", check);
-          video.removeEventListener("canplay", check);
-          video.removeEventListener("playing", check);
+          cancelAnimationFrame(raf);
+          clearTimeout(timer);
+          ["loadedmetadata", "loadeddata", "canplay", "playing"].forEach((name) => {
+            video.removeEventListener(name, check);
+          });
         };
 
         const finish = () => {
@@ -680,7 +718,7 @@
           if (settled) return;
           settled = true;
           cleanup();
-          const error = new Error("카메라 스트림은 허용됐지만 영상 크기를 받지 못했습니다.");
+          const error = new Error("카메라 권한은 허용됐지만 영상 연결이 완료되지 않았습니다.");
           error.name = "VideoMetadataTimeout";
           reject(error);
         };
@@ -690,14 +728,13 @@
             finish();
             return;
           }
-          animationFrameId = window.requestAnimationFrame(check);
+          raf = requestAnimationFrame(check);
         }
 
-        video.addEventListener("loadedmetadata", check);
-        video.addEventListener("loadeddata", check);
-        video.addEventListener("canplay", check);
-        video.addEventListener("playing", check);
-        timeoutId = window.setTimeout(fail, timeoutMs);
+        ["loadedmetadata", "loadeddata", "canplay", "playing"].forEach((name) => {
+          video.addEventListener(name, check);
+        });
+        timer = setTimeout(fail, timeoutMs);
         check();
       });
     }
@@ -705,7 +742,6 @@
     async function startVideoRobust(mindar) {
       const video = document.createElement("video");
       mindar.video = video;
-
       video.autoplay = true;
       video.muted = true;
       video.playsInline = true;
@@ -714,10 +750,8 @@
       video.setAttribute("playsinline", "");
       video.setAttribute("webkit-playsinline", "");
       video.style.position = "absolute";
-      video.style.top = "0";
       video.style.left = "0";
-      video.style.zIndex = "0";
-
+      video.style.top = "0";
       container.appendChild(video);
 
       if (!navigator.mediaDevices?.getUserMedia) {
@@ -726,751 +760,289 @@
         throw error;
       }
 
-      const constraints = {
-        audio: false,
-        video: {
-          facingMode: { ideal: "environment" },
-          width: { ideal: 1280 },
-          height: { ideal: 720 }
-        }
-      };
-
-      setBootMessage("카메라 권한을 확인하고 있습니다…");
       const stream = await withTimeout(
-        navigator.mediaDevices.getUserMedia(constraints),
+        navigator.mediaDevices.getUserMedia({
+          audio: false,
+          video: {
+            facingMode: { ideal: "environment" },
+            width: { ideal: 1280 },
+            height: { ideal: 720 }
+          }
+        }),
         CONFIG.cameraTimeoutMs,
         "카메라 권한 응답 시간이 초과됐습니다."
       );
 
       video.srcObject = stream;
-
-      try {
-        await video.play();
-      } catch (error) {
-        console.warn("video.play() was not immediately available", error);
-      }
-
+      try { await video.play(); } catch (error) { console.warn("video.play()", error); }
       await waitForLiveVideo(video, CONFIG.cameraTimeoutMs);
-
       video.width = video.videoWidth;
       video.height = video.videoHeight;
-      video.setAttribute("width", String(video.videoWidth));
-      video.setAttribute("height", String(video.videoHeight));
-
       fixCameraLayers();
-      startScreen.hidden = true;
-      setStatus("카메라 연결 완료 · 이미지 인식 엔진을 준비하고 있습니다…");
     }
 
-    function updateModelTransform() {
-      if (!state.modelHolder) return;
-
-      const finalScale = state.baseScale * state.userScale;
-      state.modelHolder.scale.setScalar(finalScale);
-      state.modelHolder.position.set(
-        CONFIG.baseOffsetX + state.userOffsetX,
-        CONFIG.baseOffsetY + state.userOffsetY,
-        CONFIG.baseOffsetZ
-      );
-      state.modelHolder.rotation.set(
-        THREE.MathUtils.degToRad(CONFIG.rotationX + state.userRotationX),
-        THREE.MathUtils.degToRad(CONFIG.rotationY + state.userRotationY),
-        THREE.MathUtils.degToRad(CONFIG.rotationZ + state.userRotationZ)
-      );
+    function stopCameraTracks() {
+      const stream = state.mindar?.video?.srcObject;
+      if (stream?.getTracks) stream.getTracks().forEach((track) => track.stop());
     }
 
-    function resetModelTransform() {
-      state.userScale = 1;
-      state.userOffsetX = 0;
-      state.userOffsetY = 0;
-      state.userRotationX = 0;
-      state.userRotationY = 0;
-      state.userRotationZ = 0;
-      updateModelTransform();
-      showTemporaryStatus("크기·위치·회전을 처음 상태로 되돌렸습니다.", 1300);
+    function showToast(text) {
+      clearTimeout(state.toastTimer);
+      targetToast.textContent = text;
+      targetToast.classList.add("show");
+      state.toastTimer = setTimeout(() => targetToast.classList.remove("show"), 1200);
     }
 
-    let temporaryStatusTimer = 0;
-    function showTemporaryStatus(message, duration = 1800) {
-      window.clearTimeout(temporaryStatusTimer);
-      setStatus(message);
-      temporaryStatusTimer = window.setTimeout(() => {
-        if (!state.started) return;
-        if (state.anchor?.visible) {
-          setStatus("", false);
-        } else if (performance.now() < state.holdUntil) {
-          setStatus("타깃을 놓쳤습니다 · 마지막 위치에서 5초간 유지합니다.");
-        } else {
-          setStatus("인식 이미지를 비춰 주세요.");
-        }
-      }, duration);
+    function showGestureHint() {
+      clearTimeout(state.hintTimer);
+      gestureHint.style.opacity = "1";
+      state.hintTimer = setTimeout(() => { gestureHint.style.opacity = "0"; }, 3200);
     }
 
-    function resetRotationPadHandle() {
-      rotationPadHandle.style.transform = "translate(-50%, -50%)";
+    function setSlide(name, { reset = false } = {}) {
+      state.currentSlide = name === "original" ? "original" : "result";
+      slides.classList.toggle("show-original", state.currentSlide === "original");
+      slides.classList.toggle("show-result", state.currentSlide === "result");
+      tabOriginal.classList.toggle("active", state.currentSlide === "original");
+      tabResult.classList.toggle("active", state.currentSlide === "result");
+      if (reset) resetCurrentZoom();
     }
 
-    function syncRotationPadVisibility() {
-      const visible = Boolean(
-        state.started &&
-        state.displayRoot?.visible &&
-        photoPreview.hidden
-      );
-      rotationPad.hidden = !visible;
-      if (!visible) {
-        rotationPad.classList.remove("active", "z-active");
-        rotationPadState.active = false;
-        rotationPadState.pointerId = null;
-        resetRotationPadHandle();
-      }
+    function clearImage(img, errorBox) {
+      img.removeAttribute("src");
+      img.style.opacity = "0";
+      errorBox.hidden = true;
+      errorBox.textContent = "";
     }
 
-    function prepareGestureBaseline() {
-      const points = [...gesture.pointers.values()];
-      gesture.mode = points.length >= 2 ? 2 : points.length;
-      gesture.startOffsetX = state.userOffsetX;
-      gesture.startOffsetY = state.userOffsetY;
-      gesture.startScale = state.userScale;
-
-      if (points.length === 1) {
-        gesture.startCentroidX = points[0].x;
-        gesture.startCentroidY = points[0].y;
-        return;
-      }
-
-      if (points.length >= 2) {
-        const first = points[0];
-        const second = points[1];
-        gesture.startCentroidX = (first.x + second.x) / 2;
-        gesture.startCentroidY = (first.y + second.y) / 2;
-        gesture.startDistance = Math.max(1, Math.hypot(second.x - first.x, second.y - first.y));
-      }
+    function loadViewerImage(img, errorBox, url, label) {
+      clearImage(img, errorBox);
+      img.onload = () => {
+        img.style.opacity = "1";
+        errorBox.hidden = true;
+      };
+      img.onerror = () => {
+        img.style.opacity = "0";
+        errorBox.textContent = `${label} 파일을 불러오지 못했습니다.\n${url}`;
+        errorBox.hidden = false;
+      };
+      // 브라우저 캐시를 그대로 활용. 인식된 작품의 2장만 네트워크에서 요청합니다.
+      img.src = url;
     }
 
-    function applyGesture() {
-      if (!state.started || !state.hasPose || !state.displayRoot?.visible) return;
+    function openViewerForTarget(index) {
+      const item = state.manifest[index];
+      if (!item) return;
 
-      const points = [...gesture.pointers.values()];
-      if (points.length === 0) return;
+      const now = performance.now();
+      if (state.activeIndex === index && now - state.lastSwitchAt < CONFIG.targetSwitchDebounceMs) return;
+      state.lastSwitchAt = now;
+      state.activeIndex = index;
+      state.activeId = item.id;
 
-      const movementUnit = 1.55 / Math.max(320, Math.min(container.clientWidth, container.clientHeight));
+      viewerTitle.textContent = item.title || `작품 #${item.id}`;
+      loadViewerImage(originalImg, originalError, item.target, "원본 이미지");
+      loadViewerImage(resultImg, resultError, item.result, "변환 이미지");
 
-      if (points.length === 1 && gesture.mode === 1) {
-        const point = points[0];
-        const dx = point.x - gesture.startCentroidX;
-        const dy = point.y - gesture.startCentroidY;
+      zoomControllers.original.reset(false);
+      zoomControllers.result.reset(false);
+      setSlide("result");
 
-        state.userOffsetX = clamp(
-          gesture.startOffsetX + dx * movementUnit,
-          -CONFIG.moveRange,
-          CONFIG.moveRange
-        );
-        state.userOffsetY = clamp(
-          gesture.startOffsetY - dy * movementUnit,
-          -CONFIG.moveRange,
-          CONFIG.moveRange
-        );
-        updateModelTransform();
-        return;
-      }
-
-      if (points.length >= 2 && gesture.mode === 2) {
-        const first = points[0];
-        const second = points[1];
-        const distance = Math.max(1, Math.hypot(second.x - first.x, second.y - first.y));
-        const scaleRatio = distance / gesture.startDistance;
-
-        state.userScale = clamp(
-          gesture.startScale * scaleRatio,
-          CONFIG.minUserScale,
-          CONFIG.maxUserScale
-        );
-        updateModelTransform();
-      }
+      viewer.classList.add("open");
+      scanFrame.classList.add("detected");
+      setStatus(`#${item.id} 인식 · 다른 그림을 비추면 자동 전환됩니다`);
+      showToast(`#${item.id} 작품을 찾았습니다`);
+      showGestureHint();
     }
 
-    function updateRotationPadHandle(clientX, clientY, mode = rotationPadState.mode) {
-      const rect = rotationPad.getBoundingClientRect();
-      const centerX = rect.left + rect.width / 2;
-      const centerY = rect.top + rect.height / 2;
-      const rawX = clientX - centerX;
-      const rawY = clientY - centerY;
-      const distance = Math.max(0.001, Math.hypot(rawX, rawY));
-
-      if (mode === "z") {
-        const radius = 64;
-        const x = (rawX / distance) * radius;
-        const y = (rawY / distance) * radius;
-        rotationPadHandle.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`;
-        return;
-      }
-
-      const maxRadius = 42;
-      const ratio = distance > maxRadius ? maxRadius / distance : 1;
-      const x = rawX * ratio;
-      const y = rawY * ratio;
-      rotationPadHandle.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`;
+    function handleTargetFound(index) {
+      openViewerForTarget(index);
     }
 
-    function connectRotationPad() {
-      const releaseRotationPad = (event) => {
-        if (event && rotationPadState.pointerId !== event.pointerId) return;
-        rotationPadState.active = false;
-        rotationPadState.pointerId = null;
-        rotationPad.classList.remove("active", "z-active");
-        resetRotationPadHandle();
+    function handleTargetLost(index) {
+      if (index !== state.activeIndex) return;
+      // 일부러 뷰어를 닫지 않습니다. 관람객이 손을 움직이거나 확대해도 계속 볼 수 있습니다.
+      scanFrame.classList.remove("detected");
+      setStatus(`#${state.activeId ?? ""} 표시 중 · 다음 그림을 비춰 주세요`);
+    }
+
+    function closeViewer() {
+      viewer.classList.remove("open");
+      scanFrame.classList.remove("detected");
+      setStatus("그림을 프레임 안에 비춰 주세요");
+    }
+
+    function createZoomController(stage, image, key) {
+      const z = {
+        scale: 1,
+        x: 0,
+        y: 0,
+        pointers: new Map(),
+        gestureMode: "none",
+        startScale: 1,
+        startX: 0,
+        startY: 0,
+        startDistance: 1,
+        startCenterX: 0,
+        startCenterY: 0,
+        singleStartX: 0,
+        singleStartY: 0,
+        lastTapAt: 0
       };
 
-      rotationPad.addEventListener("pointerdown", (event) => {
-        if (!state.started || !state.displayRoot?.visible || photoPreview.hidden === false) return;
-        event.preventDefault();
-        event.stopPropagation();
+      function limitPan() {
+        if (z.scale <= 1.001) {
+          z.x = 0;
+          z.y = 0;
+          return;
+        }
+        const rect = stage.getBoundingClientRect();
+        const maxX = rect.width * 0.50 * (z.scale - 1) + 70;
+        const maxY = rect.height * 0.50 * (z.scale - 1) + 70;
+        z.x = clamp(z.x, -maxX, maxX);
+        z.y = clamp(z.y, -maxY, maxY);
+      }
 
-        const rect = rotationPad.getBoundingClientRect();
-        const centerX = rect.left + rect.width / 2;
-        const centerY = rect.top + rect.height / 2;
-        const dxCenter = event.clientX - centerX;
-        const dyCenter = event.clientY - centerY;
-        const radiusFromCenter = Math.hypot(dxCenter, dyCenter);
-        const mode = radiusFromCenter >= 54 ? "z" : "xy";
+      function render(animated = false) {
+        image.style.transition = animated ? "transform 180ms ease" : "none";
+        image.style.transform = `translate(calc(-50% + ${z.x}px), calc(-50% + ${z.y}px)) scale(${z.scale})`;
+        if (animated) setTimeout(() => { image.style.transition = "none"; }, 190);
+      }
 
-        rotationPad.setPointerCapture?.(event.pointerId);
-        rotationPadState.active = true;
-        rotationPadState.pointerId = event.pointerId;
-        rotationPadState.mode = mode;
-        rotationPadState.centerX = centerX;
-        rotationPadState.centerY = centerY;
-        rotationPadState.startClientX = event.clientX;
-        rotationPadState.startClientY = event.clientY;
-        rotationPadState.startAngle = Math.atan2(dyCenter, dxCenter);
-        rotationPadState.startRotationX = state.userRotationX;
-        rotationPadState.startRotationY = state.userRotationY;
-        rotationPadState.startRotationZ = state.userRotationZ;
+      function reset(animated = true) {
+        z.scale = 1;
+        z.x = 0;
+        z.y = 0;
+        render(animated);
+      }
 
-        rotationPad.classList.add("active");
-        rotationPad.classList.toggle("z-active", mode === "z");
-        updateRotationPadHandle(event.clientX, event.clientY, mode);
-        showTemporaryStatus(
-          mode === "z"
-            ? "Z축 회전 · 바깥 링을 원형으로 돌리세요"
-            : "X/Y축 회전 · 안쪽 패드를 상하좌우로 움직이세요",
-          1100
-        );
-      });
-
-      rotationPad.addEventListener("pointermove", (event) => {
-        if (!rotationPadState.active || rotationPadState.pointerId !== event.pointerId) return;
-        event.preventDefault();
-        event.stopPropagation();
-
-        if (rotationPadState.mode === "z") {
-          const currentAngle = Math.atan2(
-            event.clientY - rotationPadState.centerY,
-            event.clientX - rotationPadState.centerX
-          );
-          let angleDelta = THREE.MathUtils.radToDeg(currentAngle - rotationPadState.startAngle);
-          if (angleDelta > 180) angleDelta -= 360;
-          if (angleDelta < -180) angleDelta += 360;
-          state.userRotationZ = normalizeAngleDegrees(
-            rotationPadState.startRotationZ + angleDelta
-          );
+      function prepareGesture() {
+        const pts = [...z.pointers.values()];
+        if (pts.length >= 2) {
+          z.gestureMode = "pinch";
+          const a = pts[0];
+          const b = pts[1];
+          z.startScale = z.scale;
+          z.startX = z.x;
+          z.startY = z.y;
+          z.startDistance = Math.max(1, Math.hypot(b.x - a.x, b.y - a.y));
+          z.startCenterX = (a.x + b.x) / 2;
+          z.startCenterY = (a.y + b.y) / 2;
+        } else if (pts.length === 1) {
+          z.gestureMode = z.scale > 1.01 ? "pan" : "swipe";
+          z.startX = z.x;
+          z.startY = z.y;
+          z.singleStartX = pts[0].x;
+          z.singleStartY = pts[0].y;
         } else {
-          const dx = event.clientX - rotationPadState.startClientX;
-          const dy = event.clientY - rotationPadState.startClientY;
-          state.userRotationY = normalizeAngleDegrees(
-            rotationPadState.startRotationY + dx * CONFIG.rotationDegreesPerPixel
-          );
-          state.userRotationX = normalizeAngleDegrees(
-            rotationPadState.startRotationX + dy * CONFIG.rotationDegreesPerPixel
-          );
+          z.gestureMode = "none";
         }
+      }
 
-        updateModelTransform();
-        updateRotationPadHandle(event.clientX, event.clientY, rotationPadState.mode);
-      });
-
-      rotationPad.addEventListener("pointerup", (event) => {
+      stage.addEventListener("pointerdown", (event) => {
         event.preventDefault();
-        event.stopPropagation();
-        releaseRotationPad(event);
-      });
-      rotationPad.addEventListener("pointercancel", (event) => {
-        event.preventDefault();
-        event.stopPropagation();
-        releaseRotationPad(event);
-      });
-      rotationPad.addEventListener("lostpointercapture", releaseRotationPad);
-    }
+        stage.setPointerCapture?.(event.pointerId);
+        z.pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
 
-    function connectGestures() {
-      container.addEventListener("pointerdown", (event) => {
-        if (!state.started || photoPreview.hidden === false) return;
-        event.preventDefault();
-        container.setPointerCapture?.(event.pointerId);
-        gesture.pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
-        prepareGestureBaseline();
-      });
-
-      container.addEventListener("pointermove", (event) => {
-        if (!gesture.pointers.has(event.pointerId)) return;
-        event.preventDefault();
-        gesture.pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
-        applyGesture();
-      });
-
-      const removePointer = (event) => {
-        if (!gesture.pointers.has(event.pointerId)) return;
-        event.preventDefault();
-        gesture.pointers.delete(event.pointerId);
-        prepareGestureBaseline();
-      };
-
-      container.addEventListener("pointerup", removePointer);
-      container.addEventListener("pointercancel", removePointer);
-      container.addEventListener("lostpointercapture", removePointer);
-    }
-
-    async function loadTargetAsBlobUrl(url) {
-      setBootMessage("1.mind 파일을 확인하는 중입니다…");
-      const response = await fetch(url, { cache: "no-store" });
-
-      if (!response.ok) {
-        throw new Error(`1.mind 파일을 찾지 못했습니다. HTTP ${response.status}`);
-      }
-
-      const data = await response.arrayBuffer();
-      if (data.byteLength < 32) {
-        throw new Error("1.mind 파일이 비어 있거나 올바르지 않습니다.");
-      }
-
-      return URL.createObjectURL(
-        new Blob([data], { type: "application/octet-stream" })
-      );
-    }
-
-    function loadGLB(url) {
-      return new Promise((resolve, reject) => {
-        const dracoLoader = new DRACOLoader();
-        dracoLoader.setDecoderPath(
-          "https://www.gstatic.com/draco/versioned/decoders/1.5.7/"
-        );
-
-        const manager = new THREE.LoadingManager();
-        manager.onError = (resourceUrl) => {
-          console.error("GLB resource load failed:", resourceUrl);
-          setDebug(`3D 맵핑 파일을 불러오지 못했습니다: ${resourceUrl}`);
-        };
-
-        const loader = new GLTFLoader(manager);
-        loader.setDRACOLoader(dracoLoader);
-        loader.setCrossOrigin("anonymous");
-
-        const resolvedUrl = new URL(url, window.location.href);
-        const resourceBase = resolvedUrl.href.slice(0, resolvedUrl.href.lastIndexOf("/") + 1);
-        loader.setResourcePath(resourceBase);
-
-        loader.load(
-          resolvedUrl.href,
-          (gltf) => {
-            dracoLoader.dispose();
-            resolve(gltf);
-          },
-          (event) => {
-            if (!event.total) return;
-            const percentage = Math.round((event.loaded / event.total) * 100);
-            setBootMessage(`1.glb를 불러오는 중입니다… ${percentage}%`);
-          },
-          (error) => {
-            dracoLoader.dispose();
-            reject(error);
-          }
-        );
-      });
-    }
-
-    function prepareModel(gltf) {
-      const root = gltf.scene;
-
-      root.traverse((object) => {
-        if (!object.isMesh) return;
-        object.frustumCulled = false;
-
-        const materials = Array.isArray(object.material)
-          ? object.material
-          : [object.material];
-
-        materials.filter(Boolean).forEach((material) => {
-          const colorMaps = [material.map, material.emissiveMap].filter(Boolean);
-          colorMaps.forEach((texture) => {
-            texture.colorSpace = THREE.SRGBColorSpace;
-            texture.flipY = false;
-            texture.needsUpdate = true;
-          });
-
-          [
-            material.normalMap,
-            material.roughnessMap,
-            material.metalnessMap,
-            material.aoMap,
-            material.alphaMap,
-            material.bumpMap
-          ].filter(Boolean).forEach((texture) => {
-            texture.flipY = false;
-            texture.needsUpdate = true;
-          });
-
-          material.needsUpdate = true;
-        });
-      });
-
-      const mappedMeshes = [];
-      root.traverse((object) => {
-        if (!object.isMesh) return;
-        const materials = Array.isArray(object.material) ? object.material : [object.material];
-        const maps = materials.filter(Boolean).flatMap((material) => [
-          material.map, material.normalMap, material.roughnessMap, material.metalnessMap,
-          material.emissiveMap, material.aoMap, material.alphaMap, material.bumpMap
-        ]).filter(Boolean);
-        if (maps.length > 0) mappedMeshes.push({ name: object.name || "(unnamed)", maps: maps.length });
-      });
-      console.info("GLB texture mapping:", mappedMeshes.length > 0 ? mappedMeshes : "No texture maps found in GLB");
-      if (mappedMeshes.length === 0) {
-        setDebug("GLB 안에서 텍스처 맵을 찾지 못했습니다. Blender에서 텍스처를 GLB에 포함(Embed)해 내보냈는지 확인해 주세요.");
-      }
-
-      if (gltf.animations.length > 0) {
-        state.mixer = new THREE.AnimationMixer(root);
-        const action = state.mixer.clipAction(gltf.animations[0]);
-        action.reset();
-        action.enabled = true;
-        action.clampWhenFinished = false;
-        action.setLoop(THREE.LoopPingPong, Infinity);
-        action.repetitions = Infinity;
-        action.zeroSlopeAtStart = true;
-        action.zeroSlopeAtEnd = true;
-        action.play();
-        state.primaryAction = action;
-        state.mixer.setTime(0);
-      }
-
-      root.updateMatrixWorld(true);
-
-      const box = new THREE.Box3().setFromObject(root, true);
-      if (box.isEmpty()) {
-        throw new Error("GLB의 표시 영역을 계산할 수 없습니다.");
-      }
-
-      const size = box.getSize(new THREE.Vector3());
-      const center = box.getCenter(new THREE.Vector3());
-
-      if (!Number.isFinite(size.y) || size.y <= 0) {
-        throw new Error("GLB 높이 계산값이 올바르지 않습니다.");
-      }
-
-      state.baseScale = CONFIG.fitHeight / size.y;
-
-      root.position.x -= center.x;
-      root.position.y -= center.y;
-      root.position.z -= box.min.z;
-
-      const holder = new THREE.Group();
-      holder.name = "ARModelHolder";
-      holder.add(root);
-
-      state.modelHolder = holder;
-      updateModelTransform();
-
-      console.info("AR model fitted", {
-        measuredSize: size.toArray(),
-        measuredCenter: center.toArray(),
-        baseScale: state.baseScale,
-        animations: gltf.animations.length
-      });
-
-      return holder;
-    }
-
-    function copyTrackedPoseImmediately() {
-      if (!state.anchor || !state.displayRoot) return;
-
-      state.anchor.group.matrix.decompose(
-        pose.currentPosition,
-        pose.currentQuaternion,
-        pose.currentScale
-      );
-      pose.targetPosition.copy(pose.currentPosition);
-      pose.targetQuaternion.copy(pose.currentQuaternion);
-      pose.targetScale.copy(pose.currentScale);
-
-      state.displayRoot.position.copy(pose.currentPosition);
-      state.displayRoot.quaternion.copy(pose.currentQuaternion);
-      state.displayRoot.scale.copy(pose.currentScale);
-      state.hasPose = true;
-    }
-
-    function updateTrackedPose(delta, now) {
-      if (!state.anchor || !state.displayRoot) return;
-
-      const tracking = Boolean(state.anchor.visible);
-
-      if (tracking) {
-        state.anchor.group.matrix.decompose(
-          pose.targetPosition,
-          pose.targetQuaternion,
-          pose.targetScale
-        );
-
-        if (!state.hasPose || (!state.trackingLastFrame && now > state.holdUntil)) {
-          copyTrackedPoseImmediately();
-        } else if (state.smoothingEnabled) {
-          const positionAlpha = 1 - Math.exp(-CONFIG.smoothingPositionResponse * delta);
-          const rotationAlpha = 1 - Math.exp(-CONFIG.smoothingRotationResponse * delta);
-          const scaleAlpha = 1 - Math.exp(-CONFIG.smoothingScaleResponse * delta);
-
-          pose.currentPosition.lerp(pose.targetPosition, positionAlpha);
-          pose.currentQuaternion.slerp(pose.targetQuaternion, rotationAlpha);
-          pose.currentScale.lerp(pose.targetScale, scaleAlpha);
-
-          state.displayRoot.position.copy(pose.currentPosition);
-          state.displayRoot.quaternion.copy(pose.currentQuaternion);
-          state.displayRoot.scale.copy(pose.currentScale);
-        } else {
-          pose.currentPosition.copy(pose.targetPosition);
-          pose.currentQuaternion.copy(pose.targetQuaternion);
-          pose.currentScale.copy(pose.targetScale);
-
-          state.displayRoot.position.copy(pose.targetPosition);
-          state.displayRoot.quaternion.copy(pose.targetQuaternion);
-          state.displayRoot.scale.copy(pose.targetScale);
+        const now = performance.now();
+        if (z.pointers.size === 1 && now - z.lastTapAt < 290) {
+          reset(true);
+          z.lastTapAt = 0;
+        } else if (z.pointers.size === 1) {
+          z.lastTapAt = now;
         }
-
-        state.lastTargetSeenAt = now;
-        state.holdUntil = now + CONFIG.targetHoldMs;
-        state.displayRoot.visible = true;
-      } else if (state.hasPose && now <= state.holdUntil) {
-        state.displayRoot.visible = true;
-      } else {
-        state.displayRoot.visible = false;
-      }
-
-      state.trackingLastFrame = tracking;
-    }
-
-    function getCaptureDimensions() {
-      const width = Math.max(1, container.clientWidth);
-      const height = Math.max(1, container.clientHeight);
-      const maxDimension = Math.max(width, height);
-      const scale = Math.min(
-        window.devicePixelRatio || 1,
-        CONFIG.captureMaxDimension / maxDimension
-      );
-
-      return {
-        width: Math.max(1, Math.round(width * scale)),
-        height: Math.max(1, Math.round(height * scale))
-      };
-    }
-
-    function drawCameraFrame(context, outputWidth, outputHeight) {
-      const video = state.mindar?.video;
-      if (!video || video.videoWidth <= 0 || video.videoHeight <= 0) {
-        throw new Error("촬영할 카메라 영상을 찾지 못했습니다.");
-      }
-
-      const containerRect = container.getBoundingClientRect();
-      const videoRect = video.getBoundingClientRect();
-      const scaleX = outputWidth / containerRect.width;
-      const scaleY = outputHeight / containerRect.height;
-
-      const drawX = (videoRect.left - containerRect.left) * scaleX;
-      const drawY = (videoRect.top - containerRect.top) * scaleY;
-      const drawWidth = videoRect.width * scaleX;
-      const drawHeight = videoRect.height * scaleY;
-
-      context.drawImage(video, drawX, drawY, drawWidth, drawHeight);
-    }
-
-    function renderAROverlayCanvas(outputWidth, outputHeight) {
-      const { renderer, scene, camera } = state.mindar;
-      const target = new THREE.WebGLRenderTarget(outputWidth, outputHeight, {
-        format: THREE.RGBAFormat,
-        type: THREE.UnsignedByteType,
-        depthBuffer: true,
-        stencilBuffer: false
-      });
-      target.texture.colorSpace = THREE.SRGBColorSpace;
-
-      const previousTarget = renderer.getRenderTarget();
-      const previousClearColor = renderer.getClearColor(new THREE.Color());
-      const previousClearAlpha = renderer.getClearAlpha();
-      const pixels = new Uint8Array(outputWidth * outputHeight * 4);
-
-      try {
-        renderer.setRenderTarget(target);
-        renderer.setClearColor(0x000000, 0);
-        renderer.clear(true, true, true);
-        renderer.render(scene, camera);
-        renderer.readRenderTargetPixels(
-          target,
-          0,
-          0,
-          outputWidth,
-          outputHeight,
-          pixels
-        );
-      } finally {
-        renderer.setRenderTarget(previousTarget);
-        renderer.setClearColor(previousClearColor, previousClearAlpha);
-        target.dispose();
-      }
-
-      const flipped = new Uint8ClampedArray(pixels.length);
-      const rowLength = outputWidth * 4;
-      for (let sourceY = 0; sourceY < outputHeight; sourceY += 1) {
-        const targetY = outputHeight - sourceY - 1;
-        const sourceStart = sourceY * rowLength;
-        const targetStart = targetY * rowLength;
-        flipped.set(pixels.subarray(sourceStart, sourceStart + rowLength), targetStart);
-      }
-
-      const overlayCanvas = document.createElement("canvas");
-      overlayCanvas.width = outputWidth;
-      overlayCanvas.height = outputHeight;
-      const overlayContext = overlayCanvas.getContext("2d", { alpha: true });
-      if (!overlayContext) {
-        throw new Error("AR 사진 합성용 캔버스를 만들지 못했습니다.");
-      }
-      overlayContext.putImageData(
-        new ImageData(flipped, outputWidth, outputHeight),
-        0,
-        0
-      );
-
-      return overlayCanvas;
-    }
-
-    function canvasToBlob(canvas, type = "image/jpeg", quality = 0.93) {
-      return new Promise((resolve, reject) => {
-        canvas.toBlob((blob) => {
-          if (!blob) {
-            reject(new Error("사진 파일을 만들지 못했습니다."));
-            return;
-          }
-          resolve(blob);
-        }, type, quality);
-      });
-    }
-
-    async function capturePhoto() {
-      if (!state.started || !state.mindar) return;
-
-      captureButton.disabled = true;
-      showTemporaryStatus("사진을 만드는 중입니다…", 3000);
-
-      try {
-        const { width, height } = getCaptureDimensions();
-        const captureCanvas = document.createElement("canvas");
-        captureCanvas.width = width;
-        captureCanvas.height = height;
-
-        const context = captureCanvas.getContext("2d", {
-          alpha: false,
-          desynchronized: true
-        });
-        if (!context) {
-          throw new Error("사진 합성용 캔버스를 만들지 못했습니다.");
-        }
-
-        drawCameraFrame(context, width, height);
-        const overlayCanvas = renderAROverlayCanvas(width, height);
-        context.drawImage(overlayCanvas, 0, 0, width, height);
-
-        const blob = await canvasToBlob(captureCanvas);
-
-        if (state.currentPhotoUrl) {
-          URL.revokeObjectURL(state.currentPhotoUrl);
-        }
-
-        state.currentPhotoBlob = blob;
-        state.currentPhotoUrl = URL.createObjectURL(blob);
-        previewImage.src = state.currentPhotoUrl;
-        photoPreview.hidden = false;
-        syncRotationPadVisibility();
-        setStatus("", false);
-      } catch (error) {
-        console.error("Photo capture failed", error);
-        showTemporaryStatus(`촬영 실패: ${error.message || error}`, 2500);
-      } finally {
-        captureButton.disabled = false;
-      }
-    }
-
-    function makePhotoFileName() {
-      const now = new Date();
-      const pad = (value) => String(value).padStart(2, "0");
-      return `AR_${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}_${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}.jpg`;
-    }
-
-    async function saveOrSharePhoto() {
-      if (!state.currentPhotoBlob) return;
-
-      const fileName = makePhotoFileName();
-      const file = new File([state.currentPhotoBlob], fileName, {
-        type: "image/jpeg"
+        prepareGesture();
       });
 
-      try {
-        if (navigator.share && navigator.canShare?.({ files: [file] })) {
-          await navigator.share({
-            files: [file],
-            title: "AR 사진"
-          });
+      stage.addEventListener("pointermove", (event) => {
+        if (!z.pointers.has(event.pointerId)) return;
+        event.preventDefault();
+        z.pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+        const pts = [...z.pointers.values()];
+
+        if (z.gestureMode === "pinch" && pts.length >= 2) {
+          const a = pts[0];
+          const b = pts[1];
+          const distance = Math.max(1, Math.hypot(b.x - a.x, b.y - a.y));
+          const centerX = (a.x + b.x) / 2;
+          const centerY = (a.y + b.y) / 2;
+          z.scale = clamp(z.startScale * (distance / z.startDistance), CONFIG.minZoom, CONFIG.maxZoom);
+          z.x = z.startX + (centerX - z.startCenterX);
+          z.y = z.startY + (centerY - z.startCenterY);
+          limitPan();
+          render(false);
           return;
         }
 
-        const link = document.createElement("a");
-        link.href = state.currentPhotoUrl;
-        link.download = fileName;
-        document.body.appendChild(link);
-        link.click();
-        link.remove();
-      } catch (error) {
-        if (error?.name !== "AbortError") {
-          console.error("Photo save failed", error);
-          showTemporaryStatus("사진 저장에 실패했습니다. 이미지를 길게 눌러 저장해 주세요.", 2600);
+        if (z.gestureMode === "pan" && pts.length === 1) {
+          z.x = z.startX + (pts[0].x - z.singleStartX);
+          z.y = z.startY + (pts[0].y - z.singleStartY);
+          limitPan();
+          render(false);
         }
-      }
+      });
+
+      const finishPointer = (event) => {
+        if (!z.pointers.has(event.pointerId)) return;
+        event.preventDefault();
+        const point = z.pointers.get(event.pointerId);
+        const wasSwipe = z.gestureMode === "swipe" && z.pointers.size === 1;
+        const dx = point.x - z.singleStartX;
+        const dy = point.y - z.singleStartY;
+        z.pointers.delete(event.pointerId);
+
+        if (wasSwipe && Math.abs(dx) > CONFIG.swipeThresholdPx && Math.abs(dx) > Math.abs(dy) * 1.15) {
+          if (dx < 0) setSlide("result");
+          else setSlide("original");
+        }
+        prepareGesture();
+      };
+
+      stage.addEventListener("pointerup", finishPointer);
+      stage.addEventListener("pointercancel", finishPointer);
+      stage.addEventListener("lostpointercapture", (event) => {
+        if (z.pointers.has(event.pointerId)) {
+          z.pointers.delete(event.pointerId);
+          prepareGesture();
+        }
+      });
+
+      stage.addEventListener("wheel", (event) => {
+        event.preventDefault();
+        const factor = event.deltaY < 0 ? 1.12 : 0.89;
+        z.scale = clamp(z.scale * factor, CONFIG.minZoom, CONFIG.maxZoom);
+        limitPan();
+        render(false);
+      }, { passive: false });
+
+      return { reset, getState: () => ({ ...z }), key };
     }
 
-    function closePhotoPreview() {
-      photoPreview.hidden = true;
-      syncRotationPadVisibility();
-      if (state.anchor?.visible) {
-        setStatus("", false);
-      } else if (performance.now() < state.holdUntil) {
-        setStatus("타깃을 놓쳤습니다 · 마지막 위치에서 5초간 유지합니다.");
-      } else {
-        setStatus("인식 이미지를 비춰 주세요.");
-      }
+    const zoomControllers = {
+      original: createZoomController(originalStage, originalImg, "original"),
+      result: createZoomController(resultStage, resultImg, "result")
+    };
+
+    function resetCurrentZoom() {
+      zoomControllers[state.currentSlide]?.reset(true);
     }
 
     async function initialize() {
       try {
-        if (!window.isSecureContext && location.hostname !== "localhost") {
-          throw new Error("카메라는 HTTPS 주소에서만 실행할 수 있습니다.");
+        if (!window.isSecureContext && location.hostname !== "localhost" && location.hostname !== "127.0.0.1") {
+          throw new Error("휴대폰 카메라는 HTTPS 주소에서만 실행할 수 있습니다.");
         }
 
         setDebug("");
+        state.manifest = await loadManifest();
+        setBoot(`${state.manifest.length}개 작품 정보 확인 · 인식 데이터 로딩 중…`);
 
-        const targetBlobUrl = await loadTargetAsBlobUrl(CONFIG.targetUrl);
-        state.targetBlobUrl = targetBlobUrl;
-
-        const gltf = await loadGLB(`${CONFIG.modelUrl}?v=20260814-touch-photo-v11`);
+        state.targetBlobUrl = await loadTargetBlobUrl();
 
         const mindar = new MindARThree({
           container,
-          imageTargetSrc: targetBlobUrl,
-          maxTrack: 1,
+          imageTargetSrc: state.targetBlobUrl,
+          maxTrack: CONFIG.maxTrack,
           uiLoading: "no",
           uiScanning: "no",
           uiError: "no",
@@ -1481,81 +1053,33 @@
         });
 
         state.mindar = mindar;
-
-        const { renderer, scene } = mindar;
+        const { renderer } = mindar;
         renderer.setClearColor(0x000000, 0);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
         renderer.outputColorSpace = THREE.SRGBColorSpace;
-        renderer.toneMapping = THREE.ACESFilmicToneMapping;
-        renderer.toneMappingExposure = 1.0;
 
-        scene.add(new THREE.HemisphereLight(0xffffff, 0x555555, 2.4));
+        state.anchors = state.manifest.map((item, index) => {
+          const anchor = mindar.addAnchor(index);
+          anchor.onTargetFound = () => handleTargetFound(index);
+          anchor.onTargetLost = () => handleTargetLost(index);
+          return anchor;
+        });
 
-        const keyLight = new THREE.DirectionalLight(0xffffff, 2.6);
-        keyLight.position.set(1.5, 2.5, 3);
-        scene.add(keyLight);
-
-        const fillLight = new THREE.DirectionalLight(0xffffff, 1.2);
-        fillLight.position.set(-2, 1, 1.5);
-        scene.add(fillLight);
-
-        const anchor = mindar.addAnchor(0);
-        state.anchor = anchor;
-
-        const displayRoot = new THREE.Group();
-        displayRoot.name = "StabilizedDisplayRoot";
-        displayRoot.visible = false;
-        state.displayRoot = displayRoot;
-        scene.add(displayRoot);
-
-        const holder = prepareModel(gltf);
-        displayRoot.add(holder);
-
-        anchor.onTargetFound = () => {
-          const now = performance.now();
-          const wasNeverSeen = !state.targetSeenOnce;
-          state.targetSeenOnce = true;
-          state.lastTargetSeenAt = now;
-          state.holdUntil = now + CONFIG.targetHoldMs;
-
-          if (wasNeverSeen) {
-            showTemporaryStatus(
-              "한 손가락 이동 · 두 손가락 스케일 · 오른쪽 XYZ 회전 패드",
-              3000
-            );
-          } else {
-            setStatus("", false);
-          }
-        };
-
-        anchor.onTargetLost = () => {
-          state.holdUntil = performance.now() + CONFIG.targetHoldMs;
-          setStatus("타깃을 놓쳤습니다 · 마지막 위치에서 5초간 유지합니다.");
-        };
-
-        connectGestures();
-        connectRotationPad();
-
-        captureButton.addEventListener("click", capturePhoto);
-        closePreviewButton.addEventListener("click", closePhotoPreview);
-        savePhotoButton.addEventListener("click", saveOrSharePhoto);
-
-        state.modelReady = true;
+        state.ready = true;
         startButton.disabled = false;
         startButton.textContent = "카메라 시작";
-        setBootMessage("1.mind와 1.glb 확인 완료");
+        setBoot(`${state.manifest.length}개 작품 준비 완료`);
       } catch (error) {
         console.error(error);
         startButton.disabled = true;
         startButton.textContent = "시작할 수 없음";
-        setBootMessage("시작 파일을 준비하지 못했습니다.");
+        setBoot("AR 파일을 준비하지 못했습니다.");
         setDebug(describeError(error));
       }
     }
 
     async function startAR() {
-      if (state.started || state.starting || !state.modelReady || !state.mindar) return;
-
+      if (!state.ready || state.started || state.starting || !state.mindar) return;
       state.starting = true;
       startButton.disabled = true;
       startButton.textContent = "카메라 여는 중…";
@@ -1563,89 +1087,53 @@
 
       try {
         await startVideoRobust(state.mindar);
-
-        setStatus("카메라 연결 완료 · 1.mind를 초기화하고 있습니다…");
+        setBoot("이미지 인식 엔진을 시작하고 있습니다…");
 
         await withTimeout(
           state.mindar._startAR(),
           CONFIG.arTimeoutMs,
-          "카메라는 연결됐지만 1.mind 인식 엔진 초기화가 완료되지 않았습니다."
+          "카메라는 연결됐지만 이미지 인식 엔진 준비 시간이 초과됐습니다."
         );
 
         state.started = true;
         state.starting = false;
-
+        startScreen.hidden = true;
+        hud.hidden = false;
+        setStatus("그림을 프레임 안에 비춰 주세요");
         fixCameraLayers();
-        window.setTimeout(fixCameraLayers, 100);
-        window.setTimeout(fixCameraLayers, 500);
+        setTimeout(fixCameraLayers, 100);
+        setTimeout(fixCameraLayers, 500);
 
-        toolbar.hidden = false;
-        syncRotationPadVisibility();
-        setStatus("인식 이미지를 비춰 주세요.");
-
-        const clock = new THREE.Clock();
-        state.clock = clock;
         const { renderer, scene, camera } = state.mindar;
-
-        renderer.setAnimationLoop(() => {
-          const delta = Math.min(clock.getDelta(), 0.05);
-          const now = performance.now();
-
-          if (state.mixer) state.mixer.update(delta);
-          updateTrackedPose(delta, now);
-          syncRotationPadVisibility();
-
-          if (
-            state.targetSeenOnce &&
-            !state.anchor.visible &&
-            now > state.holdUntil &&
-            state.displayRoot.visible === false &&
-            photoPreview.hidden &&
-            status.textContent !== "인식 이미지를 비춰 주세요."
-          ) {
-            setStatus("인식 이미지를 비춰 주세요.");
-          }
-
-          renderer.render(scene, camera);
-        });
+        renderer.setAnimationLoop(() => renderer.render(scene, camera));
       } catch (error) {
         console.error("AR start failed", error);
         state.starting = false;
         stopCameraTracks();
-
         startScreen.hidden = false;
         startButton.disabled = false;
         startButton.textContent = "다시 시작";
-        setStatus("", false);
 
-        if (error?.name === "NotAllowedError") {
-          setBootMessage("카메라 권한이 차단되었습니다.");
-        } else if (error?.name === "NotFoundError") {
-          setBootMessage("사용할 수 있는 카메라를 찾지 못했습니다.");
-        } else if (error?.name === "NotReadableError") {
-          setBootMessage("다른 앱이 카메라를 사용 중이거나 카메라를 열 수 없습니다.");
-        } else if (error?.name === "VideoMetadataTimeout") {
-          setBootMessage("권한은 허용됐지만 카메라 영상 연결이 완료되지 않았습니다.");
-        } else if (error?.name === "TimeoutError") {
-          setBootMessage("카메라 또는 이미지 인식 엔진의 준비 시간이 초과됐습니다.");
-        } else {
-          setBootMessage("AR 시작 중 오류가 발생했습니다.");
-        }
-
+        if (error?.name === "NotAllowedError") setBoot("카메라 권한이 차단되었습니다.");
+        else if (error?.name === "NotFoundError") setBoot("사용할 수 있는 카메라를 찾지 못했습니다.");
+        else if (error?.name === "NotReadableError") setBoot("다른 앱이 카메라를 사용 중이거나 카메라를 열 수 없습니다.");
+        else if (error?.name === "VideoMetadataTimeout") setBoot("권한은 허용됐지만 카메라 영상 연결이 완료되지 않았습니다.");
+        else if (error?.name === "TimeoutError") setBoot("카메라 또는 이미지 인식 엔진 준비 시간이 초과됐습니다.");
+        else setBoot("AR 시작 중 오류가 발생했습니다.");
         setDebug(describeError(error));
       }
     }
 
     startButton.addEventListener("click", startAR);
+    closeViewerButton.addEventListener("click", closeViewer);
+    tabOriginal.addEventListener("click", () => setSlide("original"));
+    tabResult.addEventListener("click", () => setSlide("result"));
+    resetZoomButton.addEventListener("click", resetCurrentZoom);
 
-    window.addEventListener("resize", () => {
-      window.requestAnimationFrame(fixCameraLayers);
-    });
-
+    window.addEventListener("resize", () => requestAnimationFrame(fixCameraLayers));
     window.addEventListener("pagehide", stopCameraTracks);
-
     window.addEventListener("unhandledrejection", (event) => {
-      console.error("Unhandled promise rejection", event.reason);
+      console.error("Unhandled rejection", event.reason);
       setDebug(describeError(event.reason));
     });
 
