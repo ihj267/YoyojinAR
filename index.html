@@ -8,15 +8,9 @@
   />
   <meta name="theme-color" content="#080808" />
   <title>YOYOJIN AR · Image Compare</title>
-
-  <script type="importmap">
-  {
-    "imports": {
-      "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
-      "mindar-image-three": "https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-three.prod.js"
-    }
-  }
-  </script>
+  <!-- A-Frame classic build: import-map/module 없이 모바일 호환성 우선 -->
+  <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
 
   <style>
     :root {
@@ -47,6 +41,15 @@
       isolation: isolate;
     }
 
+    #ar-container a-scene {
+      position: absolute !important;
+      inset: 0 !important;
+      width: 100% !important;
+      height: 100% !important;
+      z-index: 1 !important;
+    }
+
+    #ar-container video,
     #ar-container > video {
       position: absolute !important;
       inset: 0 auto auto 0 !important;
@@ -58,6 +61,7 @@
       background: #000 !important;
     }
 
+    #ar-container canvas,
     #ar-container > canvas {
       position: absolute !important;
       z-index: 1 !important;
@@ -464,7 +468,20 @@
 </head>
 
 <body>
-  <div id="ar-container" aria-label="AR camera view"></div>
+  <div id="ar-container" aria-label="AR camera view">
+    <a-scene
+      id="ar-scene"
+      embedded
+      mindar-image="imageTargetSrc: ./targets.mind; autoStart: false; maxTrack: 1; uiLoading: no; uiScanning: no; uiError: no; warmupTolerance: 3; missTolerance: 5; filterMinCF: 0.001; filterBeta: 20;"
+      color-space="sRGB"
+      renderer="colorManagement: true; alpha: true; antialias: true;"
+      vr-mode-ui="enabled: false"
+      device-orientation-permission-ui="enabled: false"
+      loading-screen="enabled: false"
+    >
+      <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+    </a-scene>
+  </div>
 
   <section id="start-screen">
     <div id="start-card">
@@ -532,11 +549,8 @@
     </footer>
   </section>
 
-  <script type="module">
-    import * as THREE from "three";
-    import { MindARThree } from "mindar-image-three";
-
-    console.info("YOYOJIN AR BUILD: MULTI_IMAGE_COMPARE_V1_20260907");
+  <script>
+    console.info("YOYOJIN AR BUILD: MULTI_IMAGE_COMPARE_AFRAME_V2_20260907");
 
     const CONFIG = Object.freeze({
       manifestUrl: "./targets.json",
@@ -554,6 +568,7 @@
     const $ = (selector) => document.querySelector(selector);
 
     const container = $("#ar-container");
+    const sceneEl = $("#ar-scene");
     const startScreen = $("#start-screen");
     const startButton = $("#start-button");
     const bootStatus = $("#boot-status");
@@ -580,8 +595,9 @@
 
     const state = {
       manifest: [],
-      mindar: null,
+      arSystem: null,
       anchors: [],
+      sceneReady: false,
       started: false,
       starting: false,
       ready: false,
@@ -782,8 +798,15 @@
     }
 
     function stopCameraTracks() {
-      const stream = state.mindar?.video?.srcObject;
-      if (stream?.getTracks) stream.getTracks().forEach((track) => track.stop());
+      try {
+        state.arSystem?.stop?.();
+      } catch (error) {
+        console.warn("AR stop warning", error);
+      }
+      document.querySelectorAll("video").forEach((video) => {
+        const stream = video.srcObject;
+        if (stream?.getTracks) stream.getTracks().forEach((track) => track.stop());
+      });
     }
 
     function showToast(text) {
@@ -1027,6 +1050,56 @@
       zoomControllers[state.currentSlide]?.reset(true);
     }
 
+    function waitForSceneLoaded(timeoutMs = 15000) {
+      return new Promise((resolve, reject) => {
+        if (!window.AFRAME) {
+          reject(new Error("A-Frame 라이브러리를 불러오지 못했습니다. 네트워크 연결을 확인해 주세요."));
+          return;
+        }
+        if (!sceneEl) {
+          reject(new Error("AR scene을 찾지 못했습니다."));
+          return;
+        }
+        if (sceneEl.hasLoaded) {
+          resolve();
+          return;
+        }
+        let timer = 0;
+        const done = () => {
+          clearTimeout(timer);
+          sceneEl.removeEventListener("loaded", done);
+          resolve();
+        };
+        sceneEl.addEventListener("loaded", done, { once: true });
+        timer = setTimeout(() => {
+          sceneEl.removeEventListener("loaded", done);
+          reject(new Error("AR 라이브러리 초기화 시간이 초과됐습니다."));
+        }, timeoutMs);
+      });
+    }
+
+    function createTargetEntities() {
+      state.anchors.forEach((el) => el.remove());
+      state.anchors = state.manifest.map((item, index) => {
+        const entity = document.createElement("a-entity");
+        entity.setAttribute("mindar-image-target", `targetIndex: ${index}`);
+        entity.dataset.targetIndex = String(index);
+        entity.addEventListener("targetFound", () => handleTargetFound(index));
+        entity.addEventListener("targetLost", () => handleTargetLost(index));
+        sceneEl.appendChild(entity);
+        return entity;
+      });
+    }
+
+    async function checkTargetMindExists() {
+      // GitHub Pages에서 파일명/경로 실수를 시작 전에 잡아냅니다.
+      const response = await fetch(`${CONFIG.targetUrl}?v=20260907b`, { cache: "no-store" });
+      if (!response.ok) throw new Error(`targets.mind를 찾지 못했습니다. HTTP ${response.status}`);
+      const data = await response.arrayBuffer();
+      if (data.byteLength < 32) throw new Error("targets.mind 파일이 비어 있거나 올바르지 않습니다.");
+      return data.byteLength;
+    }
+
     async function initialize() {
       try {
         if (!window.isSecureContext && location.hostname !== "localhost" && location.hostname !== "127.0.0.1") {
@@ -1034,43 +1107,32 @@
         }
 
         setDebug("");
+        setBoot("AR 라이브러리를 확인하고 있습니다…");
+        await waitForSceneLoaded();
+
+        const arSystem = sceneEl.systems?.["mindar-image-system"];
+        if (!arSystem) {
+          throw new Error("MindAR 이미지 인식 모듈을 시작하지 못했습니다. 페이지를 새로고침해 주세요.");
+        }
+        state.arSystem = arSystem;
+        state.sceneReady = true;
+
+        setBoot("작품 목록을 확인하고 있습니다…");
         state.manifest = await loadManifest();
-        setBoot(`${state.manifest.length}개 작품 정보 확인 · 인식 데이터 로딩 중…`);
 
-        state.targetBlobUrl = await loadTargetBlobUrl();
+        setBoot(`${state.manifest.length}개 작품 정보 확인 · targets.mind 확인 중…`);
+        const mindBytes = await checkTargetMindExists();
+        console.info("targets.mind bytes:", mindBytes);
 
-        const mindar = new MindARThree({
-          container,
-          imageTargetSrc: state.targetBlobUrl,
-          maxTrack: CONFIG.maxTrack,
-          uiLoading: "no",
-          uiScanning: "no",
-          uiError: "no",
-          warmupTolerance: 3,
-          missTolerance: 5,
-          filterMinCF: 0.001,
-          filterBeta: 20
-        });
-
-        state.mindar = mindar;
-        const { renderer } = mindar;
-        renderer.setClearColor(0x000000, 0);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-        renderer.outputColorSpace = THREE.SRGBColorSpace;
-
-        state.anchors = state.manifest.map((item, index) => {
-          const anchor = mindar.addAnchor(index);
-          anchor.onTargetFound = () => handleTargetFound(index);
-          anchor.onTargetLost = () => handleTargetLost(index);
-          return anchor;
-        });
+        createTargetEntities();
 
         state.ready = true;
         startButton.disabled = false;
         startButton.textContent = "카메라 시작";
-        setBoot(`${state.manifest.length}개 작품 준비 완료`);
+        setBoot(`${state.manifest.length}개 작품 준비 완료 · 버튼을 눌러 주세요`);
       } catch (error) {
-        console.error(error);
+        console.error("Initialize failed", error);
+        state.ready = false;
         startButton.disabled = true;
         startButton.textContent = "시작할 수 없음";
         setBoot("AR 파일을 준비하지 못했습니다.");
@@ -1079,21 +1141,45 @@
     }
 
     async function startAR() {
-      if (!state.ready || state.started || state.starting || !state.mindar) return;
+      if (!state.ready || state.started || state.starting || !state.arSystem) return;
+
       state.starting = true;
       startButton.disabled = true;
       startButton.textContent = "카메라 여는 중…";
+      setBoot("카메라 권한을 요청하고 있습니다…");
       setDebug("");
 
+      let readyTimer = 0;
       try {
-        await startVideoRobust(state.mindar);
-        setBoot("이미지 인식 엔진을 시작하고 있습니다…");
+        const readyPromise = new Promise((resolve, reject) => {
+          const onReady = () => {
+            cleanup();
+            resolve();
+          };
+          const onError = (event) => {
+            cleanup();
+            const detail = event?.detail?.error || event?.detail || "카메라 또는 AR 엔진 오류";
+            reject(detail instanceof Error ? detail : new Error(String(detail)));
+          };
+          const cleanup = () => {
+            clearTimeout(readyTimer);
+            sceneEl.removeEventListener("arReady", onReady);
+            sceneEl.removeEventListener("arError", onError);
+          };
+          sceneEl.addEventListener("arReady", onReady, { once: true });
+          sceneEl.addEventListener("arError", onError, { once: true });
+          readyTimer = setTimeout(() => {
+            cleanup();
+            const error = new Error("카메라 또는 이미지 인식 엔진 준비 시간이 초과됐습니다.");
+            error.name = "TimeoutError";
+            reject(error);
+          }, CONFIG.arTimeoutMs);
+        });
 
-        await withTimeout(
-          state.mindar._startAR(),
-          CONFIG.arTimeoutMs,
-          "카메라는 연결됐지만 이미지 인식 엔진 준비 시간이 초과됐습니다."
-        );
+        // 반드시 사용자 버튼 클릭 안에서 실행 -> 모바일 카메라 권한 창이 정상적으로 뜹니다.
+        const maybePromise = state.arSystem.start();
+        if (maybePromise?.catch) maybePromise.catch((error) => console.warn("MindAR start promise", error));
+        await readyPromise;
 
         state.started = true;
         state.starting = false;
@@ -1102,22 +1188,20 @@
         setStatus("그림을 프레임 안에 비춰 주세요");
         fixCameraLayers();
         setTimeout(fixCameraLayers, 100);
-        setTimeout(fixCameraLayers, 500);
-
-        const { renderer, scene, camera } = state.mindar;
-        renderer.setAnimationLoop(() => renderer.render(scene, camera));
+        setTimeout(fixCameraLayers, 600);
       } catch (error) {
+        clearTimeout(readyTimer);
         console.error("AR start failed", error);
         state.starting = false;
+        state.started = false;
         stopCameraTracks();
         startScreen.hidden = false;
         startButton.disabled = false;
         startButton.textContent = "다시 시작";
 
-        if (error?.name === "NotAllowedError") setBoot("카메라 권한이 차단되었습니다.");
+        if (error?.name === "NotAllowedError") setBoot("카메라 권한이 차단되었습니다. 브라우저 설정에서 카메라를 허용해 주세요.");
         else if (error?.name === "NotFoundError") setBoot("사용할 수 있는 카메라를 찾지 못했습니다.");
         else if (error?.name === "NotReadableError") setBoot("다른 앱이 카메라를 사용 중이거나 카메라를 열 수 없습니다.");
-        else if (error?.name === "VideoMetadataTimeout") setBoot("권한은 허용됐지만 카메라 영상 연결이 완료되지 않았습니다.");
         else if (error?.name === "TimeoutError") setBoot("카메라 또는 이미지 인식 엔진 준비 시간이 초과됐습니다.");
         else setBoot("AR 시작 중 오류가 발생했습니다.");
         setDebug(describeError(error));
@@ -1136,6 +1220,21 @@
       console.error("Unhandled rejection", event.reason);
       setDebug(describeError(event.reason));
     });
+
+    window.addEventListener("error", (event) => {
+      if (!state.ready && !state.started) {
+        const message = event?.message || "스크립트 로딩 오류";
+        setDebug(message);
+      }
+    });
+
+    // 외부 라이브러리가 실패해도 화면이 영원히 "준비 중"에 멈추지 않도록 안전장치.
+    setTimeout(() => {
+      if (!state.ready && startButton.textContent === "준비 중…") {
+        setBoot("초기화가 지연되고 있습니다.");
+        setDebug("페이지를 새로고침해도 같으면 A-Frame/MindAR 라이브러리 또는 targets.mind 경로를 확인해 주세요.");
+      }
+    }, 12000);
 
     initialize();
   </script>
