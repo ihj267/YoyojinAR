@@ -1,25 +1,7 @@
 {
   "items": [
-    {
-      "id": "1",
-      "targetIndex": 0,
-      "marker": "1.jpg",
-      "artwork": "1.jpeg",
-      "title": "작품 1"
-    },
-    {
-      "id": "2",
-      "targetIndex": 1,
-      "marker": "2.jpg",
-      "artwork": "2.jpeg",
-      "title": "작품 2"
-    },
-    {
-      "id": "3",
-      "targetIndex": 2,
-      "marker": "3.png",
-      "artwork": "3.jpeg",
-      "title": "작품 3"
-    }
+    { "id": "1", "targetIndex": 0, "marker": "1.jpg", "artwork": "1.jpeg", "title": "벽화 속 친구 1" },
+    { "id": "2", "targetIndex": 1, "marker": "2.jpg", "artwork": "2.jpeg", "title": "벽화 속 친구 2" },
+    { "id": "3", "targetIndex": 2, "marker": "3.png", "artwork": "3.jpeg", "title": "벽화 속 친구 3" }
   ]
 }

@@ -1,70 +1,53 @@
 <!doctype html>
 <html lang="ko">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>YOYOJIN targets.mind 만들기</title>
-  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image.prod.js"></script>
-  <style>
-    body{font-family:Arial,"Noto Sans KR",sans-serif;max-width:680px;margin:0 auto;padding:28px;background:#111;color:#fff;line-height:1.6}
-    button{width:100%;min-height:54px;border:0;border-radius:14px;font-size:16px;font-weight:800;margin:14px 0;cursor:pointer}
-    pre{white-space:pre-wrap;background:#1c1c1c;padding:14px;border-radius:12px;color:#ddd}
-    .bar{height:10px;background:#292929;border-radius:99px;overflow:hidden}.bar>div{height:100%;width:0;background:#fff;transition:width .15s}
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>YOYOJIN · targets.mind 생성</title>
+<script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image.prod.js"></script>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#0b0b0b;color:#fff;font-family:Arial,"Noto Sans KR",sans-serif;padding:28px;line-height:1.55}.wrap{max-width:760px;margin:auto}h1{font-size:28px;margin:0 0 8px}p{color:#bbb}.card{background:#171717;border:1px solid #333;border-radius:18px;padding:18px;margin:16px 0}.row{display:grid;grid-template-columns:72px 1fr;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid #292929}.row:last-child{border:0}.thumb{width:72px;height:72px;object-fit:contain;background:#fff;border-radius:10px}.meta{font-size:13px;color:#ccc}.name{font-size:15px;font-weight:800;color:#fff}.ok{color:#9fe6ad}.bad{color:#ffaaa5}button{width:100%;height:56px;border:0;border-radius:999px;background:#fff;color:#000;font-size:16px;font-weight:900;cursor:pointer}button:disabled{opacity:.35}.bar{height:10px;background:#2a2a2a;border-radius:999px;overflow:hidden;margin:15px 0}.bar>div{height:100%;width:0;background:#fff;transition:width .12s}.small{font-size:12px;color:#999;white-space:pre-wrap}.warn{background:#261b12;border-color:#5b3c1e;color:#ffd4a3}
+</style>
 </head>
-<body>
-  <h1>targets.mind 만들기</h1>
-  <p>이 페이지는 현재 테스트용 타깃 3개를 아래 순서로 컴파일합니다.</p>
-  <pre>0 → 1.jpg
-1 → 2.jpg
-2 → 3.png</pre>
-  <button id="go">targets.mind 생성</button>
-  <div class="bar"><div id="fill"></div></div>
-  <p id="status">대기 중</p>
-  <script>
-    const paths=["1.jpg","2.jpg","3.png"];
-    const status=document.querySelector("#status");
-    const fill=document.querySelector("#fill");
-    const button=document.querySelector("#go");
-
-    async function loadImage(url){
-      return new Promise((resolve,reject)=>{
-        const img=new Image();
-        img.onload=()=>resolve(img);
-        img.onerror=()=>reject(new Error(url+" 로딩 실패"));
-        img.src=url+"?v="+Date.now();
-      });
-    }
-
-    button.addEventListener("click",async()=>{
-      button.disabled=true;
-      try{
-        if(!window.MINDAR?.IMAGE?.Compiler) throw new Error("MindAR Compiler를 불러오지 못했습니다.");
-        status.textContent="타깃 이미지를 읽는 중…";
-        const images=[];
-        for(const path of paths) images.push(await loadImage(path));
-        const compiler=new window.MINDAR.IMAGE.Compiler();
-        status.textContent="컴파일 중…";
-        await compiler.compileImageTargets(images,(progress)=>{
-          const p=Math.max(0,Math.min(100,Number(progress)||0));
-          fill.style.width=p+"%";
-          status.textContent=`컴파일 중… ${p.toFixed(1)}%`;
-        });
-        const buffer=await compiler.exportData();
-        const blob=new Blob([buffer],{type:"application/octet-stream"});
-        const a=document.createElement("a");
-        a.href=URL.createObjectURL(blob);
-        a.download="targets.mind";
-        a.click();
-        setTimeout(()=>URL.revokeObjectURL(a.href),1000);
-        fill.style.width="100%";
-        status.textContent="완료. 다운로드된 targets.mind를 GitHub의 index.html 옆에 올리세요.";
-      }catch(error){
-        console.error(error);
-        status.textContent="오류: "+(error.message||error);
-        button.disabled=false;
-      }
-    });
-  </script>
-</body>
-</html>
+<body><div class="wrap">
+<h1>targets.mind 생성</h1>
+<p><b>targets.json</b>을 읽어서 marker 파일을 targetIndex 순서로 자동 컴파일합니다. 3개 테스트 후, 나중에 목록만 늘려도 같은 방식으로 사용할 수 있습니다.</p>
+<div class="card warn"><b>중요</b><br>기존 <code>1.mind</code>는 사용하지 마세요. 이 페이지가 내려주는 파일 이름은 <b>targets.mind</b>입니다.</div>
+<div id="list" class="card">파일 확인 중…</div>
+<button id="build" disabled>targets.mind 생성</button>
+<div class="bar"><div id="fill"></div></div>
+<div id="status" class="small">준비 중…</div>
+</div>
+<script>
+const BUILD='YOYOJIN_TARGET_BUILDER_V4';
+const listEl=document.querySelector('#list'),button=document.querySelector('#build'),fill=document.querySelector('#fill'),statusEl=document.querySelector('#status');
+let items=[];
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+async function loadImage(url){return new Promise((resolve,reject)=>{const img=new Image();img.onload=()=>resolve(img);img.onerror=()=>reject(new Error(url+' 로딩 실패'));img.src=url+'?v='+Date.now();});}
+async function init(){
+ try{
+  const r=await fetch('./targets.json?v='+Date.now(),{cache:'no-store'}); if(!r.ok) throw new Error('targets.json HTTP '+r.status);
+  const data=await r.json(); items=(Array.isArray(data)?data:data.items||[]).slice().sort((a,b)=>(a.targetIndex??0)-(b.targetIndex??0));
+  if(!items.length) throw new Error('targets.json의 items가 비어 있습니다.');
+  const loaded=[]; listEl.innerHTML='';
+  for(let i=0;i<items.length;i++){
+   const item=items[i]; if((item.targetIndex??i)!==i) throw new Error('targetIndex가 0부터 연속이어야 합니다: '+i);
+   const marker=item.marker||item.target; if(!marker) throw new Error(i+'번 marker 파일명이 없습니다.');
+   statusEl.textContent=`타깃 파일 확인 중 ${i+1}/${items.length}: ${marker}`;
+   const img=await loadImage(marker); loaded.push(img);
+   const row=document.createElement('div'); row.className='row'; row.innerHTML=`<img class="thumb" src="${esc(marker)}"><div><div class="name">targetIndex ${i} → ${esc(marker)}</div><div class="meta ok">확인 완료 · ${img.naturalWidth} × ${img.naturalHeight}px</div></div>`; listEl.appendChild(row);
+  }
+  window.__targetImages=loaded; button.disabled=false; statusEl.textContent=`${items.length}개 타깃 확인 완료. 생성 버튼을 누르세요.`;
+ }catch(e){console.error(e);listEl.innerHTML='<span class="bad">'+esc(e.message||e)+'</span>';statusEl.textContent='파일 확인 실패';}
+}
+button.addEventListener('click',async()=>{
+ button.disabled=true; fill.style.width='0%';
+ try{
+  if(!window.MINDAR?.IMAGE?.Compiler) throw new Error('MindAR Compiler 로딩 실패');
+  const compiler=new window.MINDAR.IMAGE.Compiler(); statusEl.textContent='컴파일 시작…';
+  await compiler.compileImageTargets(window.__targetImages,p=>{const n=Math.max(0,Math.min(100,Number(p)||0));fill.style.width=n+'%';statusEl.textContent=`컴파일 중… ${n.toFixed(1)}%`;});
+  const buffer=await compiler.exportData(); const blob=new Blob([buffer],{type:'application/octet-stream'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='targets.mind'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),1500); fill.style.width='100%'; statusEl.textContent=`완료 · ${items.length}개 타깃이 들어간 targets.mind를 GitHub의 index.html 옆에 올리세요.`;
+ }catch(e){console.error(e);statusEl.textContent='오류: '+(e.message||e);button.disabled=false;}
+});
+init();
+</script></body></html>
