@@ -1,7 +1,7 @@
 import './catalog-migrations.js';
 import './worksheet.js';
 const $ = s => document.querySelector(s);
-const preview = false; // This encrypted test uses the exported snapshot only.
+const preview = false; // Deployed snapshot, independent of browser drafts.
 const DRAFT_KEY = 'yoyojin.mural.draft.v1';
 const state = {catalog:null, targets:null, view:'ready', galleryPage:0, zoom:1, ar:null, session:0, starting:false, introTimer:null, guide:null};
 const worksheetTools=window.YoyojinWorksheet;
@@ -50,16 +50,15 @@ function renderGallery() {
   const grid=$('#gallery-grid');grid.replaceChildren();
   for(const item of items.slice(state.galleryPage*24,(state.galleryPage+1)*24)){
     const b=document.createElement('button'); b.className='art-card';b.onclick=()=>openArtwork(item);
-    const img=document.createElement('img');img.alt=titleOf(item);img.decoding='async';window.YoyojinTest.assetURL(item.thumbnail).then(url=>{if(img.isConnected)img.src=url;}).catch(()=>{if(img.isConnected)img.alt='그림을 불러오지 못했어요';});
+    const img=document.createElement('img');img.src=item.thumbnail;img.alt=titleOf(item);img.loading='lazy';img.decoding='async';
     const id=document.createElement('span');id.className='card-id';id.textContent=`NO. ${item.id}`;
     const title=document.createElement('strong');title.textContent=titleOf(item);b.append(img,id,title);grid.append(b);
   }
   if(!items.length){const p=document.createElement('p');p.className='subtle';p.textContent=q?'해당 번호의 그림이 없어요.':'공개할 그림을 준비하고 있어요.';grid.append(p);}
   $('#page-label').textContent=`${state.galleryPage+1} / ${pages}`;$('#prev-page').disabled=state.galleryPage===0;$('#next-page').disabled=state.galleryPage===pages-1;
 }
-let artworkFocus=null; let artworkRequest=0;
+let artworkFocus=null;
 function openArtwork(item) {
-  const request=++artworkRequest;
   artworkFocus=document.activeElement;$('#art-number').textContent=`참여 작품 · ${item.id}`;$('#art-title').textContent=titleOf(item);
   $('#art-name').textContent=item.displayName||'';$('#art-name').hidden=!item.displayName;
   const story=$('#art-story');story.replaceChildren();
@@ -75,11 +74,10 @@ function openArtwork(item) {
   }else story.textContent=item.story||'아이의 그림과 손글씨를 원화에서 만나 보세요.';
   $('#art-review').textContent=preview?`PDF ${item.sourcePage}쪽 · ${item.publish?'공개 선택됨':'공개 전 검수용'}${item.mapping?.confirmed?' · 위치 확인됨':' · 벽화 위치 연결 대기'}`:'';
   $('#art-image').alt=titleOf(item);$('#art-image-error').hidden=true;
-  $('#art-image').onerror=()=>{$('#art-image-error').hidden=false;};$('#art-image').removeAttribute('src');$('#art-image').hidden=true;
-  $('#full-art').removeAttribute('href');$('#full-art').hidden=true;$('#art-dialog').showModal();
-  window.YoyojinTest.assetURL(item.image).then(url=>{if(request!==artworkRequest||!$('#art-dialog').open)return;$('#art-image').src=url;$('#art-image').hidden=false;$('#full-art').href=url;$('#full-art').hidden=false;}).catch(()=>{if(request===artworkRequest&&$('#art-dialog').open)$('#art-image-error').hidden=false;});
+  $('#art-image').onerror=()=>{$('#art-image-error').hidden=false;};$('#art-image').src=item.image;
+  $('#full-art').href=item.image;$('#art-dialog').showModal();
 }
-function closeArtwork(){ ++artworkRequest; $('#art-dialog').close(); artworkFocus?.focus(); }
+function closeArtwork(){ $('#art-dialog').close(); artworkFocus?.focus(); }
 async function showIntro() {
   $('#intro').hidden=false;const start=performance.now();
   const lines=[['안녕! 벽화 속에서 만나자.','우리의 이야기는 아이들의 작은 상상에서 시작됐어.'],['카메라로 나를 찾아줘!','벽화를 천천히 비추면 노란 포인트가 나타날 거야.'],['포인트를 톡, 눌러 볼까?','아이들이 그린 원화와 함께 살아가는 이야기를 만날 수 있어.']];
@@ -183,7 +181,7 @@ window.addEventListener('pagehide',()=>{stopCamera();state.guide?.pause();});
 document.addEventListener('visibilitychange',()=>{if(document.hidden){if(state.ar||state.starting){stopCamera();switchView('ready');$('#camera-message').textContent='화면을 떠나 카메라를 껐어요. 다시 시작하려면 버튼을 눌러 주세요.';}state.guide?.pause();}else if(!$('#intro').hidden)state.guide?.play();});
 window.addEventListener('storage',event=>{if(preview&&event.key===DRAFT_KEY)location.reload();});
 try{
-  const [catalog,targets]=await Promise.all([Promise.resolve(window.YoyojinTest.catalog),json('./data/targets.json')]);state.catalog=catalog;state.targets=targets;
+  const [catalog,targets]=await Promise.all([json('./data/catalog.json'),json('./data/targets.json')]);state.catalog=catalog;state.targets=targets;
   if(preview){$('#preview-banner').hidden=false;try{const draft=JSON.parse(localStorage.getItem(DRAFT_KEY));if(validDraft(draft,catalog))state.catalog={...catalog,items:draft.items};}catch{}}
   state.catalog=worksheetTools.merge(state.catalog,new Map(catalog.items.filter(item=>item.worksheet).map(item=>[item.id,item.worksheet]))).catalog;
   state.catalog=window.YoyojinCatalogMigrations.removeLegacyCandidates(state.catalog).catalog;
