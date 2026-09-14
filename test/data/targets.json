@@ -1,0 +1,342 @@
+{
+  "version": 1,
+  "wall": {
+    "width": 22149,
+    "height": 4162
+  },
+  "banks": [
+    {
+      "id": "left",
+      "label": "왼쪽",
+      "mind": "assets/targets/left.mind",
+      "targets": [
+        {
+          "targetIndex": 0,
+          "image": "assets/targets/zone-00.webp",
+          "x": 0,
+          "y": 0,
+          "width": 2081,
+          "height": 2081
+        },
+        {
+          "targetIndex": 1,
+          "image": "assets/targets/zone-01.webp",
+          "x": 0,
+          "y": 1040,
+          "width": 2081,
+          "height": 2081
+        },
+        {
+          "targetIndex": 2,
+          "image": "assets/targets/zone-02.webp",
+          "x": 0,
+          "y": 2081,
+          "width": 2081,
+          "height": 2081
+        },
+        {
+          "targetIndex": 3,
+          "image": "assets/targets/zone-03.webp",
+          "x": 1672,
+          "y": 0,
+          "width": 2081,
+          "height": 2081
+        },
+        {
+          "targetIndex": 4,
+          "image": "assets/targets/zone-04.webp",
+          "x": 1672,
+          "y": 1040,
+          "width": 2081,
+          "height": 2081
+        },
+        {
+          "targetIndex": 5,
+          "image": "assets/targets/zone-05.webp",
+          "x": 1672,
+          "y": 2081,
+          "width": 2081,
+          "height": 2081
+        },
+        {
+          "targetIndex": 6,
+          "image": "assets/targets/zone-06.webp",
+          "x": 3345,
+          "y": 0,
+          "width": 2081,
+          "height": 2081
+        },
+        {
+          "targetIndex": 7,
+          "image": "assets/targets/zone-07.webp",
+          "x": 3345,
+          "y": 1040,
+          "width": 2081,
+          "height": 2081
+        },
+        {
+          "targetIndex": 8,
+          "image": "assets/targets/zone-08.webp",
+          "x": 3345,
+          "y": 2081,
+          "width": 2081,
+          "height": 2081
+        },
+        {
+          "targetIndex": 9,
+          "image": "assets/targets/zone-09.webp",
+          "x": 5017,
+          "y": 0,
+          "width": 2081,
+          "height": 2081
+        },
+        {
+          "targetIndex": 10,
+          "image": "assets/targets/zone-10.webp",
+          "x": 5017,
+          "y": 1040,
+          "width": 2081,
+          "height": 2081
+        },
+        {
+          "targetIndex": 11,
+          "image": "assets/targets/zone-11.webp",
+          "x": 5017,
+          "y": 2081,
+          "width": 2081,
+          "height": 2081
+        }
+      ]
+    },
+    {
+      "id": "center",
+      "label": "가운데",
+      "mind": "assets/targets/center.mind",
+      "targets": [
+        {
+          "targetIndex": 0,
+          "image": "assets/targets/zone-12.webp",
+          "x": 6689,
+          "y": 0,
+          "width": 2081,
+          "height": 2081
+        },
+        {
+          "targetIndex": 1,
+          "image": "assets/targets/zone-13.webp",
+          "x": 6689,
+          "y": 1040,
+          "width": 2081,
+          "height": 2081
+        },
+        {
+          "targetIndex": 2,
+          "image": "assets/targets/zone-14.webp",
+          "x": 6689,
+          "y": 2081,
+          "width": 2081,
+          "height": 2081
+        },
+        {
+          "targetIndex": 3,
+          "image": "assets/targets/zone-15.webp",
+          "x": 8362,
+          "y": 0,
+          "width": 2081,
+          "height": 2081
+        },
+        {
+          "targetIndex": 4,
+          "image": "assets/targets/zone-16.webp",
+          "x": 8362,
+          "y": 1040,
+          "width": 2081,
+          "height": 2081
+        },
+        {
+          "targetIndex": 5,
+          "image": "assets/targets/zone-17.webp",
+          "x": 8362,
+          "y": 2081,
+          "width": 2081,
+          "height": 2081
+        },
+        {
+          "targetIndex": 6,
+          "image": "assets/targets/zone-18.webp",
+          "x": 10034,
+          "y": 0,
+          "width": 2081,
+          "height": 2081
+        },
+        {
+          "targetIndex": 7,
+          "image": "assets/targets/zone-19.webp",
+          "x": 10034,
+          "y": 1040,
+          "width": 2081,
+          "height": 2081
+        },
+        {
+          "targetIndex": 8,
+          "image": "assets/targets/zone-20.webp",
+          "x": 10034,
+          "y": 2081,
+          "width": 2081,
+          "height": 2081
+        },
+        {
+          "targetIndex": 9,
+          "image": "assets/targets/zone-21.webp",
+          "x": 11706,
+          "y": 0,
+          "width": 2081,
+          "height": 2081
+        },
+        {
+          "targetIndex": 10,
+          "image": "assets/targets/zone-22.webp",
+          "x": 11706,
+          "y": 1040,
+          "width": 2081,
+          "height": 2081
+        },
+        {
+          "targetIndex": 11,
+          "image": "assets/targets/zone-23.webp",
+          "x": 11706,
+          "y": 2081,
+          "width": 2081,
+          "height": 2081
+        },
+        {
+          "targetIndex": 12,
+          "image": "assets/targets/zone-24.webp",
+          "x": 13379,
+          "y": 0,
+          "width": 2081,
+          "height": 2081
+        },
+        {
+          "targetIndex": 13,
+          "image": "assets/targets/zone-25.webp",
+          "x": 13379,
+          "y": 1040,
+          "width": 2081,
+          "height": 2081
+        },
+        {
+          "targetIndex": 14,
+          "image": "assets/targets/zone-26.webp",
+          "x": 13379,
+          "y": 2081,
+          "width": 2081,
+          "height": 2081
+        }
+      ]
+    },
+    {
+      "id": "right",
+      "label": "오른쪽",
+      "mind": "assets/targets/right.mind",
+      "targets": [
+        {
+          "targetIndex": 0,
+          "image": "assets/targets/zone-27.webp",
+          "x": 15051,
+          "y": 0,
+          "width": 2081,
+          "height": 2081
+        },
+        {
+          "targetIndex": 1,
+          "image": "assets/targets/zone-28.webp",
+          "x": 15051,
+          "y": 1040,
+          "width": 2081,
+          "height": 2081
+        },
+        {
+          "targetIndex": 2,
+          "image": "assets/targets/zone-29.webp",
+          "x": 15051,
+          "y": 2081,
+          "width": 2081,
+          "height": 2081
+        },
+        {
+          "targetIndex": 3,
+          "image": "assets/targets/zone-30.webp",
+          "x": 16723,
+          "y": 0,
+          "width": 2081,
+          "height": 2081
+        },
+        {
+          "targetIndex": 4,
+          "image": "assets/targets/zone-31.webp",
+          "x": 16723,
+          "y": 1040,
+          "width": 2081,
+          "height": 2081
+        },
+        {
+          "targetIndex": 5,
+          "image": "assets/targets/zone-32.webp",
+          "x": 16723,
+          "y": 2081,
+          "width": 2081,
+          "height": 2081
+        },
+        {
+          "targetIndex": 6,
+          "image": "assets/targets/zone-33.webp",
+          "x": 18396,
+          "y": 0,
+          "width": 2081,
+          "height": 2081
+        },
+        {
+          "targetIndex": 7,
+          "image": "assets/targets/zone-34.webp",
+          "x": 18396,
+          "y": 1040,
+          "width": 2081,
+          "height": 2081
+        },
+        {
+          "targetIndex": 8,
+          "image": "assets/targets/zone-35.webp",
+          "x": 18396,
+          "y": 2081,
+          "width": 2081,
+          "height": 2081
+        },
+        {
+          "targetIndex": 9,
+          "image": "assets/targets/zone-36.webp",
+          "x": 20068,
+          "y": 0,
+          "width": 2081,
+          "height": 2081
+        },
+        {
+          "targetIndex": 10,
+          "image": "assets/targets/zone-37.webp",
+          "x": 20068,
+          "y": 1040,
+          "width": 2081,
+          "height": 2081
+        },
+        {
+          "targetIndex": 11,
+          "image": "assets/targets/zone-38.webp",
+          "x": 20068,
+          "y": 2081,
+          "width": 2081,
+          "height": 2081
+        }
+      ]
+    }
+  ]
+}

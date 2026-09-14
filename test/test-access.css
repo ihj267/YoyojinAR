@@ -1,0 +1,36 @@
+@charset "UTF-8";
+
+body.test-locked > :not(#test-access-gate) { display: none !important; }
+body.test-locked { min-height: 100vh; min-height: 100dvh; background: #f6f3e9; }
+#test-access-gate {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: max(30px, env(safe-area-inset-top)) 22px max(30px, env(safe-area-inset-bottom));
+  color: #22251f;
+  background: radial-gradient(ellipse at 88% 6%, #f8cf312a, transparent 42%), #f6f3e9;
+}
+.test-access-card { width: min(100%, 430px); }
+.test-access-brand { margin: 0 0 54px; font-size: 12px; font-weight: 800; letter-spacing: .8px; }
+.test-access-tag { display: inline-block; padding: 6px 10px; border: 1px solid #b8c4b4; border-radius: 30px; color: #284e3d; font-size: 11px; font-weight: 700; }
+#test-access-title { margin: 21px 0 20px; font-size: clamp(40px, 11vw, 58px); font-weight: 850; letter-spacing: -2.8px; line-height: 1.14; }
+#test-access-title > span { color: #eabd12; display: inline-block; font-size: .28em; margin-left: 8px; vertical-align: .09em; }
+.test-access-description { font-size: 14px; line-height: 1.8; color: #62695f; max-width: 310px; margin-bottom: 32px; word-break: keep-all; }
+#test-access-form > label { display: block; margin-bottom: 9px; font-size: 12px; font-weight: 700; }
+.test-access-input-wrap { display: flex; align-items: stretch; border: 1px solid #bec4b7; border-radius: 8px; background: #fffefa; overflow: hidden; }
+.test-access-input-wrap:focus-within { outline: 3px solid #c5a222; outline-offset: 3px; }
+#test-access-password { min-width: 0; width: 100%; min-height: 52px; border: 0; border-radius: 8px 0 0 8px; padding: 13px 14px; background: transparent; color: #22251f; font: inherit; font-size: 16px; outline: none; }
+#test-access-toggle { flex-shrink: 0; min-width: 57px; padding: 12px; border: 0; background: transparent; font: inherit; font-size: 12px; color: #526249; cursor: pointer; }
+#test-access-submit { display: flex; justify-content: space-between; align-items: center; gap: 20px; width: 100%; min-height: 54px; margin-top: 12px; padding: 14px 18px; border: 0; border-radius: 8px; background: #284e3d; color: #fff; font: inherit; font-size: 15px; font-weight: 750; cursor: pointer; }
+#test-access-submit > span { font-size: 23px; font-weight: 400; }
+#test-access-submit:disabled { cursor: wait; opacity: .55; }
+#test-access-status { min-height: 40px; margin: 13px 0 0; color: #687261; font-size: 12px; line-height: 1.7; word-break: keep-all; }
+#test-access-status.test-access-error { color: #9b3e26; }
+#test-access-retry { border: 1px solid #b8c4b4; border-radius: 6px; padding: 12px 18px; background: transparent; font: inherit; font-size: 13px; cursor: pointer; }
+.test-access-note { margin: 23px 0 0; padding-top: 20px; border-top: 1px solid #dedfd2; color: #71766b; font-size: 11px; line-height: 1.8; }
+#test-access-banner { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 9px 5vw; border-bottom: 1px solid #d0d9c8; background: #e8eedf; color: #294a37; font-size: 11px; line-height: 1.6; }
+#test-access-banner > span { min-width: 0; overflow-wrap: anywhere; }
+#test-access-banner strong { font-weight: 800; }
+#test-access-banner button { flex-shrink: 0; border: 1px solid #afbe9f; border-radius: 5px; background: transparent; min-height: 36px; padding: 7px 12px; font: inherit; font-size: 11px; cursor: pointer; }
+@media (max-height: 700px) { .test-access-brand { margin-bottom: 28px; } .test-access-note { margin-top: 14px; } }
