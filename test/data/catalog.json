@@ -20,6 +20,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.03145024265106,
+        "y": 0.7133654442835614,
+        "width": 0.013681743978144749,
+        "height": 0.07470228421145941
+      },
+      "muralImage": "assets/mural-crops/001.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -108,6 +115,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.2794708564720755,
+        "y": 0.8505526189332052,
+        "width": 0.022574382590636145,
+        "height": 0.14656415185007207
+      },
+      "muralImage": "assets/mural-crops/011.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -152,6 +166,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.321007720438846,
+        "y": 0.7520422873618453,
+        "width": 0.03566752449320511,
+        "height": 0.1802018260451706
+      },
+      "muralImage": "assets/mural-crops/018.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -196,6 +217,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.05023257961379087,
+        "y": 0.5364974712831958,
+        "width": 0.0110807160912774,
+        "height": 0.08517782919388195
+      },
+      "muralImage": "assets/mural-crops/023.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": true,
@@ -240,6 +268,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.3833130163890018,
+        "y": 0.6259010091302258,
+        "width": 0.02189715111291706,
+        "height": 0.1802018260451706
+      },
+      "muralImage": "assets/mural-crops/039.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -284,6 +319,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.07285084455895255,
+        "y": 0.3559291983097426,
+        "width": 0.019545348540206772,
+        "height": 0.06713749593688129
+      },
+      "muralImage": "assets/mural-crops/042.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -328,6 +370,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.0878143482775746,
+        "y": 0.937049495434887,
+        "width": 0.012641654250756243,
+        "height": 0.06295050456511293
+      },
+      "muralImage": "assets/mural-crops/054.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -372,6 +421,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.45464806537541197,
+        "y": 0.557424315233061,
+        "width": 0.03657049979683056,
+        "height": 0.17779913503123498
+      },
+      "muralImage": "assets/mural-crops/055.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -416,6 +472,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.4183033094044878,
+        "y": 0.49735703988467084,
+        "width": 0.027992234412388822,
+        "height": 0.12373858721768381
+      },
+      "muralImage": "assets/mural-crops/059.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -460,6 +523,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.5011512935121224,
+        "y": 0.7628543969245555,
+        "width": 0.024154589371980676,
+        "height": 0.10211436809226333
+      },
+      "muralImage": "assets/mural-crops/066.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -504,6 +574,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.49573344169036976,
+        "y": 0.61268620855358,
+        "width": 0.03476454918957966,
+        "height": 0.16098029793368573
+      },
+      "muralImage": "assets/mural-crops/071.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -548,6 +625,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.13634927084744233,
+        "y": 0.3387794329649207,
+        "width": 0.02979818501963971,
+        "height": 0.15377222489187892
+      },
+      "muralImage": "assets/mural-crops/083.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -592,6 +676,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.11874125242674613,
+        "y": 0.3712157616530514,
+        "width": 0.020768431983385256,
+        "height": 0.09851033157135992
+      },
+      "muralImage": "assets/mural-crops/085.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -636,6 +727,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.12032145920809066,
+        "y": 0.2715040845747237,
+        "width": 0.025734796153325207,
+        "height": 0.12373858721768381
+      },
+      "muralImage": "assets/mural-crops/086.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -680,6 +778,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.1557632398753894,
+        "y": 0.3423834694858241,
+        "width": 0.019413969027947085,
+        "height": 0.10091302258529553
+      },
+      "muralImage": "assets/mural-crops/087.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -724,6 +829,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.23567655424624137,
+        "y": 0.38202787121576165,
+        "width": 0.023477357894261593,
+        "height": 0.0913022585295531
+      },
+      "muralImage": "assets/mural-crops/095.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -768,6 +880,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.342227640074044,
+        "y": 0.3952426717924075,
+        "width": 0.02031694433157253,
+        "height": 0.1189332051898126
+      },
+      "muralImage": "assets/mural-crops/103.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -812,6 +931,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.49641067316808885,
+        "y": 0.4012493993272465,
+        "width": 0.014447604858007133,
+        "height": 0.13575204228736185
+      },
+      "muralImage": "assets/mural-crops/117.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -856,6 +982,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.023477357894261593,
+        "y": 0.21984622777510812,
+        "width": 0.024380333197887037,
+        "height": 0.12854396924555503
+      },
+      "muralImage": "assets/mural-crops/127.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": true,
@@ -900,6 +1033,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.03115264797507788,
+        "y": 0.07688611244593946,
+        "width": 0.015802067813445304,
+        "height": 0.11653051417587698
+      },
+      "muralImage": "assets/mural-crops/138.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -944,6 +1084,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.05124384848074405,
+        "y": 0,
+        "width": 0.027992234412388822,
+        "height": 0.10091302258529553
+      },
+      "muralImage": "assets/mural-crops/143.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": true,
@@ -988,6 +1135,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.10293918461330083,
+        "y": 0.22345026429601153,
+        "width": 0.020768431983385256,
+        "height": 0.09730898606439212
+      },
+      "muralImage": "assets/mural-crops/146.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -1032,6 +1186,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.11061447469411712,
+        "y": 0.11773185968284479,
+        "width": 0.022574382590636145,
+        "height": 0.10331571359923114
+      },
+      "muralImage": "assets/mural-crops/147.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -1076,6 +1237,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.12348187277077972,
+        "y": 0.19341662662181644,
+        "width": 0.01535058016163258,
+        "height": 0.11773185968284479
+      },
+      "muralImage": "assets/mural-crops/148.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -1120,6 +1288,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.1623098108266739,
+        "y": 0.22945699183085055,
+        "width": 0.024380333197887037,
+        "height": 0.08169149447381067
+      },
+      "muralImage": "assets/mural-crops/158.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -1164,6 +1339,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.20632985687841437,
+        "y": 0.22585295530994715,
+        "width": 0.019413969027947085,
+        "height": 0.11532916866890917
+      },
+      "muralImage": "assets/mural-crops/166.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -1208,6 +1390,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.2225834123436724,
+        "y": 0.14824603555982702,
+        "width": 0.021400514695923068,
+        "height": 0.10043248438250842
+      },
+      "muralImage": "assets/mural-crops/170.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -1252,6 +1441,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.23567655424624137,
+        "y": 0.2378664103796252,
+        "width": 0.01715653076888347,
+        "height": 0.11653051417587698
+      },
+      "muralImage": "assets/mural-crops/171.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -1296,6 +1492,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.21355365930741793,
+        "y": 0.03844305622296973,
+        "width": 0.028443722064201545,
+        "height": 0.06967803940413263
+      },
+      "muralImage": "assets/mural-crops/172.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -1340,6 +1543,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.23928845546074315,
+        "y": 0.09490629505045652,
+        "width": 0.023477357894261593,
+        "height": 0.13334935127342623
+      },
+      "muralImage": "assets/mural-crops/175.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -1384,6 +1594,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.20655560070432075,
+        "y": 0.0036040365209034117,
+        "width": 0.012641654250756243,
+        "height": 0.10571840461316674
+      },
+      "muralImage": "assets/mural-crops/176.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -1428,6 +1645,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.2681836651767574,
+        "y": 0.048053820278712155,
+        "width": 0.01851099372432164,
+        "height": 0.17779913503123498
+      },
+      "muralImage": "assets/mural-crops/179.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -1472,6 +1696,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.24741523319337216,
+        "y": 0.20879384911100432,
+        "width": 0.04004695471578852,
+        "height": 0.14800576645843344
+      },
+      "muralImage": "assets/mural-crops/183.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -1516,6 +1747,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.0984243080951736,
+        "y": 0.8193176357520423,
+        "width": 0.04013725224615107,
+        "height": 0.17515617491590582
+      },
+      "muralImage": "assets/mural-crops/187.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -1560,6 +1798,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.12799674928890695,
+        "y": 0.6895723209995195,
+        "width": 0.015124836335726219,
+        "height": 0.12013455069678039
+      },
+      "muralImage": "assets/mural-crops/191.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -1604,6 +1849,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.24109440606799404,
+        "y": 0.2979336857280154,
+        "width": 0.028669465890107906,
+        "height": 0.13455069678039405
+      },
+      "muralImage": "assets/mural-crops/200.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -1648,6 +1900,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.23883696780893043,
+        "y": 0.8385391638635271,
+        "width": 0.0216714072870107,
+        "height": 0.14175876982220087
+      },
+      "muralImage": "assets/mural-crops/209.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -1692,6 +1951,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.2821797823829518,
+        "y": 0.245074483421432,
+        "width": 0.019865456679759808,
+        "height": 0.2090341182123979
+      },
+      "muralImage": "assets/mural-crops/211.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -1736,6 +2002,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.2848887082938282,
+        "y": 0.1802018260451706,
+        "width": 0.028624317124926635,
+        "height": 0.1189332051898126
+      },
+      "muralImage": "assets/mural-crops/212.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -1780,6 +2053,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.29617589958914625,
+        "y": 0.05814512253724171,
+        "width": 0.03160413562689061,
+        "height": 0.122537241710716
+      },
+      "muralImage": "assets/mural-crops/216.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -1824,6 +2104,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.36525351031649284,
+        "y": 0.245074483421432,
+        "width": 0.01805950607250892,
+        "height": 0.11292647765497357
+      },
+      "muralImage": "assets/mural-crops/223.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -1868,6 +2155,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.4092735563682333,
+        "y": 0.06727534839019703,
+        "width": 0.016479299291164387,
+        "height": 0.14175876982220087
+      },
+      "muralImage": "assets/mural-crops/235.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -1912,6 +2206,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.4002438033319789,
+        "y": 0.2102354637193657,
+        "width": 0.02596053997923157,
+        "height": 0.09490629505045652
+      },
+      "muralImage": "assets/mural-crops/236.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -1956,6 +2257,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.4221409544448959,
+        "y": 0.23306102835175396,
+        "width": 0.023928845546074315,
+        "height": 0.11412782316194138
+      },
+      "muralImage": "assets/mural-crops/240.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -2000,6 +2308,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.43184793895886947,
+        "y": 0.3363767419509851,
+        "width": 0.015802067813445304,
+        "height": 0.10331571359923114
+      },
+      "muralImage": "assets/mural-crops/242.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -2044,6 +2359,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.4433608740800939,
+        "y": 0.11773185968284479,
+        "width": 0.02618628380513793,
+        "height": 0.17299375300336375
+      },
+      "muralImage": "assets/mural-crops/247.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -2088,6 +2410,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.43500835252155856,
+        "y": 0,
+        "width": 0.0216714072870107,
+        "height": 0.08049014896684287
+      },
+      "muralImage": "assets/mural-crops/249.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -2132,6 +2461,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.45555104067903746,
+        "y": 0.04565112926477655,
+        "width": 0.03115264797507788,
+        "height": 0.1489668428640077
+      },
+      "muralImage": "assets/mural-crops/250.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -2176,6 +2512,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.4663867443225428,
+        "y": 0.26189332051898123,
+        "width": 0.03657049979683056,
+        "height": 0.17059106198942817
+      },
+      "muralImage": "assets/mural-crops/252.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -2220,6 +2563,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.4878324077836471,
+        "y": 0.22224891878904374,
+        "width": 0.02596053997923157,
+        "height": 0.10091302258529553
+      },
+      "muralImage": "assets/mural-crops/256.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -2264,6 +2614,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.5011512935121224,
+        "y": 0.04204709274387314,
+        "width": 0.01715653076888347,
+        "height": 0.10091302258529553
+      },
+      "muralImage": "assets/mural-crops/262.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -2308,6 +2665,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.5115355095038151,
+        "y": 0,
+        "width": 0.04153686396677051,
+        "height": 0.10091302258529553
+      },
+      "muralImage": "assets/mural-crops/265.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -2352,6 +2716,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.5180820804550995,
+        "y": 0.22705430081691494,
+        "width": 0.0216714072870107,
+        "height": 0.1249399327246516
+      },
+      "muralImage": "assets/mural-crops/268.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -2396,6 +2767,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.5634565894622782,
+        "y": 0.7880826525708794,
+        "width": 0.0216714072870107,
+        "height": 0.07928880345987506
+      },
+      "muralImage": "assets/mural-crops/275.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -2440,6 +2818,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.5801616325793489,
+        "y": 0.8529553099471407,
+        "width": 0.017608018420696193,
+        "height": 0.10812109562710236
+      },
+      "muralImage": "assets/mural-crops/278.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -2484,6 +2869,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.5860309720529143,
+        "y": 0.76045170591062,
+        "width": 0.025509052327418846,
+        "height": 0.13094666025949062
+      },
+      "muralImage": "assets/mural-crops/279.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -2528,6 +2920,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.6074766355140186,
+        "y": 0.7664584334454589,
+        "width": 0.02957244119373335,
+        "height": 0.13094666025949062
+      },
+      "muralImage": "assets/mural-crops/284.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -2572,6 +2971,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.6262133730642467,
+        "y": 0.8769822200864968,
+        "width": 0.04514876518127229,
+        "height": 0.12301777991350313
+      },
+      "muralImage": "assets/mural-crops/285.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -2616,6 +3022,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.7065781750869113,
+        "y": 0.7664584334454589,
+        "width": 0.03476454918957966,
+        "height": 0.23306102835175396
+      },
+      "muralImage": "assets/mural-crops/291.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -2660,6 +3073,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.7372793354101765,
+        "y": 0.821720326765978,
+        "width": 0.04514876518127229,
+        "height": 0.16818837097549255
+      },
+      "muralImage": "assets/mural-crops/292.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -2704,6 +3124,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.6772314777190844,
+        "y": 0.6727534839019702,
+        "width": 0.020768431983385256,
+        "height": 0.1561749159058145
+      },
+      "muralImage": "assets/mural-crops/296.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -2748,6 +3175,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.7074811503905368,
+        "y": 0.821720326765978,
+        "width": 0.027089259108763374,
+        "height": 0.17779913503123498
+      },
+      "muralImage": "assets/mural-crops/298.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -2792,6 +3226,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.7765587611178835,
+        "y": 0.8481499279192696,
+        "width": 0.030249672671452437,
+        "height": 0.09370494954348871
+      },
+      "muralImage": "assets/mural-crops/301.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -2836,6 +3277,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.8180956250846539,
+        "y": 0.7784718885151369,
+        "width": 0.02483182084969976,
+        "height": 0.1765977895242672
+      },
+      "muralImage": "assets/mural-crops/305.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -2880,6 +3328,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.8411214953271028,
+        "y": 0.7976934166266219,
+        "width": 0.019413969027947085,
+        "height": 0.13334935127342623
+      },
+      "muralImage": "assets/mural-crops/306.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -2924,6 +3379,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.9052327418845094,
+        "y": 0.6991830850552619,
+        "width": 0.02483182084969976,
+        "height": 0.11052378664103796
+      },
+      "muralImage": "assets/mural-crops/313.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -2968,6 +3430,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.94180324168134,
+        "y": 0.735223450264296,
+        "width": 0.03431306153776694,
+        "height": 0.19221528111484862
+      },
+      "muralImage": "assets/mural-crops/315.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -3012,6 +3481,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.984243080951736,
+        "y": 0.7712638154733301,
+        "width": 0.01575691904826403,
+        "height": 0.1489668428640077
+      },
+      "muralImage": "assets/mural-crops/321.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -3056,6 +3532,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.9273556368233329,
+        "y": 0.6655454108601634,
+        "width": 0.03115264797507788,
+        "height": 0.1561749159058145
+      },
+      "muralImage": "assets/mural-crops/327.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -3100,6 +3583,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.9079416677953858,
+        "y": 0.5915425276309466,
+        "width": 0.03611901214501784,
+        "height": 0.12373858721768381
+      },
+      "muralImage": "assets/mural-crops/329.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -3144,6 +3634,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.8618899273104881,
+        "y": 0.5886592984142239,
+        "width": 0.02618628380513793,
+        "height": 0.12013455069678039
+      },
+      "muralImage": "assets/mural-crops/335.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -3188,6 +3685,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.8329947175944737,
+        "y": 0.6054781355117732,
+        "width": 0.03431306153776694,
+        "height": 0.245074483421432
+      },
+      "muralImage": "assets/mural-crops/336.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -3232,6 +3736,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.8108718226556504,
+        "y": 0.7736665064872658,
+        "width": 0.018962481376134363,
+        "height": 0.13935607880826525
+      },
+      "muralImage": "assets/mural-crops/339.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -3276,6 +3787,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.7733983475551943,
+        "y": 0.6319077366650648,
+        "width": 0.0216714072870107,
+        "height": 0.10091302258529553
+      },
+      "muralImage": "assets/mural-crops/342.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -3320,6 +3838,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.7607566933044381,
+        "y": 0.7328207592503604,
+        "width": 0.033410086234141496,
+        "height": 0.14656415185007207
+      },
+      "muralImage": "assets/mural-crops/343.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -3364,6 +3889,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.7964242177976433,
+        "y": 0.6895723209995195,
+        "width": 0.02934669736782699,
+        "height": 0.11292647765497357
+      },
+      "muralImage": "assets/mural-crops/344.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -3408,6 +3940,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.7555645853085918,
+        "y": 0.6234983181162902,
+        "width": 0.018962481376134363,
+        "height": 0.09851033157135992
+      },
+      "muralImage": "assets/mural-crops/349.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -3452,6 +3991,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.7034177615242223,
+        "y": 0.6319077366650648,
+        "width": 0.02483182084969976,
+        "height": 0.14416146083613648
+      },
+      "muralImage": "assets/mural-crops/355.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -3496,6 +4042,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.6921305702289042,
+        "y": 0.6751561749159058,
+        "width": 0.02483182084969976,
+        "height": 0.10571840461316674
+      },
+      "muralImage": "assets/mural-crops/358.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -3540,6 +4093,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.6438213914849429,
+        "y": 0.6174915905814512,
+        "width": 0.022574382590636145,
+        "height": 0.14656415185007207
+      },
+      "muralImage": "assets/mural-crops/360.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -3584,6 +4144,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.65826899634295,
+        "y": 0.7184046131667468,
+        "width": 0.023477357894261593,
+        "height": 0.12013455069678039
+      },
+      "muralImage": "assets/mural-crops/361.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -3628,6 +4195,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.6086053546435505,
+        "y": 0.6559346468044209,
+        "width": 0.016253555465258026,
+        "height": 0.13214800576645844
+      },
+      "muralImage": "assets/mural-crops/364.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -3672,6 +4246,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.591448823874667,
+        "y": 0.6727534839019702,
+        "width": 0.02009120050566617,
+        "height": 0.11532916866890917
+      },
+      "muralImage": "assets/mural-crops/367.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -3716,6 +4297,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.5928032868301052,
+        "y": 0.5526189332051898,
+        "width": 0.0216714072870107,
+        "height": 0.14416146083613648
+      },
+      "muralImage": "assets/mural-crops/374.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -3760,6 +4348,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.5684229536322182,
+        "y": 0.5153772224891879,
+        "width": 0.03070116032326516,
+        "height": 0.10571840461316674
+      },
+      "muralImage": "assets/mural-crops/375.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -3804,6 +4399,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.6424669285295047,
+        "y": 0.5309947140797694,
+        "width": 0.02618628380513793,
+        "height": 0.09370494954348871
+      },
+      "muralImage": "assets/mural-crops/377.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -3848,6 +4450,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.679488915978148,
+        "y": 0.5261893320518981,
+        "width": 0.02031694433157253,
+        "height": 0.10812109562710236
+      },
+      "muralImage": "assets/mural-crops/378.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -3892,6 +4501,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.6677502370310172,
+        "y": 0.49735703988467084,
+        "width": 0.01535058016163258,
+        "height": 0.10571840461316674
+      },
+      "muralImage": "assets/mural-crops/379.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -3936,6 +4552,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.7851370265023252,
+        "y": 0.4925516578567996,
+        "width": 0.03386157388595422,
+        "height": 0.17299375300336375
+      },
+      "muralImage": "assets/mural-crops/384.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -3980,6 +4603,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.8327689737685674,
+        "y": 0.4997597308986064,
+        "width": 0.028443722064201545,
+        "height": 0.14296011532916866
+      },
+      "muralImage": "assets/mural-crops/386.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -4024,6 +4654,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.904329766580884,
+        "y": 0.44209514656415183,
+        "width": 0.03431306153776694,
+        "height": 0.19702066314271985
+      },
+      "muralImage": "assets/mural-crops/389.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -4068,6 +4705,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.9377398528150255,
+        "y": 0.4589139836617011,
+        "width": 0.03476454918957966,
+        "height": 0.19702066314271985
+      },
+      "muralImage": "assets/mural-crops/390.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -4112,6 +4756,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.9716014267009797,
+        "y": 0.43969245555021624,
+        "width": 0.023928845546074315,
+        "height": 0.0913022585295531
+      },
+      "muralImage": "assets/mural-crops/392.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -4156,6 +4807,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.545848571041582,
+        "y": 0.3628063431042768,
+        "width": 0.03160413562689061,
+        "height": 0.11773185968284479
+      },
+      "muralImage": "assets/mural-crops/393.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -4200,6 +4858,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.5530723734705856,
+        "y": 0.28832292167227297,
+        "width": 0.04560025283308502,
+        "height": 0.13695338779432964
+      },
+      "muralImage": "assets/mural-crops/398.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -4244,6 +4909,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.5535238611223983,
+        "y": 0,
+        "width": 0.05056661700302497,
+        "height": 0.15857760691975012
+      },
+      "muralImage": "assets/mural-crops/402.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -4288,6 +4960,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.56706849067678,
+        "y": 0.12013455069678039,
+        "width": 0.03386157388595422,
+        "height": 0.17299375300336375
+      },
+      "muralImage": "assets/mural-crops/403.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -4332,6 +5011,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.5842250214456635,
+        "y": 0.03844305622296973,
+        "width": 0.03205562327870333,
+        "height": 0.16098029793368573
+      },
+      "muralImage": "assets/mural-crops/404.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -4376,6 +5062,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.6077023793399251,
+        "y": 0.002402691013935608,
+        "width": 0.03431306153776694,
+        "height": 0.18740989908697742
+      },
+      "muralImage": "assets/mural-crops/406.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -4420,6 +5113,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.5742922931057836,
+        "y": 0.22104757328207592,
+        "width": 0.03837645040408145,
+        "height": 0.17779913503123498
+      },
+      "muralImage": "assets/mural-crops/407.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -4464,6 +5164,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.5788071696239108,
+        "y": 0.34839019702066315,
+        "width": 0.01851099372432164,
+        "height": 0.1513695338779433
+      },
+      "muralImage": "assets/mural-crops/410.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -4508,6 +5215,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.5792586572757235,
+        "y": 0.3652090341182124,
+        "width": 0.03995665718542598,
+        "height": 0.17779913503123498
+      },
+      "muralImage": "assets/mural-crops/411.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -4552,6 +5266,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.6530768883471038,
+        "y": 0.3772224891878904,
+        "width": 0.025734796153325207,
+        "height": 0.17299375300336375
+      },
+      "muralImage": "assets/mural-crops/414.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -4596,6 +5317,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.6747482956341144,
+        "y": 0.4012493993272465,
+        "width": 0.02325161406835523,
+        "height": 0.14656415185007207
+      },
+      "muralImage": "assets/mural-crops/416.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -4640,6 +5368,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.678811684500429,
+        "y": 0.31715521383950024,
+        "width": 0.01693078694297711,
+        "height": 0.09851033157135992
+      },
+      "muralImage": "assets/mural-crops/418.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -4684,6 +5419,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.6343401507968757,
+        "y": 0.1802018260451706,
+        "width": 0.02934669736782699,
+        "height": 0.16578567996155694
+      },
+      "muralImage": "assets/mural-crops/419.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -4728,6 +5470,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.6533026321730101,
+        "y": 0.11532916866890917,
+        "width": 0.03386157388595422,
+        "height": 0.122537241710716
+      },
+      "muralImage": "assets/mural-crops/422.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -4772,6 +5521,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.6379520520113775,
+        "y": 0.06727534839019703,
+        "width": 0.030249672671452437,
+        "height": 0.11292647765497357
+      },
+      "muralImage": "assets/mural-crops/423.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -4816,6 +5572,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.6487877556548829,
+        "y": 0.04324843825084094,
+        "width": 0.03115264797507788,
+        "height": 0.09370494954348871
+      },
+      "muralImage": "assets/mural-crops/424.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -4860,6 +5623,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.6880671813625897,
+        "y": 0.026429601153291685,
+        "width": 0.02979818501963971,
+        "height": 0.19221528111484862
+      },
+      "muralImage": "assets/mural-crops/428.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -4904,6 +5674,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.6998058603097206,
+        "y": 0.13935607880826525,
+        "width": 0.03205562327870333,
+        "height": 0.10331571359923114
+      },
+      "muralImage": "assets/mural-crops/431.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -4948,6 +5725,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.6885186690144025,
+        "y": 0.19461797212878423,
+        "width": 0.015802067813445304,
+        "height": 0.10571840461316674
+      },
+      "muralImage": "assets/mural-crops/432.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -4992,6 +5776,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.7059009436091923,
+        "y": 0.2498798654493032,
+        "width": 0.03386157388595422,
+        "height": 0.122537241710716
+      },
+      "muralImage": "assets/mural-crops/434.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -5036,6 +5827,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.7165109034267912,
+        "y": 0.3531955790485344,
+        "width": 0.01805950607250892,
+        "height": 0.14656415185007207
+      },
+      "muralImage": "assets/mural-crops/436.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -5080,6 +5878,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.7562418167863109,
+        "y": 0.16338298894762135,
+        "width": 0.027992234412388822,
+        "height": 0.19942335415665546
+      },
+      "muralImage": "assets/mural-crops/440.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -5124,6 +5929,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.7851370265023252,
+        "y": 0.17539644401729937,
+        "width": 0.019639712853853446,
+        "height": 0.10331571359923114
+      },
+      "muralImage": "assets/mural-crops/443.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -5168,6 +5980,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.7699218926362364,
+        "y": 0.08193176357520422,
+        "width": 0.021039324574472888,
+        "height": 0.10740028832292167
+      },
+      "muralImage": "assets/mural-crops/444.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -5212,6 +6031,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.7548873538308727,
+        "y": 0.007208073041806823,
+        "width": 0.02483182084969976,
+        "height": 0.15377222489187892
+      },
+      "muralImage": "assets/mural-crops/445.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -5256,6 +6082,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.7871687209354824,
+        "y": 0.03964440172993753,
+        "width": 0.023928845546074315,
+        "height": 0.14175876982220087
+      },
+      "muralImage": "assets/mural-crops/446.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -5300,6 +6133,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.8068084337893359,
+        "y": 0.012013455069678039,
+        "width": 0.027540746760576097,
+        "height": 0.18740989908697742
+      },
+      "muralImage": "assets/mural-crops/448.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -5344,6 +6184,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.8241455596189444,
+        "y": 0.16122056703507928,
+        "width": 0.01738227459478983,
+        "height": 0.11965401249399327
+      },
+      "muralImage": "assets/mural-crops/451.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -5388,6 +6235,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.8454106280193237,
+        "y": 0.41926958193176356,
+        "width": 0.012912546841843876,
+        "height": 0.096828447861605
+      },
+      "muralImage": "assets/mural-crops/455.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -5432,6 +6286,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.853763149577859,
+        "y": 0.3531955790485344,
+        "width": 0.022574382590636145,
+        "height": 0.12013455069678039
+      },
+      "muralImage": "assets/mural-crops/456.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -5476,6 +6337,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.8673077791322408,
+        "y": 0.29072561268620856,
+        "width": 0.027992234412388822,
+        "height": 0.10812109562710236
+      },
+      "muralImage": "assets/mural-crops/459.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -5520,6 +6388,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.8510542236669827,
+        "y": 0.16338298894762135,
+        "width": 0.017608018420696193,
+        "height": 0.12013455069678039
+      },
+      "muralImage": "assets/mural-crops/461.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -5564,6 +6439,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.9287100997787711,
+        "y": 0.03604036520903412,
+        "width": 0.016705043117070748,
+        "height": 0.11773185968284479
+      },
+      "muralImage": "assets/mural-crops/470.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -5608,6 +6490,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.9223892726533929,
+        "y": 0.1489668428640077,
+        "width": 0.03566752449320511,
+        "height": 0.1489668428640077
+      },
+      "muralImage": "assets/mural-crops/471.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -5652,6 +6541,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.8890243351844327,
+        "y": 0.4014896684286401,
+        "width": 0.01950426655830963,
+        "height": 0.11845266698702547
+      },
+      "muralImage": "assets/mural-crops/474.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -5696,6 +6592,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.9079416677953858,
+        "y": 0.30754444978375783,
+        "width": 0.03250711093051605,
+        "height": 0.10812109562710236
+      },
+      "muralImage": "assets/mural-crops/475.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -5740,6 +6643,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.9079416677953858,
+        "y": 0.3868332532436329,
+        "width": 0.02979818501963971,
+        "height": 0.122537241710716
+      },
+      "muralImage": "assets/mural-crops/476.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -5784,6 +6694,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.9264526615197074,
+        "y": 0.4180682364247958,
+        "width": 0.023477357894261593,
+        "height": 0.1249399327246516
+      },
+      "muralImage": "assets/mural-crops/478.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -5828,6 +6745,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.9390943157704637,
+        "y": 0.3387794329649207,
+        "width": 0.02934669736782699,
+        "height": 0.15377222489187892
+      },
+      "muralImage": "assets/mural-crops/479.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -5872,6 +6796,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.9562508465393471,
+        "y": 0.1826045170591062,
+        "width": 0.024380333197887037,
+        "height": 0.11773185968284479
+      },
+      "muralImage": "assets/mural-crops/485.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -5916,6 +6847,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.9481240688067182,
+        "y": 0.11412782316194138,
+        "width": 0.04605174048489774,
+        "height": 0.11532916866890917
+      },
+      "muralImage": "assets/mural-crops/489.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,
@@ -5960,6 +6898,13 @@
         "confirmed": true
       },
       "publish": true,
+      "wallRegion": {
+        "x": 0.9738588649600434,
+        "y": 0,
+        "width": 0.025734796153325207,
+        "height": 0.11412782316194138
+      },
+      "muralImage": "assets/mural-crops/499.webp",
       "worksheet": {
         "source": "pdf-ai-v1",
         "reviewed": false,

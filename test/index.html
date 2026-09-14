@@ -8,17 +8,18 @@
   <meta name="description" content="벽화 속 친구를 만나고, 아이들이 그린 원화와 이야기를 발견하세요.">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="artwork-pair.css">
   <script type="importmap">{"imports":{"three":"./vendor/build/three.module.js","three/addons/":"./vendor/examples/jsm/"}}</script>
 <meta name="robots" content="noindex,nofollow"></head>
 <body>
-  <header class="topbar"><a class="brand" href="./index.html" id="home-link">YOYOJIN<span>울산시립미술관</span></a><span class="edition">함께 살아가는 세상</span><button class="icon" id="help" aria-label="관람 방법">?</button></header><aside id="test-version" style="padding:10px 5vw;background:#e8eedf;color:#294a37;font-size:12px">AR 테스트 · 2026-09-15 · 확정 연결 136개 · 바로 접속</aside>
+  <header class="topbar"><a class="brand" href="./index.html" id="home-link">YOYOJIN<span>울산시립미술관</span></a><span class="edition">함께 살아가는 세상</span><button class="icon" id="help" aria-label="관람 방법">?</button></header><aside id="test-version" style="padding:10px 5vw;background:#e8eedf;color:#294a37;font-size:12px">AR 테스트 · 2026-09-15 08:28 · 확정 연결 136개 · 자동 구역 인식</aside>
   <div id="preview-banner" hidden>작가용 미리보기 · 공개 전 검수 자료입니다 </div>
   <main>
     <section id="ready-view" class="view ready">
       <div class="wall-strip" role="img" aria-label="YOYOJIN의 함께 살아가는 세상 벽화"></div>
       <div class="welcome"><p class="eyebrow">499개의 상상, 하나의 벽화</p><h1>함께 살아가는<br>세상<span class="yellow-dot"></span></h1><p class="lede">벽화 속 친구에게 다가가 보세요.<br>그 안에 아이들의 그림과 이야기가 기다립니다.</p>
         <div class="steps"><span><b>01</b> 카메라로 비추기</span><span><b>02</b> 포인트 누르기</span><span><b>03</b> 이야기 만나기</span></div>
-        <label class="zone-label" for="bank-select">지금 서 있는 벽화 구역</label><select id="bank-select" aria-label="벽화 구역"><option value="left">왼쪽</option><option value="center">가운데</option><option value="right">오른쪽</option></select>
+        <p class="camera-note">벽화의 어느 부분이든 비춰 주세요. 위치를 자동으로 찾아요.</p>
         <button class="primary" id="start-camera">카메라로 친구 찾기 <span>↗</span></button>
         <p class="camera-note">카메라 허용이 필요해요. 촬영 영상은 저장하거나 전송하지 않아요.</p><p id="camera-message" class="status-text" role="status"></p>
         <button class="text-button" id="browse-wall">카메라 없이 벽화 둘러보기 →</button>
@@ -36,8 +37,8 @@
   <nav id="bottom-nav" aria-label="관람 화면" hidden><button data-view="ready">◉ <span>카메라</span></button><button data-view="map">▧ <span>벽화 지도</span></button><button data-view="gallery">▦ <span>아이들의 그림</span></button></nav>
   <section id="intro" class="intro" hidden aria-label="10초 캐릭터 안내"><button id="skip-intro" class="intro-close" aria-label="캐릭터 안내 건너뛰기">건너뛰기 ×</button><div class="intro-inner"><p class="eyebrow">함께 살아가는 세상</p><div class="guide-stage" id="guide-stage"><span id="guide-loading">친구가 오는 중이에요…</span></div><h2 id="intro-title">안녕! 벽화 속에서 만나자.</h2><p id="intro-copy">우리의 이야기는 아이들의 작은 상상에서 시작됐어.</p><div class="intro-progress"><span id="intro-progress"></span></div><small id="intro-countdown">10초 후 관람 안내로 이동</small></div></section>
   <dialog id="art-dialog"><div class="dialog-head"><div><p class="eyebrow" id="art-number"></p><h2 id="art-title"></h2></div><button id="close-art" class="icon" aria-label="그림 닫기">×</button></div><div class="art-body"><div class="art-image-wrap"><img id="art-image" alt=""><p id="art-image-error" hidden>그림을 불러오지 못했어요. 다시 열어 주세요.</p></div><div class="art-story"><p id="art-name"></p><div id="art-story"></div><p id="art-review" class="subtle"></p><a id="full-art" target="_blank" rel="noopener" class="text-button">원화 크게 보기 ↗</a></div></div></dialog>
-  <dialog id="help-dialog"><div class="dialog-head"><h2>벽화 속 친구를 만나는 방법</h2><button id="close-help" class="icon" aria-label="관람 방법 닫기">×</button></div><ol><li>서 있는 구역을 고르고 카메라를 허용해 주세요.</li><li>벽화를 정면에서 천천히 비춰 주세요.</li><li>벽화 위에 나타나는 노란 포인트를 누르면 원화가 열려요.</li></ol><p>인식이 어려우면 벽화 지도나 아이들의 그림 목록으로도 관람할 수 있어요. 휴대폰의 Safari 또는 Chrome에서 열어 주세요.</p><p class="subtle">카메라 영상은 기기에서만 처리됩니다. 이 화면은 마이크를 요청하지 않습니다.</p></dialog>
+  <dialog id="help-dialog"><div class="dialog-head"><h2>벽화 속 친구를 만나는 방법</h2><button id="close-help" class="icon" aria-label="관람 방법 닫기">×</button></div><ol><li>카메라를 허용하고 처음 인식 자료가 준비될 때까지 기다려 주세요.</li><li>벽화의 어느 부분이든 친구와 주변 그림을 함께 천천히 비춰 주세요. 위치는 자동으로 찾아요.</li><li>벽화 위에 나타나는 노란 포인트를 누르면 그림과 이야기가 열려요.</li></ol><p>처음에는 약 32MB의 인식 자료를 불러와요. 인식이 어려우면 벽화 지도나 아이들의 그림 목록으로도 관람할 수 있어요. 휴대폰의 Safari 또는 Chrome에서 열어 주세요.</p><p class="subtle">카메라 영상은 기기에서만 처리됩니다. 이 화면은 마이크를 요청하지 않습니다.</p></dialog>
   <div id="fatal" hidden role="alert"></div>
-  <script type="module" src="app.js?v=open-access-20260915"></script>
+  <script type="module" src="app.js?v=20260915-082831-ef66c4ec"></script>
 </body>
 </html>

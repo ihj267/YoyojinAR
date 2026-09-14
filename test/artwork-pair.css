@@ -1,0 +1,126 @@
+/* Keep the two related pictures together, with the worksheet answers below. */
+#art-dialog.has-artwork-pair {
+  width: min(1060px, 96vw);
+}
+#art-dialog.has-artwork-pair .dialog-head {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: var(--paper);
+}
+#art-dialog.has-artwork-pair .art-body {
+  display: block;
+}
+#art-dialog .artwork-pair {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+  gap: 18px;
+  padding: 20px;
+  min-height: 0;
+  background: #eeede5;
+}
+.artwork-pair-figure {
+  min-width: 0;
+  width: 100%;
+  margin: 0;
+}
+.artwork-pair-figure figcaption {
+  margin-bottom: 10px;
+  color: var(--green);
+  font-size: 14px;
+  font-weight: 750;
+  line-height: 1.5;
+}
+.artwork-pair-stage {
+  position: relative;
+  display: grid;
+  place-items: center;
+  height: clamp(210px, 36vw, 370px);
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  container-type: size;
+}
+#art-dialog .artwork-pair #art-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-height: none;
+  min-height: 0;
+  object-fit: contain;
+}
+.artwork-pair-crop {
+  position: relative;
+  overflow: hidden;
+  width: min(100%, var(--crop-fit-width, 100%));
+  aspect-ratio: var(--crop-ratio, 1);
+  max-height: 100%;
+}
+#art-mural-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+#art-mural-image.artwork-pair-whole-wall {
+  position: absolute;
+  max-width: none;
+  max-height: none;
+  object-fit: fill;
+}
+.artwork-pair-message,
+#art-dialog .artwork-pair #art-image-error {
+  margin: 0;
+  padding: 18px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.7;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+#art-dialog .artwork-pair #art-image-error {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: #fff;
+}
+#art-dialog .artwork-pair .text-button {
+  display: inline-block;
+  min-height: 44px;
+  margin: 2px 0 0;
+  padding: 12px 0;
+  font-size: 12px;
+  line-height: 1.6;
+}
+#art-dialog.has-artwork-pair .art-story {
+  border-top: 1px solid var(--line);
+  padding: 22px 26px 28px;
+}
+@media (max-width: 680px) {
+  #art-dialog .artwork-pair {
+    gap: 10px;
+    padding: 14px 10px 10px;
+  }
+  .artwork-pair-stage {
+    height: clamp(145px, 47vw, 265px);
+  }
+  .artwork-pair-figure figcaption {
+    margin-bottom: 7px;
+    font-size: 12px;
+  }
+  #art-dialog .artwork-pair .text-button {
+    font-size: 11px;
+  }
+  .artwork-pair-message,
+  #art-dialog .artwork-pair #art-image-error {
+    padding: 10px;
+    font-size: 11px;
+  }
+  #art-dialog.has-artwork-pair .art-story {
+    padding: 18px;
+  }
+}

@@ -338,5 +338,405 @@
         }
       ]
     }
-  ]
+  ],
+  "automaticBank": {
+    "id": "all",
+    "label": "벽화 전체 자동 인식",
+    "mind": "assets/targets/all.mind",
+    "bytes": 31709733,
+    "sha256": "50384ade14843e6b1e9c4a1360c95735f12c075fe49b25c25bf638722a9b5714",
+    "targets": [
+      {
+        "targetIndex": 0,
+        "image": "assets/targets/zone-00.webp",
+        "x": 0,
+        "y": 0,
+        "width": 2081,
+        "height": 2081,
+        "sourceBank": "left",
+        "sourceTargetIndex": 0
+      },
+      {
+        "targetIndex": 1,
+        "image": "assets/targets/zone-01.webp",
+        "x": 0,
+        "y": 1040,
+        "width": 2081,
+        "height": 2081,
+        "sourceBank": "left",
+        "sourceTargetIndex": 1
+      },
+      {
+        "targetIndex": 2,
+        "image": "assets/targets/zone-02.webp",
+        "x": 0,
+        "y": 2081,
+        "width": 2081,
+        "height": 2081,
+        "sourceBank": "left",
+        "sourceTargetIndex": 2
+      },
+      {
+        "targetIndex": 3,
+        "image": "assets/targets/zone-03.webp",
+        "x": 1672,
+        "y": 0,
+        "width": 2081,
+        "height": 2081,
+        "sourceBank": "left",
+        "sourceTargetIndex": 3
+      },
+      {
+        "targetIndex": 4,
+        "image": "assets/targets/zone-04.webp",
+        "x": 1672,
+        "y": 1040,
+        "width": 2081,
+        "height": 2081,
+        "sourceBank": "left",
+        "sourceTargetIndex": 4
+      },
+      {
+        "targetIndex": 5,
+        "image": "assets/targets/zone-05.webp",
+        "x": 1672,
+        "y": 2081,
+        "width": 2081,
+        "height": 2081,
+        "sourceBank": "left",
+        "sourceTargetIndex": 5
+      },
+      {
+        "targetIndex": 6,
+        "image": "assets/targets/zone-06.webp",
+        "x": 3345,
+        "y": 0,
+        "width": 2081,
+        "height": 2081,
+        "sourceBank": "left",
+        "sourceTargetIndex": 6
+      },
+      {
+        "targetIndex": 7,
+        "image": "assets/targets/zone-07.webp",
+        "x": 3345,
+        "y": 1040,
+        "width": 2081,
+        "height": 2081,
+        "sourceBank": "left",
+        "sourceTargetIndex": 7
+      },
+      {
+        "targetIndex": 8,
+        "image": "assets/targets/zone-08.webp",
+        "x": 3345,
+        "y": 2081,
+        "width": 2081,
+        "height": 2081,
+        "sourceBank": "left",
+        "sourceTargetIndex": 8
+      },
+      {
+        "targetIndex": 9,
+        "image": "assets/targets/zone-09.webp",
+        "x": 5017,
+        "y": 0,
+        "width": 2081,
+        "height": 2081,
+        "sourceBank": "left",
+        "sourceTargetIndex": 9
+      },
+      {
+        "targetIndex": 10,
+        "image": "assets/targets/zone-10.webp",
+        "x": 5017,
+        "y": 1040,
+        "width": 2081,
+        "height": 2081,
+        "sourceBank": "left",
+        "sourceTargetIndex": 10
+      },
+      {
+        "targetIndex": 11,
+        "image": "assets/targets/zone-11.webp",
+        "x": 5017,
+        "y": 2081,
+        "width": 2081,
+        "height": 2081,
+        "sourceBank": "left",
+        "sourceTargetIndex": 11
+      },
+      {
+        "targetIndex": 12,
+        "image": "assets/targets/zone-12.webp",
+        "x": 6689,
+        "y": 0,
+        "width": 2081,
+        "height": 2081,
+        "sourceBank": "center",
+        "sourceTargetIndex": 0
+      },
+      {
+        "targetIndex": 13,
+        "image": "assets/targets/zone-13.webp",
+        "x": 6689,
+        "y": 1040,
+        "width": 2081,
+        "height": 2081,
+        "sourceBank": "center",
+        "sourceTargetIndex": 1
+      },
+      {
+        "targetIndex": 14,
+        "image": "assets/targets/zone-14.webp",
+        "x": 6689,
+        "y": 2081,
+        "width": 2081,
+        "height": 2081,
+        "sourceBank": "center",
+        "sourceTargetIndex": 2
+      },
+      {
+        "targetIndex": 15,
+        "image": "assets/targets/zone-15.webp",
+        "x": 8362,
+        "y": 0,
+        "width": 2081,
+        "height": 2081,
+        "sourceBank": "center",
+        "sourceTargetIndex": 3
+      },
+      {
+        "targetIndex": 16,
+        "image": "assets/targets/zone-16.webp",
+        "x": 8362,
+        "y": 1040,
+        "width": 2081,
+        "height": 2081,
+        "sourceBank": "center",
+        "sourceTargetIndex": 4
+      },
+      {
+        "targetIndex": 17,
+        "image": "assets/targets/zone-17.webp",
+        "x": 8362,
+        "y": 2081,
+        "width": 2081,
+        "height": 2081,
+        "sourceBank": "center",
+        "sourceTargetIndex": 5
+      },
+      {
+        "targetIndex": 18,
+        "image": "assets/targets/zone-18.webp",
+        "x": 10034,
+        "y": 0,
+        "width": 2081,
+        "height": 2081,
+        "sourceBank": "center",
+        "sourceTargetIndex": 6
+      },
+      {
+        "targetIndex": 19,
+        "image": "assets/targets/zone-19.webp",
+        "x": 10034,
+        "y": 1040,
+        "width": 2081,
+        "height": 2081,
+        "sourceBank": "center",
+        "sourceTargetIndex": 7
+      },
+      {
+        "targetIndex": 20,
+        "image": "assets/targets/zone-20.webp",
+        "x": 10034,
+        "y": 2081,
+        "width": 2081,
+        "height": 2081,
+        "sourceBank": "center",
+        "sourceTargetIndex": 8
+      },
+      {
+        "targetIndex": 21,
+        "image": "assets/targets/zone-21.webp",
+        "x": 11706,
+        "y": 0,
+        "width": 2081,
+        "height": 2081,
+        "sourceBank": "center",
+        "sourceTargetIndex": 9
+      },
+      {
+        "targetIndex": 22,
+        "image": "assets/targets/zone-22.webp",
+        "x": 11706,
+        "y": 1040,
+        "width": 2081,
+        "height": 2081,
+        "sourceBank": "center",
+        "sourceTargetIndex": 10
+      },
+      {
+        "targetIndex": 23,
+        "image": "assets/targets/zone-23.webp",
+        "x": 11706,
+        "y": 2081,
+        "width": 2081,
+        "height": 2081,
+        "sourceBank": "center",
+        "sourceTargetIndex": 11
+      },
+      {
+        "targetIndex": 24,
+        "image": "assets/targets/zone-24.webp",
+        "x": 13379,
+        "y": 0,
+        "width": 2081,
+        "height": 2081,
+        "sourceBank": "center",
+        "sourceTargetIndex": 12
+      },
+      {
+        "targetIndex": 25,
+        "image": "assets/targets/zone-25.webp",
+        "x": 13379,
+        "y": 1040,
+        "width": 2081,
+        "height": 2081,
+        "sourceBank": "center",
+        "sourceTargetIndex": 13
+      },
+      {
+        "targetIndex": 26,
+        "image": "assets/targets/zone-26.webp",
+        "x": 13379,
+        "y": 2081,
+        "width": 2081,
+        "height": 2081,
+        "sourceBank": "center",
+        "sourceTargetIndex": 14
+      },
+      {
+        "targetIndex": 27,
+        "image": "assets/targets/zone-27.webp",
+        "x": 15051,
+        "y": 0,
+        "width": 2081,
+        "height": 2081,
+        "sourceBank": "right",
+        "sourceTargetIndex": 0
+      },
+      {
+        "targetIndex": 28,
+        "image": "assets/targets/zone-28.webp",
+        "x": 15051,
+        "y": 1040,
+        "width": 2081,
+        "height": 2081,
+        "sourceBank": "right",
+        "sourceTargetIndex": 1
+      },
+      {
+        "targetIndex": 29,
+        "image": "assets/targets/zone-29.webp",
+        "x": 15051,
+        "y": 2081,
+        "width": 2081,
+        "height": 2081,
+        "sourceBank": "right",
+        "sourceTargetIndex": 2
+      },
+      {
+        "targetIndex": 30,
+        "image": "assets/targets/zone-30.webp",
+        "x": 16723,
+        "y": 0,
+        "width": 2081,
+        "height": 2081,
+        "sourceBank": "right",
+        "sourceTargetIndex": 3
+      },
+      {
+        "targetIndex": 31,
+        "image": "assets/targets/zone-31.webp",
+        "x": 16723,
+        "y": 1040,
+        "width": 2081,
+        "height": 2081,
+        "sourceBank": "right",
+        "sourceTargetIndex": 4
+      },
+      {
+        "targetIndex": 32,
+        "image": "assets/targets/zone-32.webp",
+        "x": 16723,
+        "y": 2081,
+        "width": 2081,
+        "height": 2081,
+        "sourceBank": "right",
+        "sourceTargetIndex": 5
+      },
+      {
+        "targetIndex": 33,
+        "image": "assets/targets/zone-33.webp",
+        "x": 18396,
+        "y": 0,
+        "width": 2081,
+        "height": 2081,
+        "sourceBank": "right",
+        "sourceTargetIndex": 6
+      },
+      {
+        "targetIndex": 34,
+        "image": "assets/targets/zone-34.webp",
+        "x": 18396,
+        "y": 1040,
+        "width": 2081,
+        "height": 2081,
+        "sourceBank": "right",
+        "sourceTargetIndex": 7
+      },
+      {
+        "targetIndex": 35,
+        "image": "assets/targets/zone-35.webp",
+        "x": 18396,
+        "y": 2081,
+        "width": 2081,
+        "height": 2081,
+        "sourceBank": "right",
+        "sourceTargetIndex": 8
+      },
+      {
+        "targetIndex": 36,
+        "image": "assets/targets/zone-36.webp",
+        "x": 20068,
+        "y": 0,
+        "width": 2081,
+        "height": 2081,
+        "sourceBank": "right",
+        "sourceTargetIndex": 9
+      },
+      {
+        "targetIndex": 37,
+        "image": "assets/targets/zone-37.webp",
+        "x": 20068,
+        "y": 1040,
+        "width": 2081,
+        "height": 2081,
+        "sourceBank": "right",
+        "sourceTargetIndex": 10
+      },
+      {
+        "targetIndex": 38,
+        "image": "assets/targets/zone-38.webp",
+        "x": 20068,
+        "y": 2081,
+        "width": 2081,
+        "height": 2081,
+        "sourceBank": "right",
+        "sourceTargetIndex": 11
+      }
+    ]
+  },
+  "defaultBank": "all"
 }
