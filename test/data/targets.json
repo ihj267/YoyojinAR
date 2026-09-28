@@ -738,5 +738,606 @@
       }
     ]
   },
-  "defaultBank": "all"
+  "defaultBank": "all",
+  "progressive": {
+    "version": 1,
+    "initial": {
+      "url": "vendor/yoyojin/targets/discovery-dd8788cbd097.mind",
+      "bytes": 13747569,
+      "sha256": "dd8788cbd097d0f9eef00b82206840172aaec2759fcc0f72088b1ea28933ad38"
+    },
+    "baseLevels": [
+      0,
+      2,
+      5
+    ],
+    "patches": [
+      {
+        "url": "vendor/yoyojin/targets/zone-00-a016a0e23d60.mind",
+        "bytes": 458787,
+        "sha256": "a016a0e23d60516c80e58fbf586f53f27bafa517109f9d22433e616ff805f25b",
+        "targetIndex": 0,
+        "levels": [
+          1,
+          3,
+          4,
+          6,
+          7,
+          8,
+          9
+        ]
+      },
+      {
+        "url": "vendor/yoyojin/targets/zone-01-18d197f36a55.mind",
+        "bytes": 454959,
+        "sha256": "18d197f36a5583a649ce68328fa92293909c0fbb019fb7624998c3f0ea52aef7",
+        "targetIndex": 1,
+        "levels": [
+          1,
+          3,
+          4,
+          6,
+          7,
+          8,
+          9
+        ]
+      },
+      {
+        "url": "vendor/yoyojin/targets/zone-02-647826fa1b1a.mind",
+        "bytes": 448445,
+        "sha256": "647826fa1b1a02ebaa645b953e032189dc01d2d84fd5ee23fe1aabee49e86fd5",
+        "targetIndex": 2,
+        "levels": [
+          1,
+          3,
+          4,
+          6,
+          7,
+          8,
+          9
+        ]
+      },
+      {
+        "url": "vendor/yoyojin/targets/zone-03-6126081cc881.mind",
+        "bytes": 463497,
+        "sha256": "6126081cc881069217e5566a11ea80070e0e1c590e66d6e132d0bf26dc53eaa9",
+        "targetIndex": 3,
+        "levels": [
+          1,
+          3,
+          4,
+          6,
+          7,
+          8,
+          9
+        ]
+      },
+      {
+        "url": "vendor/yoyojin/targets/zone-04-81a152255373.mind",
+        "bytes": 459588,
+        "sha256": "81a152255373e9ca98ebf6635542a4eea872727898a41d5875285e064264f54e",
+        "targetIndex": 4,
+        "levels": [
+          1,
+          3,
+          4,
+          6,
+          7,
+          8,
+          9
+        ]
+      },
+      {
+        "url": "vendor/yoyojin/targets/zone-05-e4df205ec9e5.mind",
+        "bytes": 451676,
+        "sha256": "e4df205ec9e559a3d8925afa68a1b70fe53be136323abf9c4c78aecbfbd54bc5",
+        "targetIndex": 5,
+        "levels": [
+          1,
+          3,
+          4,
+          6,
+          7,
+          8,
+          9
+        ]
+      },
+      {
+        "url": "vendor/yoyojin/targets/zone-06-03d9273be2cb.mind",
+        "bytes": 458767,
+        "sha256": "03d9273be2cb86b081a03c582a54e60d692af58cb523224926e6efc40e7e64fa",
+        "targetIndex": 6,
+        "levels": [
+          1,
+          3,
+          4,
+          6,
+          7,
+          8,
+          9
+        ]
+      },
+      {
+        "url": "vendor/yoyojin/targets/zone-07-ecde5c3a7a0d.mind",
+        "bytes": 458024,
+        "sha256": "ecde5c3a7a0d2c9db3e76c7c58f7c70edbc1b36d0891c141fa65bec12fce74d8",
+        "targetIndex": 7,
+        "levels": [
+          1,
+          3,
+          4,
+          6,
+          7,
+          8,
+          9
+        ]
+      },
+      {
+        "url": "vendor/yoyojin/targets/zone-08-ea9db48769c7.mind",
+        "bytes": 453583,
+        "sha256": "ea9db48769c7bafbc766b0ab207b88559816480c95ab4621696cc92535aeae62",
+        "targetIndex": 8,
+        "levels": [
+          1,
+          3,
+          4,
+          6,
+          7,
+          8,
+          9
+        ]
+      },
+      {
+        "url": "vendor/yoyojin/targets/zone-09-59a360be2ebf.mind",
+        "bytes": 467841,
+        "sha256": "59a360be2ebf8c919011dd0533e3c9373093567c79c0633a959220588cd33937",
+        "targetIndex": 9,
+        "levels": [
+          1,
+          3,
+          4,
+          6,
+          7,
+          8,
+          9
+        ]
+      },
+      {
+        "url": "vendor/yoyojin/targets/zone-10-cf6cc81d7aeb.mind",
+        "bytes": 463356,
+        "sha256": "cf6cc81d7aeb645195e046443c0803bf4293b7dc877cac7f634ca36b989a1a34",
+        "targetIndex": 10,
+        "levels": [
+          1,
+          3,
+          4,
+          6,
+          7,
+          8,
+          9
+        ]
+      },
+      {
+        "url": "vendor/yoyojin/targets/zone-11-b597055becd2.mind",
+        "bytes": 458446,
+        "sha256": "b597055becd2ffe7a646a0608215c4d81eb616028dec8d1a8c0dfd81c0d80672",
+        "targetIndex": 11,
+        "levels": [
+          1,
+          3,
+          4,
+          6,
+          7,
+          8,
+          9
+        ]
+      },
+      {
+        "url": "vendor/yoyojin/targets/zone-12-342be706edce.mind",
+        "bytes": 465221,
+        "sha256": "342be706edcec1226d46a8939464afbba77c8fb009390d8fd4237ba82d4b1f9c",
+        "targetIndex": 12,
+        "levels": [
+          1,
+          3,
+          4,
+          6,
+          7,
+          8,
+          9
+        ]
+      },
+      {
+        "url": "vendor/yoyojin/targets/zone-13-00ef506077ef.mind",
+        "bytes": 464624,
+        "sha256": "00ef506077ef7e6caa69259b8113d642391a7dae19562ffde4118361b2e67f7e",
+        "targetIndex": 13,
+        "levels": [
+          1,
+          3,
+          4,
+          6,
+          7,
+          8,
+          9
+        ]
+      },
+      {
+        "url": "vendor/yoyojin/targets/zone-14-02563ac282ba.mind",
+        "bytes": 462487,
+        "sha256": "02563ac282badf2182844798024fb66254a0df08b7ed968ec85a14d6c05af32c",
+        "targetIndex": 14,
+        "levels": [
+          1,
+          3,
+          4,
+          6,
+          7,
+          8,
+          9
+        ]
+      },
+      {
+        "url": "vendor/yoyojin/targets/zone-15-c1bbaf4c51e4.mind",
+        "bytes": 462728,
+        "sha256": "c1bbaf4c51e4b861b27f65cf7cf0c1d61231225baaac3d6b6d1253de13c981d0",
+        "targetIndex": 15,
+        "levels": [
+          1,
+          3,
+          4,
+          6,
+          7,
+          8,
+          9
+        ]
+      },
+      {
+        "url": "vendor/yoyojin/targets/zone-16-cd72dad5d77a.mind",
+        "bytes": 460301,
+        "sha256": "cd72dad5d77a5154b4c34ffbc24d31f3dde7ef05e8d0f8da186f55ce398e0f6d",
+        "targetIndex": 16,
+        "levels": [
+          1,
+          3,
+          4,
+          6,
+          7,
+          8,
+          9
+        ]
+      },
+      {
+        "url": "vendor/yoyojin/targets/zone-17-a60965b5936b.mind",
+        "bytes": 465715,
+        "sha256": "a60965b5936b06edabd35f20c49ac798c2735b778c60ac5911c64a70b6855589",
+        "targetIndex": 17,
+        "levels": [
+          1,
+          3,
+          4,
+          6,
+          7,
+          8,
+          9
+        ]
+      },
+      {
+        "url": "vendor/yoyojin/targets/zone-18-1a0a6cdcbc5a.mind",
+        "bytes": 460051,
+        "sha256": "1a0a6cdcbc5a10e307b656680d0f9cd4f735a893eefd06ddc6fb3e405fe473ee",
+        "targetIndex": 18,
+        "levels": [
+          1,
+          3,
+          4,
+          6,
+          7,
+          8,
+          9
+        ]
+      },
+      {
+        "url": "vendor/yoyojin/targets/zone-19-fb87c4bcc310.mind",
+        "bytes": 464334,
+        "sha256": "fb87c4bcc3105bb656899a69010791d89adf38c008ef81237aa408990c8e3ade",
+        "targetIndex": 19,
+        "levels": [
+          1,
+          3,
+          4,
+          6,
+          7,
+          8,
+          9
+        ]
+      },
+      {
+        "url": "vendor/yoyojin/targets/zone-20-76ba7b006afe.mind",
+        "bytes": 460383,
+        "sha256": "76ba7b006afe03e68bf168c49ebe0d346980737d8fc3feb1871224ae2ed3fb5e",
+        "targetIndex": 20,
+        "levels": [
+          1,
+          3,
+          4,
+          6,
+          7,
+          8,
+          9
+        ]
+      },
+      {
+        "url": "vendor/yoyojin/targets/zone-21-66aa8b62dc13.mind",
+        "bytes": 461328,
+        "sha256": "66aa8b62dc13a225c86f7642f1001870315c8ac17c1016d6bc0238bf6355d107",
+        "targetIndex": 21,
+        "levels": [
+          1,
+          3,
+          4,
+          6,
+          7,
+          8,
+          9
+        ]
+      },
+      {
+        "url": "vendor/yoyojin/targets/zone-22-11b969ccc811.mind",
+        "bytes": 461572,
+        "sha256": "11b969ccc811a38e87cf85b6dd82854ed0c98974627d3eba734f3c268a0f99a3",
+        "targetIndex": 22,
+        "levels": [
+          1,
+          3,
+          4,
+          6,
+          7,
+          8,
+          9
+        ]
+      },
+      {
+        "url": "vendor/yoyojin/targets/zone-23-af8cb58fea28.mind",
+        "bytes": 456458,
+        "sha256": "af8cb58fea2860aab97d4e605812ddf778c4441f9115c4c17f540c73a8e100fc",
+        "targetIndex": 23,
+        "levels": [
+          1,
+          3,
+          4,
+          6,
+          7,
+          8,
+          9
+        ]
+      },
+      {
+        "url": "vendor/yoyojin/targets/zone-24-691e7f7015f8.mind",
+        "bytes": 461102,
+        "sha256": "691e7f7015f86b3392e022b7350cba5e88c369eadcc5dcb9936168184da3d82f",
+        "targetIndex": 24,
+        "levels": [
+          1,
+          3,
+          4,
+          6,
+          7,
+          8,
+          9
+        ]
+      },
+      {
+        "url": "vendor/yoyojin/targets/zone-25-6ceb1fc8437c.mind",
+        "bytes": 462020,
+        "sha256": "6ceb1fc8437c41a330ae369ae3268ca630273dd9af5eb073199fffd5ad8bd950",
+        "targetIndex": 25,
+        "levels": [
+          1,
+          3,
+          4,
+          6,
+          7,
+          8,
+          9
+        ]
+      },
+      {
+        "url": "vendor/yoyojin/targets/zone-26-cfe8b67d2530.mind",
+        "bytes": 456946,
+        "sha256": "cfe8b67d2530198b100ebecc48e72cd272e500b723d592e49e7789629bb1b327",
+        "targetIndex": 26,
+        "levels": [
+          1,
+          3,
+          4,
+          6,
+          7,
+          8,
+          9
+        ]
+      },
+      {
+        "url": "vendor/yoyojin/targets/zone-27-1e65a357ad9a.mind",
+        "bytes": 459932,
+        "sha256": "1e65a357ad9a6ee1ecd296088b27c1ab1d870b212d1f097052240fb636f31d73",
+        "targetIndex": 27,
+        "levels": [
+          1,
+          3,
+          4,
+          6,
+          7,
+          8,
+          9
+        ]
+      },
+      {
+        "url": "vendor/yoyojin/targets/zone-28-17ac776b36e9.mind",
+        "bytes": 456936,
+        "sha256": "17ac776b36e967cc12c92aecbf1460babfcd8fd0da85123137107fe5e0bcc16c",
+        "targetIndex": 28,
+        "levels": [
+          1,
+          3,
+          4,
+          6,
+          7,
+          8,
+          9
+        ]
+      },
+      {
+        "url": "vendor/yoyojin/targets/zone-29-722869a6ecbb.mind",
+        "bytes": 463973,
+        "sha256": "722869a6ecbbf75b91b5df62ac207ec90d4bfbfc4527d8098e18b984469cea5c",
+        "targetIndex": 29,
+        "levels": [
+          1,
+          3,
+          4,
+          6,
+          7,
+          8,
+          9
+        ]
+      },
+      {
+        "url": "vendor/yoyojin/targets/zone-30-12b692e266f5.mind",
+        "bytes": 460023,
+        "sha256": "12b692e266f5f5984af3d17ab086db28e8cb643edb135fb0920a4ed361e7741a",
+        "targetIndex": 30,
+        "levels": [
+          1,
+          3,
+          4,
+          6,
+          7,
+          8,
+          9
+        ]
+      },
+      {
+        "url": "vendor/yoyojin/targets/zone-31-7f7816b91945.mind",
+        "bytes": 459732,
+        "sha256": "7f7816b9194556752400599650dd6896b4044fb04d99b23e572aacbadbde58f3",
+        "targetIndex": 31,
+        "levels": [
+          1,
+          3,
+          4,
+          6,
+          7,
+          8,
+          9
+        ]
+      },
+      {
+        "url": "vendor/yoyojin/targets/zone-32-39ce24f4f56f.mind",
+        "bytes": 465194,
+        "sha256": "39ce24f4f56fe2aa9836aa7493925ed8643b2de64fe06cf420b35a53616635d7",
+        "targetIndex": 32,
+        "levels": [
+          1,
+          3,
+          4,
+          6,
+          7,
+          8,
+          9
+        ]
+      },
+      {
+        "url": "vendor/yoyojin/targets/zone-33-b94ff3c38a66.mind",
+        "bytes": 462101,
+        "sha256": "b94ff3c38a6636c4b86f7fa2601928b3a89808751f22f519ce5fbcb71e803e4e",
+        "targetIndex": 33,
+        "levels": [
+          1,
+          3,
+          4,
+          6,
+          7,
+          8,
+          9
+        ]
+      },
+      {
+        "url": "vendor/yoyojin/targets/zone-34-e0aecd7fe154.mind",
+        "bytes": 461890,
+        "sha256": "e0aecd7fe154eab7c863a7d9ba78c0430b87abd737dca45f829ad5a758ba26f2",
+        "targetIndex": 34,
+        "levels": [
+          1,
+          3,
+          4,
+          6,
+          7,
+          8,
+          9
+        ]
+      },
+      {
+        "url": "vendor/yoyojin/targets/zone-35-2492be5292a5.mind",
+        "bytes": 466659,
+        "sha256": "2492be5292a58552f0a53705c20d9ef10e4250bd9c047c5831ec79336763ba26",
+        "targetIndex": 35,
+        "levels": [
+          1,
+          3,
+          4,
+          6,
+          7,
+          8,
+          9
+        ]
+      },
+      {
+        "url": "vendor/yoyojin/targets/zone-36-85b33b3f409d.mind",
+        "bytes": 466377,
+        "sha256": "85b33b3f409dbe6650d3ee79d2136a790d6a39675894313f25be1f75d0575b94",
+        "targetIndex": 36,
+        "levels": [
+          1,
+          3,
+          4,
+          6,
+          7,
+          8,
+          9
+        ]
+      },
+      {
+        "url": "vendor/yoyojin/targets/zone-37-f154c24e3c37.mind",
+        "bytes": 459439,
+        "sha256": "f154c24e3c37b94ba4ebf5cacf269a04e682cd895ab7fd34386bffb0dd3d74e1",
+        "targetIndex": 37,
+        "levels": [
+          1,
+          3,
+          4,
+          6,
+          7,
+          8,
+          9
+        ]
+      },
+      {
+        "url": "vendor/yoyojin/targets/zone-38-53e7b6e678cd.mind",
+        "bytes": 460594,
+        "sha256": "53e7b6e678cde1c8c6e0714daf226ef1f6e521a4885da76b49dbbe9355b5f245",
+        "targetIndex": 38,
+        "levels": [
+          1,
+          3,
+          4,
+          6,
+          7,
+          8,
+          9
+        ]
+      }
+    ],
+    "sourceSha256": "50384ade14843e6b1e9c4a1360c95735f12c075fe49b25c25bf638722a9b5714"
+  }
 }
