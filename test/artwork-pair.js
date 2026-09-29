@@ -25,10 +25,12 @@ function setup() {
   const child = figure('아이의 원화', 'artwork-pair-child');
   const childStage = document.createElement('div');
   childStage.className = 'artwork-pair-stage';
+  originalError.textContent = '원화를 불러오지 못했어요. 아래에서 원화를 크게 열어 보세요.';
+  originalLink.textContent = '원화 크게 보기 ↗';
   childStage.append(original, originalError);
   child.append(childStage, originalLink);
 
-  const mural = figure('YOYOJIN의 벽화', 'artwork-pair-mural');
+  const mural = figure('요요진의 벽화', 'artwork-pair-mural');
   const muralStage = document.createElement('div');
   muralStage.className = 'artwork-pair-stage';
   const crop = document.createElement('div');
@@ -45,7 +47,7 @@ function setup() {
   const link = document.createElement('a');
   link.id = 'full-mural';
   link.className = 'text-button';
-  link.textContent = '벽화 그림 크게 보기 ↗';
+  link.textContent = '벽화 크게 보기 ↗';
   link.target = '_blank';
   link.rel = 'noopener';
   link.hidden = true;
@@ -80,7 +82,7 @@ export function showArtworkPair(item, { wall, preview = false } = {}) {
   const token = revision;
   const region = regionOf(item?.wallRegion);
   if (!region) {
-    ui.message.textContent = preview ? '벽화 영역이 아직 지정되지 않았어요. 그림 연결 화면에서 영역을 지정해 주세요.' : '이 원화에 연결된 벽화 영역을 준비하고 있어요.';
+    ui.message.textContent = preview ? '벽화 영역이 아직 지정되지 않았어요. 그림 연결 화면에서 영역을 지정해 주세요.' : '지금은 벽화 이미지를 볼 수 없어요. 원화와 이야기를 먼저 살펴보세요.';
     return;
   }
 
@@ -88,7 +90,7 @@ export function showArtworkPair(item, { wall, preview = false } = {}) {
   const source = publicCrop || localImageURL(wall?.image);
   const dimensionsKnown = Number.isFinite(wall?.width) && wall.width > 0 && Number.isFinite(wall?.height) && wall.height > 0;
   if (!source || (!publicCrop && !dimensionsKnown)) {
-    ui.message.textContent = '연결된 벽화 그림을 불러올 자료가 없어요.';
+    ui.message.textContent = '지금은 벽화 이미지를 볼 수 없어요. 원화와 이야기를 먼저 살펴보세요.';
     return;
   }
 
@@ -97,10 +99,10 @@ export function showArtworkPair(item, { wall, preview = false } = {}) {
   const ratio = dimensionsKnown ? region.width * wall.width / (region.height * wall.height) : 1;
   ui.crop.style.setProperty('--crop-ratio', String(ratio));
   ui.crop.style.setProperty('--crop-fit-width', `${ratio * 100}cqh`);
-  ui.image.alt = `참여 작품 ${item.id}과 연결된 YOYOJIN의 벽화 그림`;
+  ui.image.alt = `참여 작품 ${item.id}과 연결된 요요진의 벽화`;
   ui.image.classList.toggle('artwork-pair-whole-wall', !publicCrop);
   ui.mural.classList.toggle('artwork-pair-pending', preview && item.mapping?.confirmed !== true);
-  ui.message.textContent = '벽화 그림을 불러오는 중이에요…';
+  ui.message.textContent = '벽화를 불러오고 있어요…';
   ui.mural.setAttribute('aria-busy', 'true');
   if (publicCrop) {
     ui.image.style.cssText = '';
@@ -130,7 +132,7 @@ export function showArtworkPair(item, { wall, preview = false } = {}) {
     if (token !== revision) return;
     ui.crop.hidden = true;
     ui.message.hidden = false;
-    ui.message.textContent = '벽화 그림을 불러오지 못했어요. 창을 닫고 다시 열어 주세요.';
+    ui.message.textContent = '벽화를 불러오지 못했어요. 인터넷 연결을 확인한 뒤 다시 열어 주세요.';
     ui.mural.removeAttribute('aria-busy');
   };
   if (ui.image.src !== source || (ui.image.complete && ui.image.naturalWidth === 0)) ui.image.src = source;

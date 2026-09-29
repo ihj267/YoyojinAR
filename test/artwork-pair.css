@@ -1,12 +1,18 @@
 /* Keep the two related pictures together, with the worksheet answers below. */
 #art-dialog.has-artwork-pair {
   width: min(1060px, 96vw);
+  color: #181818;
+  background: #fff;
+  border: 1px solid #dedede;
+  border-radius: 4px;
 }
 #art-dialog.has-artwork-pair .dialog-head {
   position: sticky;
   top: 0;
   z-index: 2;
-  background: var(--paper);
+  padding: 24px 30px;
+  background: #fff;
+  border-bottom: 1px solid #e6e6e6;
 }
 #art-dialog.has-artwork-pair .art-body {
   display: block;
@@ -15,10 +21,10 @@
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   align-items: start;
-  gap: 18px;
-  padding: 20px;
+  gap: 24px;
+  padding: 28px 30px 24px;
   min-height: 0;
-  background: #eeede5;
+  background: #fff;
 }
 .artwork-pair-figure {
   min-width: 0;
@@ -26,22 +32,22 @@
   margin: 0;
 }
 .artwork-pair-figure figcaption {
-  margin-bottom: 10px;
-  color: var(--green);
+  margin-bottom: 12px;
+  color: #181818;
   font-size: 14px;
-  font-weight: 750;
+  font-weight: 650;
   line-height: 1.5;
 }
 .artwork-pair-stage {
   position: relative;
   display: grid;
   place-items: center;
-  height: clamp(210px, 36vw, 370px);
+  height: clamp(230px, 36vw, 390px);
   min-width: 0;
   overflow: hidden;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: #fff;
+  border: 1px solid #e6e6e6;
+  border-radius: 2px;
+  background: #f7f7f5;
   container-type: size;
 }
 #art-dialog .artwork-pair #art-image {
@@ -75,8 +81,8 @@
 #art-dialog .artwork-pair #art-image-error {
   margin: 0;
   padding: 18px;
-  color: var(--muted);
-  font-size: 12px;
+  color: #606060;
+  font-size: 14px;
   line-height: 1.7;
   text-align: center;
   overflow-wrap: anywhere;
@@ -89,38 +95,61 @@
   background: #fff;
 }
 #art-dialog .artwork-pair .text-button {
-  display: inline-block;
-  min-height: 44px;
-  margin: 2px 0 0;
-  padding: 12px 0;
-  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 48px;
+  margin: 12px 0 0;
+  padding: 12px 8px;
+  border: 1px solid #d6d6d6;
+  border-radius: 2px;
+  color: #181818;
+  background: #fff;
+  font-size: 14px;
+  font-weight: 600;
   line-height: 1.6;
+  text-decoration: none;
+}
+#art-dialog .artwork-pair .text-button:hover {
+  border-color: #181818;
+  background: #f7f7f5;
 }
 #art-dialog.has-artwork-pair .art-story {
-  border-top: 1px solid var(--line);
-  padding: 22px 26px 28px;
+  border-top: 1px solid #e6e6e6;
+  padding: 26px 30px 34px;
+}
+#art-dialog.has-artwork-pair .pdf-answers {
+  gap: 10px;
+}
+#art-dialog.has-artwork-pair .pdf-answers dt {
+  color: #181818;
+  font-size: 14px;
+}
+#art-dialog.has-artwork-pair .pdf-answers dd {
+  color: #404040;
+  font-size: 15px;
 }
 @media (max-width: 680px) {
+  #art-dialog.has-artwork-pair .dialog-head {
+    padding: 18px 16px;
+  }
   #art-dialog .artwork-pair {
-    gap: 10px;
-    padding: 14px 10px 10px;
+    gap: 12px;
+    padding: 22px 14px;
   }
   .artwork-pair-stage {
-    height: clamp(145px, 47vw, 265px);
+    height: clamp(160px, 47vw, 280px);
   }
   .artwork-pair-figure figcaption {
-    margin-bottom: 7px;
-    font-size: 12px;
-  }
-  #art-dialog .artwork-pair .text-button {
-    font-size: 11px;
+    margin-bottom: 10px;
   }
   .artwork-pair-message,
   #art-dialog .artwork-pair #art-image-error {
     padding: 10px;
-    font-size: 11px;
+    font-size: 13px;
   }
   #art-dialog.has-artwork-pair .art-story {
-    padding: 18px;
+    padding: 22px 18px 28px;
   }
 }

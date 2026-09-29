@@ -22,8 +22,8 @@ export function createProgressiveTargets({manifest,targets,matchingDataList,deco
           patch.levels.forEach((level,n)=>{merged[level]=data[0].matchingData[n];});
           if(merged.filter(Boolean).length!==merged.length)throw Error('구역 자료 누락');
           matchingDataList[index]=merged;loaded.add(index);dirty=true;
-          onStatus('주변 구역도 준비했어요. 이동하며 비춰 주세요.');
-        }catch(error){if(alive()){retryAfter.set(index,now()+15000);onStatus('보충 자료를 기다리고 있어요. 현재 인식은 계속됩니다.');}}
+          onStatus('다른 친구도 천천히 비춰 보세요.');
+        }catch(error){if(alive()){retryAfter.set(index,now()+15000);onStatus('표시가 보이지 않으면 잠시 멈춰 비춰 주세요.');}}
         finally{queued.delete(index);}
       }
     }finally{active=false;}

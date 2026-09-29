@@ -1,12 +1,12 @@
 import './catalog-migrations.js';
 import './worksheet.js';
 import {createTargetSearchOrder} from './ar-target-search.js';
-import {showArtworkPair,resetArtworkPair} from './artwork-pair.js';
+import {showArtworkPair,resetArtworkPair} from './artwork-pair.js?v=exhibition-20260929';
 const $ = s => document.querySelector(s);
 const preview = false; // Use the prepared GitHub snapshot.
-const lightMode = new URLSearchParams(location.search).get('ar') === 'light';
+const lightMode = new URLSearchParams(location.search).get('ar') !== 'full';
 const DRAFT_KEY = 'yoyojin.mural.draft.v1';
-const state = {catalog:null, targets:null, view:'ready', galleryPage:0, zoom:1, ar:null, session:0, starting:false, cameraAbort:null, introTimer:null, guide:null};
+const state = {catalog:null, targets:null, view:'ready', galleryPage:0, zoom:1, ar:null, session:0, starting:false, cameraAbort:null, introTimer:null, guide:null, guidePromise:null};
 const worksheetTools=window.YoyojinWorksheet;
 const titleOf = worksheetTools.titleOf;
 const visibleItems = () => state.catalog.items.filter(i => preview || i.publish === true);
@@ -28,9 +28,10 @@ function switchView(view) {
   state.view=view;
   ['ready','map','gallery','camera'].forEach(v=>$(`#${v}-view`).hidden=v!==view);
   $('#bottom-nav').hidden=view==='ready'||view==='camera';
-  document.querySelectorAll('[data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===view));
+  document.querySelectorAll('[data-view]').forEach(b=>{b.classList.toggle('active',b.dataset.view===view);if(b.dataset.view===view)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});
   if(view==='gallery') renderGallery();
   if(view==='map') renderMap();
+  if(view!=='camera'){window.scrollTo(0,0);(view==='ready'?$('#start-camera'):$('main h2#'+view+'-title'))?.focus({preventScroll:true});}
 }
 function point(item) {
   const b=document.createElement('button'); b.className='point'+(item.mapping?.confirmed?'':' candidate'); b.textContent=item.id;
@@ -43,7 +44,7 @@ function renderMap() {
   for(const item of mappedItems()){const b=point(item);b.style.left=`${item.mapping.x*100}%`;b.style.top=`${item.mapping.y*100}%`;layer.append(b);}
   const n=mappedItems().length;
   const pending=mappedItems().filter(i=>!i.mapping.confirmed).length;
-  $('#mapping-status').textContent=n?`${n}개 위치${pending?` · 점선 ${pending}개는 작가 확인 전 후보입니다.`:'가 연결되어 있어요.'}`:preview?'아직 확정된 위치가 없어요. 작가용 화면에서 원화와 벽화를 연결해 주세요.':'벽화 속 이야기를 준비하고 있어요.';
+  $('#mapping-status').textContent=n?(preview&&pending?`${n}개의 이야기 · 위치 확인 전 ${pending}개`:`${n}개의 이야기`):'벽화 속 이야기를 준비하고 있어요.';
 }
 function renderGallery() {
   const q=$('#search').value.trim();
@@ -57,7 +58,7 @@ function renderGallery() {
     const id=document.createElement('span');id.className='card-id';id.textContent=`NO. ${item.id}`;
     const title=document.createElement('strong');title.textContent=titleOf(item);b.append(img,id,title);grid.append(b);
   }
-  if(!items.length){const p=document.createElement('p');p.className='subtle';p.textContent=q?'해당 번호의 그림이 없어요.':'공개할 그림을 준비하고 있어요.';grid.append(p);}
+  if(!items.length){const p=document.createElement('p');p.className='subtle';p.textContent=q?'찾는 그림이 없어요. 번호나 이름을 다시 입력해 주세요.':'공개할 그림을 준비하고 있어요.';grid.append(p);}
   $('#page-label').textContent=`${state.galleryPage+1} / ${pages}`;$('#prev-page').disabled=state.galleryPage===0;$('#next-page').disabled=state.galleryPage===pages-1;
 }
 let artworkFocus=null;
@@ -68,12 +69,14 @@ function openArtwork(item) {
   if(item.worksheet){
     const answers=document.createElement('dl');answers.className='pdf-answers';
     for(const question of worksheetTools.questions){
-      const answer=item.worksheet[question.key],dt=document.createElement('dt'),dd=document.createElement('dd');
-      dt.textContent=question.label;dd.textContent=answer.text||'원본에 글로 쓴 답변이 없어요.';
-      if(answer.status==='uncertain'){const note=document.createElement('small');note.className='pdf-answer-note';note.textContent='글씨 확인 필요'+(preview&&answer.note?` · ${answer.note}`:'');dd.append(note);}
+      const answer=item.worksheet[question.key];
+      if(!answer?.text?.trim()||answer.status==='blank')continue;
+      const dt=document.createElement('dt'),dd=document.createElement('dd');
+      dt.textContent=question.label;dd.textContent=answer.text;
+      if(answer.status==='uncertain'){const note=document.createElement('small');note.className='pdf-answer-note';note.textContent=preview?'글씨 확인 필요'+(answer.note?` · ${answer.note}`:''):'손글씨를 옮긴 내용으로, 일부 글자가 다를 수 있어요. 원화에서 함께 확인해 주세요.';dd.append(note);}
       if(answer.status==='blank')dd.classList.add('blank');answers.append(dt,dd);
     }
-    story.append(answers);
+    if(answers.children.length)story.append(answers);else story.textContent='아이의 그림과 손글씨를 원화에서 만나 보세요.';
   }else story.textContent=item.story||'아이의 그림과 손글씨를 원화에서 만나 보세요.';
   $('#art-review').textContent=preview?`PDF ${item.sourcePage}쪽 · ${item.publish?'공개 선택됨':'공개 전 검수용'}${item.mapping?.confirmed?' · 위치 확인됨':' · 벽화 위치 연결 대기'}`:'';
   $('#art-image').alt=titleOf(item);$('#art-image-error').hidden=true;
@@ -82,29 +85,37 @@ function openArtwork(item) {
 }
 function closeArtwork(){ resetArtworkPair();$('#art-dialog').close(); artworkFocus?.focus(); }
 async function showIntro() {
-  $('#intro').hidden=false;const start=performance.now();
-  const lines=[['안녕! 벽화 속에서 만나자.','우리의 이야기는 아이들의 작은 상상에서 시작됐어.'],['카메라로 나를 찾아줘!','벽화를 천천히 비추면 노란 포인트가 나타날 거야.'],['포인트를 톡, 눌러 볼까?','아이들이 그린 원화와 함께 살아가는 이야기를 만날 수 있어.']];
+  if(!state.guide){$('#guide-stage').classList.remove('guide-unavailable');$('#guide-loading').hidden=false;$('#guide-loading').textContent='친구가 오는 중이에요…';}
+  $('#intro').hidden=false;for(const el of document.body.children)if(el!==$('#intro'))el.inert=true;$('#skip-intro').focus();const start=performance.now();
+  const lines=[['안녕! 벽화 속에서 만나자.','우리의 이야기는 아이들의 작은 상상에서 시작됐어.'],['카메라로 나를 찾아줘!','벽화를 천천히 비추면 노란 표시가 나타날 거야.'],['노란 표시를 톡, 눌러 볼까?','아이들이 그린 원화와 함께 살아가는 이야기를 만날 수 있어.']];
   clearInterval(state.introTimer);
-  const tick=()=>{const elapsed=(performance.now()-start)/1000;const line=lines[Math.min(2,Math.floor(elapsed/3.4))];$('#intro-title').textContent=line[0];$('#intro-copy').textContent=line[1];$('#intro-progress').style.width=`${Math.min(100,elapsed*10)}%`;$('#intro-countdown').textContent=`${Math.max(0,Math.ceil(10-elapsed))}초 후 관람 안내로 이동`;if(elapsed>=10)closeIntro();};
+  const tick=()=>{const elapsed=(performance.now()-start)/1000;const line=lines[Math.min(2,Math.floor(elapsed/3.4))];$('#intro-title').textContent=line[0];$('#intro-copy').textContent=line[1];$('#intro-progress').style.width=`${Math.min(100,elapsed*10)}%`;$('#intro-countdown').textContent=`${Math.max(0,Math.ceil(10-elapsed))}초 후 관람 화면으로 이동`;if(elapsed>=10)closeIntro();};
   tick();state.introTimer=setInterval(tick,100);
-  try{const module=await import('./guide.js'); if(!$('#intro').hidden){state.guide ??= await module.createGuide($('#guide-stage'));state.guide?.play();}}catch(e){$('#guide-loading').textContent='벽화 속 친구들의 이야기를 만나 보세요.';console.warn('guide',e);}
+  try{
+    state.guidePromise??=import('./guide.js').then(module=>$('#intro').hidden?null:module.createGuide($('#guide-stage')));
+    const guide=await state.guidePromise;
+    if(!guide){state.guidePromise=null;return;}
+    state.guide=guide;$('#guide-stage').classList.remove('guide-unavailable');
+    if(!$('#intro').hidden)guide.play();else guide.pause();
+  }catch(e){state.guidePromise=null;$('#guide-stage').classList.add('guide-unavailable');$('#guide-loading').hidden=false;$('#guide-loading').textContent='벽화 속 친구들의 이야기를 만나 보세요.';console.warn('guide',e);}
 }
-function closeIntro(){clearInterval(state.introTimer);$('#intro').hidden=true;state.guide?.pause();$('#start-camera').focus();}
+function closeIntro(){clearInterval(state.introTimer);$('#intro').hidden=true;for(const el of document.body.children)el.inert=false;state.guide?.pause();try{sessionStorage.setItem('yoyojin.intro.seen','1');}catch{}$('#start-camera').focus();}
 function cameraError(error) {
   const name=error?.name;
   if(name==='NotAllowedError')return '카메라가 허용되지 않았어요. 주소창의 카메라 권한을 확인한 뒤 다시 눌러 주세요.';
   if(name==='NotFoundError')return '사용 가능한 카메라를 찾지 못했어요. 카메라가 있는 휴대폰에서 열거나 벽화 지도를 이용해 주세요.';
   if(name==='NotReadableError')return '다른 앱이 카메라를 사용 중일 수 있어요. 다른 카메라 앱을 닫고 다시 시도해 주세요.';
-  return error?.message||'카메라를 열지 못했어요. Safari 또는 Chrome에서 다시 시도하거나 벽화 지도를 이용해 주세요.';
+  return '카메라 관람을 시작하지 못했어요. 인터넷 연결을 확인하고 다시 시도해 주세요. 벽화 지도로도 관람할 수 있어요.';
 }
 async function startCamera() {
   if(state.starting)return;
-  if(!window.isSecureContext||!navigator.mediaDevices?.getUserMedia){$('#camera-message').textContent='휴대폰 카메라는 HTTPS 주소에서 열어야 해요. 지금은 벽화 지도에서 관람할 수 있어요.';return;}
-  state.starting=true;const token=++state.session;const button=$('#start-camera');button.disabled=true;button.textContent='카메라 준비 중…';$('#camera-message').textContent='벽화 전체의 인식 자료를 준비하고 있어요.';
+  if(!window.isSecureContext||!navigator.mediaDevices?.getUserMedia){$('#camera-message').textContent='이 브라우저에서 카메라를 사용할 수 없어요. 휴대폰의 Safari 또는 Chrome에서 열거나 벽화 지도를 이용해 주세요.';return;}
+  state.starting=true;const token=++state.session;const button=$('#start-camera');button.disabled=true;button.textContent='카메라 준비 중…';$('#camera-message').textContent='관람 화면을 준비하고 있어요.';
   const abort=new AbortController();state.cameraAbort=abort;
   state.view='camera';['ready','map','gallery'].forEach(v=>$(`#${v}-view`).hidden=true);$('#camera-view').hidden=false;$('#bottom-nav').hidden=true;
-  $('#tracking-status').textContent='벽화 전체 인식 자료를 준비하고 있어요…';
-  $('#tracking-hint').textContent=lightMode?'필요한 자료부터 준비해요. 아래 버튼으로 취소할 수 있어요.':'처음에는 약 32MB를 불러와요. 준비 중에도 아래 버튼으로 취소할 수 있어요.';
+  document.querySelectorAll('.topbar,#preview-banner,.skip-link').forEach(el=>el.inert=true);$('#stop-camera').focus();
+  $('#tracking-status').textContent='관람 화면을 준비하고 있어요…';
+  $('#tracking-hint').textContent='잠시만 기다려 주세요. 처음에는 준비 시간이 필요해요.';
   const assertActive=()=>{if(token!==state.session||abort.signal.aborted)throw new DOMException('취소됨','AbortError');};
   let ar, downloadTimer, bytes=null;
   const releaseTargetBuffer=()=>{bytes=null;};
@@ -116,7 +127,7 @@ async function startCamera() {
     const bank=staged?{...originalBank,mind:staged.initial.url,bytes:staged.initial.bytes,sha256:staged.initial.sha256}:originalBank;
     if(!bank||bank.targets.length!==39||bank.targets.some((target,index)=>target.targetIndex!==index))throw new Error('벽화 전체 인식 자료를 다시 업데이트해 주세요.');
     downloadTimer=setTimeout(()=>abort.abort(),120000);
-    if(staged)$('#tracking-hint').textContent=`먼저 약 ${(bank.bytes/1000000).toFixed(1)}MB를 준비하고, 필요한 구역을 이어서 받아요.`;
+    if(staged)$('#tracking-hint').textContent='잠시 후 벽화를 비춰 주세요.';
     const response=await fetch(bank.mind,{signal:abort.signal});if(!response.ok)throw new Error('인식 자료를 불러오지 못했어요. 인터넷 연결을 확인한 뒤 다시 시도해 주세요.');
     const limit=48*1024*1024,total=bank.bytes||Number(response.headers.get('Content-Length'))||0;
     if(total>limit)throw new Error('인식 자료 크기가 올바르지 않아요.');
@@ -125,16 +136,16 @@ async function startCamera() {
       while(true){
         const {done,value}=await reader.read();if(done)break;assertActive();received+=value.byteLength;
         if(received>limit){await reader.cancel();throw new Error('인식 자료 크기가 올바르지 않아요.');}
-        chunks.push(value);$('#tracking-status').textContent=total?`벽화 전체 준비 중 · ${Math.min(99,Math.floor(received/total*100))}%`:`벽화 전체 준비 중 · ${(received/1000000).toFixed(1)}MB`;
+        chunks.push(value);$('#tracking-status').textContent=total?`관람 준비 중 · ${Math.min(99,Math.floor(received/total*100))}%`:'관람 화면을 준비하고 있어요…';
       }
       bytes=new Uint8Array(received);let offset=0;for(const chunk of chunks){bytes.set(chunk,offset);offset+=chunk.length;}chunks.length=0;
     }else bytes=new Uint8Array(await response.arrayBuffer());
     clearTimeout(downloadTimer);assertActive();
     if(bytes.byteLength<100||bytes.byteLength>limit||(bank.bytes&&bytes.byteLength!==bank.bytes))throw new Error('인식 자료가 완전히 내려받아지지 않았어요. 다시 시도해 주세요.');
     if(bank.sha256&&crypto.subtle){const digest=[...new Uint8Array(await crypto.subtle.digest('SHA-256',bytes))].map(n=>n.toString(16).padStart(2,'0')).join('');if(digest!==bank.sha256)throw new Error('인식 자료의 버전이 달라요. 새로고침한 뒤 다시 시도해 주세요.');}
-    $('#tracking-status').textContent='카메라와 벽화 인식을 켜고 있어요…';
+    $('#tracking-status').textContent='카메라를 켜고 있어요…';
     const [{MindARThree},{C:Controller,a:Compiler},THREE]=await Promise.all([import('./vendor/dist/mindar-image-three.prod.js'),import('./vendor/dist/controller-mGt1s8dJ.js'),import('three')]);
-    const progressiveModule=staged?await import('./vendor/yoyojin/progressive-targets.js'):null;
+    const progressiveModule=staged?await import('./vendor/yoyojin/progressive-targets.js?v=exhibition-20260929'):null;
     assertActive();
     // Capture the upstream library's bound listener for cleanup after a session.
     const resizeHandlers=[];
@@ -184,7 +195,7 @@ async function startCamera() {
       }
       if(dimensions.length!==bank.targets.length)throw new Error('인식 구역 자료가 맞지 않아요. 다시 업데이트해 주세요.');
       ar.postMatrixs=dimensions.map(([width,height])=>new THREE.Matrix4().compose(new THREE.Vector3(width/2,height/2,0),new THREE.Quaternion(),new THREE.Vector3(width,width,width)));
-      $('#tracking-status').textContent='화면에 맞게 인식을 준비하고 있어요…';
+      $('#tracking-status').textContent='이제 벽화를 비춰 주세요';
       await new Promise(resolve=>requestAnimationFrame(resolve));assertActive();window.MINDAR.IMAGE.tf.tidy(()=>controller.dummyRun(ar.video));assertActive();controller.processVideo(ar.video);
     };
     const entries=[];
@@ -196,33 +207,35 @@ async function startCamera() {
       const items=mappedItems().filter(i=>{const x=i.mapping.x*state.catalog.wall.width,y=i.mapping.y*state.catalog.wall.height;return x>=target.x-margin&&x<=target.x+target.width+margin&&y>=target.y-margin&&y<=target.y+target.height+margin;});
       const dots=items.map(item=>{const b=point(item);b.hidden=true;$('#ar-points').append(b);return{item,button:b,local:new THREE.Vector3((item.mapping.x*state.catalog.wall.width-target.x)/target.width-.5,(target.height/2-(item.mapping.y*state.catalog.wall.height-target.y))/target.width,.005)};});
       entries.push({anchor,target,dots});
-      anchor.onTargetFound=()=>{$('#tracking-status').textContent=items.length?(preview&&items.some(i=>!i.mapping.confirmed)?'구역 인식 성공 · 점선은 작가 확인 전 위치 후보입니다.':'친구를 찾았어요! 노란 포인트를 눌러 주세요.'):preview?'구역 인식 성공 · 이 위치의 원화 연결을 기다리고 있어요.':'벽화를 찾았어요. 연결된 친구가 있는 곳으로 이동해 보세요.';};
-      anchor.onTargetLost=()=>{dots.forEach(d=>d.button.hidden=true);$('#tracking-status').textContent='벽화의 한 부분을 천천히 비춰 주세요';};
+      anchor.onTargetFound=()=>{$('#tracking-status').textContent=items.length?(preview&&items.some(i=>!i.mapping.confirmed)?'구역 인식 성공 · 점선은 작가 확인 전 위치 후보입니다.':'친구를 찾았어요. 노란 표시를 눌러 보세요.'):preview?'구역 인식 성공 · 이 위치의 원화 연결을 기다리고 있어요.':'벽화를 찾았어요. 주변의 다른 친구도 비춰 보세요.';};
+      anchor.onTargetLost=()=>{dots.forEach(d=>d.button.hidden=true);$('#tracking-status').textContent='벽화를 천천히 비춰 주세요';};
     }
     let timer;
     try{await Promise.race([ar.start(),new Promise((_,reject)=>{timer=setTimeout(()=>reject(new Error('카메라 준비가 지연되고 있어요. 권한을 확인한 뒤 다시 시도해 주세요.')),45000);})]);}finally{clearTimeout(timer);}
     if(token!==state.session){disposeAR(ar);return;}
-    $('#tracking-status').textContent='벽화의 어느 부분이든 천천히 비춰 주세요';
-    $('#tracking-hint').textContent='친구와 주변 그림을 함께 담아 주세요. 구역은 자동으로 찾아요.';
+    $('#tracking-status').textContent='벽화를 천천히 비춰 주세요';
+    $('#tracking-hint').textContent='친구와 주변 그림이 함께 보이도록 담아 주세요.';
     ar.renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));
     const projected=new THREE.Vector3();
     ar.renderer.setAnimationLoop(()=>{
       if(token!==state.session)return;
       ar.scene.updateMatrixWorld(true);ar.camera.updateMatrixWorld(true);
-      const shown=[],used=new Set(),w=innerWidth,h=innerHeight;
+      const shown=[],used=new Set(),visibleButtons=new Set(),w=innerWidth,h=innerHeight;
+      const topEdge=$('#tracking-status').getBoundingClientRect().bottom+24;
+      const bottomEdge=$('#tracking-hint').getBoundingClientRect().top-24;
       for(const entry of entries)for(const d of entry.dots){
-        d.button.hidden=true;
         if(!entry.anchor.visible||$('#art-dialog').open||used.has(d.item.id))continue;
         projected.copy(d.local).applyMatrix4(entry.anchor.group.matrixWorld).project(ar.camera);
         const x=(projected.x+1)*w/2,y=(1-projected.y)*h/2;
-        if(projected.z<-1||projected.z>1||x<24||x>w-24||y<90||y>h-95||shown.length>=12||shown.some(p=>Math.hypot(x-p.x,y-p.y)<48))continue;
-        d.button.style.left=`${x}px`;d.button.style.top=`${y}px`;d.button.hidden=false;shown.push({x,y});used.add(d.item.id);
+        if(projected.z<-1||projected.z>1||x<24||x>w-24||y<topEdge||y>bottomEdge||shown.length>=12||shown.some(p=>Math.hypot(x-p.x,y-p.y)<48))continue;
+        d.button.style.left=`${x}px`;d.button.style.top=`${y}px`;visibleButtons.add(d.button);shown.push({x,y});used.add(d.item.id);
       }
+      for(const entry of entries)for(const d of entry.dots){const hidden=!visibleButtons.has(d.button);if(d.button.hidden!==hidden)d.button.hidden=hidden;}
       ar.renderer.render(ar.scene,ar.camera);
     });
     $('#camera-message').textContent='';
-  }catch(error){if(token===state.session){stopCamera();switchView('ready');$('#camera-message').textContent=error?.name==='AbortError'?'인식 자료 다운로드가 지연됐어요. 인터넷 연결을 확인한 뒤 다시 눌러 주세요.':cameraError(error);}else if(ar)disposeAR(ar);if(error?.name!=='AbortError')console.warn('camera',error);}
-  finally{clearTimeout(downloadTimer);if(token!==state.session||abort.signal.aborted)releaseTargetBuffer();if(token===state.session||!state.starting){state.starting=false;button.disabled=false;button.innerHTML='카메라로 친구 찾기 <span>↗</span>';}}
+  }catch(error){if(token===state.session){stopCamera();switchView('ready');$('#camera-message').textContent=error?.name==='AbortError'?'준비가 오래 걸리고 있어요. 인터넷 연결을 확인한 뒤 다시 시도해 주세요.':cameraError(error);}else if(ar)disposeAR(ar);if(error?.name!=='AbortError')console.warn('camera',error);}
+  finally{clearTimeout(downloadTimer);if(token!==state.session||abort.signal.aborted)releaseTargetBuffer();if(token===state.session||!state.starting){state.starting=false;button.disabled=false;button.innerHTML='카메라로 관람하기 <span aria-hidden="true">↗</span>';}}
 }
 function disposeAR(ar) {
   if(!ar)return;
@@ -247,16 +260,16 @@ function disposeAR(ar) {
   for(const handler of ar.__resizeHandlers||[])window.removeEventListener('resize',handler);
   if(ar.__url)URL.revokeObjectURL(ar.__url);
 }
-function stopCamera(){++state.session;state.starting=false;state.cameraAbort?.abort();state.cameraAbort=null;disposeAR(state.ar);state.ar=null;$('#ar-points').replaceChildren();$('#ar-container').replaceChildren();$('#start-camera').disabled=false;$('#start-camera').innerHTML='카메라로 친구 찾기 <span>↗</span>';}
+function stopCamera(){++state.session;state.starting=false;state.cameraAbort?.abort();state.cameraAbort=null;disposeAR(state.ar);state.ar=null;$('#ar-points').replaceChildren();$('#ar-container').replaceChildren();document.querySelectorAll('.topbar,#preview-banner,.skip-link').forEach(el=>el.inert=false);$('#start-camera').disabled=false;$('#start-camera').innerHTML='카메라로 관람하기 <span aria-hidden="true">↗</span>';}
 $('#start-camera').onclick=startCamera;$('#stop-camera').onclick=()=>{stopCamera();switchView('ready');$('#camera-message').textContent='';};
+$('#camera-map').onclick=()=>switchView('map');
 $('#browse-wall').onclick=()=>switchView('map');$('#open-gallery').onclick=()=>switchView('gallery');
 document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>switchView(b.dataset.view));
-$('#home-link').href=preview?'./index.html?preview=1'+(lightMode?'&ar=light':''):'./index.html'+(lightMode?'?ar=light':'');
-const trialLink=document.createElement('a');trialLink.className='text-button';trialLink.style.display='block';trialLink.style.marginTop='14px';trialLink.href=lightMode?'./index.html?intro=0':'./index.html?ar=light&intro=0';trialLink.textContent=lightMode?'기존 방식으로 비교하기 →':'빠른 시작 시험판 열기 →';$('#browse-wall').after(trialLink);
-if(lightMode){document.title='빠른 시작 시험판 · YOYOJIN';$('.camera-note').textContent='빠른 시작 시험판 · 구역 선택 없이 자동으로 찾아요.';$('#tracking-hint').textContent='필요한 구역의 인식 자료를 차례로 준비해요.';const fallback=document.createElement('a');fallback.href='./index.html?intro=0';fallback.className='camera-exit';fallback.style.top='auto';fallback.style.bottom='82px';fallback.style.padding='10px 16px';fallback.style.whiteSpace='nowrap';$('#tracking-hint').style.bottom='145px';fallback.textContent='인식이 어려우면 기존 방식으로 →';$('#camera-view').append(fallback);$('#help-dialog ol').nextElementSibling.textContent='먼저 약 13.7MB의 인식 자료를 받고 필요한 구역을 보충하는 시험판입니다. 인식이 어려우면 기존 방식으로 전환하거나 벽화 지도로 관람할 수 있어요.';}
-$('#search').oninput=()=>{state.galleryPage=0;renderGallery();};$('#prev-page').onclick=()=>{state.galleryPage--;renderGallery();};$('#next-page').onclick=()=>{state.galleryPage++;renderGallery();};
+$('#home-link').onclick=event=>{event.preventDefault();switchView('ready');};
+$('#search').oninput=()=>{state.galleryPage=0;renderGallery();};$('#prev-page').onclick=()=>{state.galleryPage--;renderGallery();$('#gallery-title').scrollIntoView();};$('#next-page').onclick=()=>{state.galleryPage++;renderGallery();$('#gallery-title').scrollIntoView();};
 for(const [selector,factor] of [['#zoom-in',1.4],['#zoom-out',1/1.4]])$(selector).onclick=()=>{state.zoom=Math.min(6,Math.max(1,state.zoom*factor));$('#map-canvas').style.height=`${state.zoom*100}%`;$('#zoom-label').textContent=`${Math.round(state.zoom*100)}%`;};
 $('#close-art').onclick=closeArtwork;$('#help').onclick=()=>$('#help-dialog').showModal();$('#close-help').onclick=()=>$('#help-dialog').close();
+$('#intro-continue').onclick=closeIntro;$('#reload-app').onclick=()=>location.reload();
 $('#skip-intro').onclick=closeIntro;$('#replay-intro').onclick=showIntro;
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('#intro').hidden)closeIntro();});
 window.addEventListener('pagehide',()=>{stopCamera();state.guide?.pause();});
@@ -267,5 +280,13 @@ try{
   if(preview){$('#preview-banner').hidden=false;try{const draft=JSON.parse(localStorage.getItem(DRAFT_KEY));if(validDraft(draft,catalog))state.catalog={...catalog,items:draft.items};}catch{}}
   state.catalog=worksheetTools.merge(state.catalog,new Map(catalog.items.filter(item=>item.worksheet).map(item=>[item.id,item.worksheet]))).catalog;
   state.catalog=window.YoyojinCatalogMigrations.removeLegacyCandidates(state.catalog).catalog;
-  if(new URLSearchParams(location.search).get('intro')!=='0')showIntro();
-}catch(error){$('#fatal').hidden=false;$('#fatal').textContent=`준비 자료를 읽지 못했습니다. 로컬 실행 안내를 확인해 주세요. ${error.message}`;$('#start-camera').disabled=true;}
+  let seenIntro=false;try{seenIntro=sessionStorage.getItem('yoyojin.intro.seen')==='1';}catch{}
+  if(!seenIntro&&new URLSearchParams(location.search).get('intro')!=='0')showIntro();
+}catch(error){console.warn('catalog',error);$('#fatal').hidden=false;$('#start-camera').disabled=true;$('#reload-app').focus();}
+
+const mapScroll=$('#map-scroll');let pan=null,suppressMapClick=false;
+mapScroll.addEventListener('pointerdown',event=>{if(event.pointerType!=='mouse'||event.button!==0)return;pan={id:event.pointerId,x:event.clientX,y:event.clientY,left:mapScroll.scrollLeft,top:mapScroll.scrollTop,moved:false};});
+mapScroll.addEventListener('pointermove',event=>{if(!pan||event.pointerId!==pan.id)return;const dx=event.clientX-pan.x,dy=event.clientY-pan.y;if(!pan.moved&&Math.hypot(dx,dy)>5){pan.moved=true;mapScroll.setPointerCapture(event.pointerId);}if(pan.moved){event.preventDefault();mapScroll.scrollLeft=pan.left-dx;mapScroll.scrollTop=pan.top-dy;}});
+const endPan=event=>{if(!pan||event.pointerId!==pan.id)return;suppressMapClick=pan.moved;pan=null;setTimeout(()=>{suppressMapClick=false;},0);};
+mapScroll.addEventListener('pointerup',endPan);mapScroll.addEventListener('pointercancel',endPan);
+mapScroll.addEventListener('click',event=>{if(suppressMapClick){event.preventDefault();event.stopPropagation();}},true);
