@@ -1,4 +1,13 @@
 @charset "UTF-8";
+/* AR numbers have no fixed count cap. The optional tidy view is separate. */
+.camera-density{position:absolute;top:max(18px,env(safe-area-inset-top));left:20px;z-index:5;min-height:48px;padding:12px 18px;border:1px solid #ffffff75;border-radius:30px;background:#171614dc;color:#fff;font-size:13px}
+.camera-density[aria-pressed="true"]{background:var(--yellow);border-color:var(--yellow);color:var(--ink)}
+#ar-points .point{left:0;top:0;touch-action:manipulation}
+#ar-points .point:not([hidden]){will-change:transform}
+#ar-points .point:disabled{opacity:1;pointer-events:none}
+#art-dialog{overflow-anchor:none;scroll-behavior:auto}
+/* Keep the pin boundary steady when the status sentence changes on phones. */
+.camera-hud #tracking-status{width:min(90vw,420px);min-height:calc(2 * 1.65em + 28px);display:flex;align-items:center;justify-content:center}
 :root{--paper:#faf9f6;--ink:#211e1b;--muted:#69655f;--line:#dedbd4;--yellow:#f8d544;--green:#211e1b;font-family:"Pretendard","Apple SD Gothic Neo","Malgun Gothic",sans-serif;color:var(--ink);background:var(--paper);font-synthesis:none}
 *{box-sizing:border-box}body{margin:0}button,input,select{font:inherit}button,a,select{-webkit-tap-highlight-color:transparent}button{cursor:pointer;color:inherit;border:0}a{color:inherit}button:disabled{opacity:.4;cursor:default}[hidden]{display:none!important}button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,[tabindex]:focus-visible{outline:3px solid #ad7600;outline-offset:4px}h1,h2,p{margin:0}h2{font-size:clamp(25px,3vw,36px);font-weight:750;letter-spacing:-1.2px}button.icon{border:1px solid var(--line);background:transparent;border-radius:50%;font-size:25px;width:48px;height:48px;display:inline-grid;place-items:center;flex-shrink:0}.skip-link{position:fixed;top:-100px;left:20px;padding:14px;background:var(--ink);color:white;z-index:200}.skip-link:focus{top:12px}
 .topbar{height:92px;padding:0 4vw;display:flex;align-items:center;justify-content:space-between;gap:24px;border-bottom:1px solid var(--line);position:relative;z-index:10;background:var(--paper)}.brand{display:flex;align-items:center;min-height:48px;text-decoration:none}.brand img{display:block;width:200px;height:auto}.edition{font-size:13px;color:var(--muted);letter-spacing:.04em}.help-button{display:flex;align-items:center;gap:9px;min-height:48px;background:transparent;font-size:13px;white-space:nowrap;padding:8px 0}.help-symbol{display:grid;place-items:center;border:1px solid var(--ink);border-radius:50%;width:24px;height:24px;font-size:14px}

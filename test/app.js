@@ -1,12 +1,13 @@
 import './catalog-migrations.js';
 import './worksheet.js';
 import {createTargetSearchOrder} from './ar-target-search.js';
+import {createStablePins} from './vendor/yoyojin/stable-pins.js?v=20261005';
 import {showArtworkPair,resetArtworkPair} from './artwork-pair.js?v=exhibition-20260929';
 const $ = s => document.querySelector(s);
 const preview = false; // Use the prepared GitHub snapshot.
 const lightMode = new URLSearchParams(location.search).get('ar') !== 'full';
 const DRAFT_KEY = 'yoyojin.mural.draft.v1';
-const state = {catalog:null, targets:null, view:'ready', galleryPage:0, zoom:1, ar:null, session:0, starting:false, cameraAbort:null, introTimer:null, guide:null, guidePromise:null};
+const state = {catalog:null, targets:null, view:'ready', galleryPage:0, zoom:1, ar:null, session:0, starting:false, cameraAbort:null, introTimer:null, guide:null, guidePromise:null, reduceOverlap:false};
 const worksheetTools=window.YoyojinWorksheet;
 const titleOf = worksheetTools.titleOf;
 const visibleItems = () => state.catalog.items.filter(i => preview || i.publish === true);
@@ -61,8 +62,9 @@ function renderGallery() {
   if(!items.length){const p=document.createElement('p');p.className='subtle';p.textContent=q?'찾는 그림이 없어요. 번호나 이름을 다시 입력해 주세요.':'공개할 그림을 준비하고 있어요.';grid.append(p);}
   $('#page-label').textContent=`${state.galleryPage+1} / ${pages}`;$('#prev-page').disabled=state.galleryPage===0;$('#next-page').disabled=state.galleryPage===pages-1;
 }
-let artworkFocus=null;
+let artworkFocus=null,artworkOpenRevision=0;
 function openArtwork(item) {
+  const opening=++artworkOpenRevision;
   artworkFocus=document.activeElement;$('#art-number').textContent=`참여 작품 · ${item.id}`;$('#art-title').textContent=titleOf(item);
   $('#art-name').textContent=item.displayName||'';$('#art-name').hidden=!item.displayName;
   const story=$('#art-story');story.replaceChildren();
@@ -81,9 +83,13 @@ function openArtwork(item) {
   $('#art-review').textContent=preview?`PDF ${item.sourcePage}쪽 · ${item.publish?'공개 선택됨':'공개 전 검수용'}${item.mapping?.confirmed?' · 위치 확인됨':' · 벽화 위치 연결 대기'}`:'';
   $('#art-image').alt=titleOf(item);$('#art-image-error').hidden=true;
   $('#art-image').onerror=()=>{$('#art-image-error').hidden=false;};$('#art-image').src=item.image;
-  $('#full-art').href=item.image;showArtworkPair(item,{wall:state.catalog.wall,preview});$('#art-dialog').showModal();
+  $('#full-art').href=item.image;showArtworkPair(item,{wall:state.catalog.wall,preview});
+  const dialog=$('#art-dialog');
+  const resetScroll=()=>{dialog.scrollTop=0;dialog.scrollLeft=0;for(const el of dialog.querySelectorAll('.art-body,.art-story,.art-image-wrap')){el.scrollTop=0;el.scrollLeft=0;}};
+  resetScroll();dialog.showModal();$('#close-art').focus({preventScroll:true});resetScroll();
+  requestAnimationFrame(()=>{if(dialog.open&&opening===artworkOpenRevision)resetScroll();});
 }
-function closeArtwork(){ resetArtworkPair();$('#art-dialog').close(); artworkFocus?.focus(); }
+function closeArtwork(){ resetArtworkPair();$('#art-dialog').close(); if(state.view==='camera')$('#stop-camera').focus({preventScroll:true});else artworkFocus?.focus({preventScroll:true}); }
 async function showIntro() {
   if(!state.guide){$('#guide-stage').classList.remove('guide-unavailable');$('#guide-loading').hidden=false;$('#guide-loading').textContent='친구가 오는 중이에요…';}
   $('#intro').hidden=false;for(const el of document.body.children)if(el!==$('#intro'))el.inert=true;$('#skip-intro').focus();const start=performance.now();
@@ -175,7 +181,14 @@ async function startCamera() {
         if(token!==state.session||event.type!=='updateMatrix')return;
         const anchor=ar.anchors.find(entry=>entry.targetIndex===event.targetIndex);if(!anchor)return;
         const visible=event.worldMatrix!==null;anchor.group.visible=visible;
-        if(visible){anchor.group.matrix.fromArray(event.worldMatrix).multiply(ar.postMatrixs[event.targetIndex]);}
+        if(visible){
+          anchor.group.matrix.fromArray(event.worldMatrix).multiply(ar.postMatrixs[event.targetIndex]);
+          // Old 'showing' poses continue during miss tolerance. Only a genuine
+          // successful tracking observation may advance the screen filter.
+          if(controller.trackingStates?.[event.targetIndex]?.isTracking){
+            anchor.__poseSequence=(anchor.__poseSequence||0)+1;
+          }
+        }
         const wasVisible=anchor.visible;anchor.visible=visible;
         if(visible&&!wasVisible)anchor.onTargetFound?.();if(!visible&&wasVisible)anchor.onTargetLost?.();anchor.onTargetUpdate?.();
       }});
@@ -198,17 +211,22 @@ async function startCamera() {
       $('#tracking-status').textContent='이제 벽화를 비춰 주세요';
       await new Promise(resolve=>requestAnimationFrame(resolve));assertActive();window.MINDAR.IMAGE.tf.tidy(()=>controller.dummyRun(ar.video));assertActive();controller.processVideo(ar.video);
     };
-    const entries=[];
+    const entries=[],buttons=new Map(),pinFilter=createStablePins();
+    ar.__pinFilter=pinFilter;
+    const buttonFor=item=>{
+      if(!buttons.has(item.id)){
+        const b=point(item);b.hidden=true;$('#ar-points').append(b);buttons.set(item.id,b);
+      }
+      return buttons.get(item.id);
+    };
     for(const target of bank.targets){
       const anchor=ar.addAnchor(target.targetIndex);
       // A small border allowance prevents overlapping targets from hiding a
       // visible neighbour's pin. Never extrapolate across the entire mural.
       const margin=target.width*.15;
       const items=mappedItems().filter(i=>{const x=i.mapping.x*state.catalog.wall.width,y=i.mapping.y*state.catalog.wall.height;return x>=target.x-margin&&x<=target.x+target.width+margin&&y>=target.y-margin&&y<=target.y+target.height+margin;});
-      const dots=items.map(item=>{const b=point(item);b.hidden=true;$('#ar-points').append(b);return{item,button:b,local:new THREE.Vector3((item.mapping.x*state.catalog.wall.width-target.x)/target.width-.5,(target.height/2-(item.mapping.y*state.catalog.wall.height-target.y))/target.width,.005)};});
+      const dots=items.map(item=>{const b=buttonFor(item);return{item,button:b,local:new THREE.Vector3((item.mapping.x*state.catalog.wall.width-target.x)/target.width-.5,(target.height/2-(item.mapping.y*state.catalog.wall.height-target.y))/target.width,.005)};});
       entries.push({anchor,target,dots});
-      anchor.onTargetFound=()=>{$('#tracking-status').textContent=items.length?(preview&&items.some(i=>!i.mapping.confirmed)?'구역 인식 성공 · 점선은 작가 확인 전 위치 후보입니다.':'친구를 찾았어요. 노란 표시를 눌러 보세요.'):preview?'구역 인식 성공 · 이 위치의 원화 연결을 기다리고 있어요.':'벽화를 찾았어요. 주변의 다른 친구도 비춰 보세요.';};
-      anchor.onTargetLost=()=>{dots.forEach(d=>d.button.hidden=true);$('#tracking-status').textContent='벽화를 천천히 비춰 주세요';};
     }
     let timer;
     try{await Promise.race([ar.start(),new Promise((_,reject)=>{timer=setTimeout(()=>reject(new Error('카메라 준비가 지연되고 있어요. 권한을 확인한 뒤 다시 시도해 주세요.')),45000);})]);}finally{clearTimeout(timer);}
@@ -217,20 +235,47 @@ async function startCamera() {
     $('#tracking-hint').textContent='친구와 주변 그림이 함께 보이도록 담아 주세요.';
     ar.renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));
     const projected=new THREE.Vector3();
+    let previousSequence=null,previousSource=null,previousSize='',wasShowing=false,visibleButtons=new Set();
     ar.renderer.setAnimationLoop(()=>{
       if(token!==state.session)return;
+      const now=performance.now(),w=innerWidth,h=innerHeight,size=`${w}x${h}`;
       ar.scene.updateMatrixWorld(true);ar.camera.updateMatrixWorld(true);
-      const shown=[],used=new Set(),visibleButtons=new Set(),w=innerWidth,h=innerHeight;
-      const topEdge=$('#tracking-status').getBoundingClientRect().bottom+24;
-      const bottomEdge=$('#tracking-hint').getBoundingClientRect().top-24;
-      for(const entry of entries)for(const d of entry.dots){
-        if(!entry.anchor.visible||$('#art-dialog').open||used.has(d.item.id))continue;
-        projected.copy(d.local).applyMatrix4(entry.anchor.group.matrixWorld).project(ar.camera);
-        const x=(projected.x+1)*w/2,y=(1-projected.y)*h/2;
-        if(projected.z<-1||projected.z>1||x<24||x>w-24||y<topEdge||y>bottomEdge||shown.length>=12||shown.some(p=>Math.hypot(x-p.x,y-p.y)<48))continue;
-        d.button.style.left=`${x}px`;d.button.style.top=`${y}px`;visibleButtons.add(d.button);shown.push({x,y});used.add(d.item.id);
+      // A lost anchor may still be 'showing' while another acquires. maxTrack=1
+      // gives one actual tracking source; never alternate between stale anchors.
+      const entry=entries.find(e=>e.anchor.visible&&ar.controller?.trackingStates?.[e.target.targetIndex]?.isTracking);
+      if(entry){
+        const source=entry.target.targetIndex,sequence=entry.anchor.__poseSequence||0;
+        if(source!==previousSource||sequence!==previousSequence||size!==previousSize){
+          const points=[];
+          for(const d of entry.dots){
+            projected.copy(d.local).applyMatrix4(entry.anchor.group.matrixWorld).project(ar.camera);
+            if(projected.z>=-1&&projected.z<=1)points.push({id:d.item.id,x:(projected.x+1)*w/2,y:(1-projected.y)*h/2});
+          }
+          pinFilter.observe({target:source,sequence,points,now,width:w,height:h});
+          previousSource=source;previousSequence=sequence;previousSize=size;
+        }
+      }else pinFilter.lose(now);
+      const stabilized=pinFilter.frame({
+        now,left:24,right:w-24,top:$('#tracking-status').getBoundingClientRect().bottom+24,
+        bottom:$('#tracking-hint').getBoundingClientRect().top-24,reduceOverlap:state.reduceOverlap
+      });
+      const pins=$('#art-dialog').open?[]:stabilized;
+      const nextVisible=new Set();
+      for(const pin of pins){
+        const b=buttons.get(pin.id);nextVisible.add(b);
+        // Transform-only movement avoids layout work for every moving number.
+        const transform=`translate3d(${Math.round(pin.x*4)/4}px,${Math.round(pin.y*4)/4}px,0) translate(-50%,-50%)`;
+        if(b.__pinTransform!==transform){b.style.transform=transform;b.__pinTransform=transform;}
+        if(b.disabled===pin.interactive)b.disabled=!pin.interactive;
+        if(b.hidden)b.hidden=false;
       }
-      for(const entry of entries)for(const d of entry.dots){const hidden=!visibleButtons.has(d.button);if(d.button.hidden!==hidden)d.button.hidden=hidden;}
+      for(const b of visibleButtons)if(!nextVisible.has(b))b.hidden=true;
+      visibleButtons=nextVisible;
+      const showing=pins.some(pin=>pin.interactive);
+      if(!$('#art-dialog').open&&showing!==wasShowing){
+        $('#tracking-status').textContent=showing?'노란 번호를 눌러 보세요':'벽화를 천천히 비춰 주세요';
+        wasShowing=showing;
+      }
       ar.renderer.render(ar.scene,ar.camera);
     });
     $('#camera-message').textContent='';
@@ -240,6 +285,7 @@ async function startCamera() {
 function disposeAR(ar) {
   if(!ar)return;
   ar.__progressive?.dispose();
+  ar.__pinFilter?.reset();
   ar.__releaseTargetBuffer?.();
   try{ar.renderer.setAnimationLoop(null);}catch{}
   try{ar.controller?.stopProcessVideo();}catch{}
@@ -263,6 +309,7 @@ function disposeAR(ar) {
 function stopCamera(){++state.session;state.starting=false;state.cameraAbort?.abort();state.cameraAbort=null;disposeAR(state.ar);state.ar=null;$('#ar-points').replaceChildren();$('#ar-container').replaceChildren();document.querySelectorAll('.topbar,#preview-banner,.skip-link').forEach(el=>el.inert=false);$('#start-camera').disabled=false;$('#start-camera').innerHTML='카메라로 관람하기 <span aria-hidden="true">↗</span>';}
 $('#start-camera').onclick=startCamera;$('#stop-camera').onclick=()=>{stopCamera();switchView('ready');$('#camera-message').textContent='';};
 $('#camera-map').onclick=()=>switchView('map');
+$('#reduce-overlap').onclick=()=>{state.reduceOverlap=!state.reduceOverlap;$('#reduce-overlap').setAttribute('aria-pressed',String(state.reduceOverlap));};
 $('#browse-wall').onclick=()=>switchView('map');$('#open-gallery').onclick=()=>switchView('gallery');
 document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>switchView(b.dataset.view));
 $('#home-link').onclick=event=>{event.preventDefault();switchView('ready');};

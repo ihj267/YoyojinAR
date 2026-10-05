@@ -4,16 +4,16 @@
   "count": 499,
   "files": {
     ".nojekyll": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-    "app.js": "4ada9de344838484b1fc5d19dfa72f0b1496efedb8e4badaa5562ea22b81bf69",
+    "app.js": "eefda13932e16a6f4f8f706f256250cf8038784dbd92cbca26413be5be83dadf",
     "ar-target-search.js": "39fbf77bebc73d3651ddb6fbfca34b8d8473ad7c99d977a7481f7f41aafc93ae",
     "artwork-pair.css": "9880b2d9c148b5d863b0755c00c713bf78e44f823b6cf4b63913260022aba364",
     "artwork-pair.js": "141f594f792908170652c8133bfb3caaff2e9945c437f8e492bdb1518507206c",
     "catalog-migrations.js": "453b157bdb15673b7fdb2ea41b38a43b89bb9d1b22654d650947d5e3d3cba4e6",
     "favicon.svg": "18ba5d908eaae78b9707830146a48d8f2176ccb7463cee4eb40a9757389c4844",
     "guide.js": "15e0972cd56dcda226e325e6f9d48fd8837b087263962c7fb4b58ca966b71431",
-    "index.html": "07e61bb788816624f00ad15b56e1789cd7de49121d9366b49ade2425d14c05e6",
+    "index.html": "7844ca4e4cd983f310180dc7d94dd0ed1c6ee915f2d3ddd3d5874178accb9152",
     "progressive-targets.js": "1155fb51dc420f00688734356909bad0a601e3bd25fb7e7c829c0ec1833efafb",
-    "style.css": "32ea4152d3e334995f9307261b3933fb5b2e0d9d618a1b0f7a5105c4c80b6546",
+    "style.css": "9027d3f04847b2bcd061af313f0d61a7ecce5fe18dfc1a69a64a8f8bd8aed300",
     "test-board.html": "dd7d7c650c9ecf9826ba899ca94f295502d64ae95544f17550eb3e2abeeb5c25",
     "TEST-README.md": "fbe26198a2a2cea91ac3882aee40da2028c2fb1bc6cb6df516082f3a631e79b7",
     "THIRD_PARTY_NOTICES.md": "99515ff8e4470ae5e6a4d5e463c10b2ea9622d309636a4b06f795284ece69756",
@@ -1624,6 +1624,8 @@
     "vendor/yoyojin/targets/zone-35-2492be5292a5.mind": "2492be5292a58552f0a53705c20d9ef10e4250bd9c047c5831ec79336763ba26",
     "vendor/yoyojin/targets/zone-36-85b33b3f409d.mind": "85b33b3f409dbe6650d3ee79d2136a790d6a39675894313f25be1f75d0575b94",
     "vendor/yoyojin/targets/zone-37-f154c24e3c37.mind": "f154c24e3c37b94ba4ebf5cacf269a04e682cd895ab7fd34386bffb0dd3d74e1",
-    "vendor/yoyojin/targets/zone-38-53e7b6e678cd.mind": "53e7b6e678cde1c8c6e0714daf226ef1f6e521a4885da76b49dbbe9355b5f245"
-  }
+    "vendor/yoyojin/targets/zone-38-53e7b6e678cd.mind": "53e7b6e678cde1c8c6e0714daf226ef1f6e521a4885da76b49dbbe9355b5f245",
+    "vendor/yoyojin/stable-pins.js": "6f6f9d72751ebe4d5752a319b83f310e03bc3497716ec1872f6cf5ced41acef7"
+  },
+  "applicationRevision": "ar-stability-20261005"
 }

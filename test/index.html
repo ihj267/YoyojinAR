@@ -7,7 +7,7 @@
   <title>함께 살아가는 세계 · 울산시립미술관</title>
   <meta name="description" content="수많은 상상, 하나의 벽화. 벽화 속 친구를 찾아 아이들의 그림과 이야기를 만나 보세요.">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="style.css?v=exhibition-20260929">
+  <link rel="stylesheet" href="style.css?v=ar-stability-20261005">
   <link rel="stylesheet" href="artwork-pair.css?v=exhibition-20260929">
   <script type="importmap">{"imports":{"three":"./vendor/build/three.module.js","three/addons/":"./vendor/examples/jsm/"}}</script>
 <meta name="robots" content="noindex,nofollow"></head>
@@ -46,7 +46,7 @@
     </section>
     <section id="camera-view" class="view camera-view" hidden aria-label="카메라로 관람하기">
       <div id="ar-container"></div><div id="ar-points"></div><div class="camera-hud"><div id="tracking-status" role="status">벽화를 천천히 비춰 주세요</div><div class="scan-frame" aria-hidden="true"><i></i><i></i><i></i><i></i></div><p id="tracking-hint">친구와 주변 그림이 함께 보이도록 담아 주세요.</p></div>
-      <button id="stop-camera" class="camera-exit" aria-label="카메라 닫기">닫기 <span aria-hidden="true">×</span></button><button id="camera-map" class="camera-map">벽화 지도로 보기 <span aria-hidden="true">→</span></button>
+      <button id="reduce-overlap" class="camera-density" aria-pressed="false" title="겹치는 번호를 줄여 더 쉽게 누르기">겹침 줄이기</button><button id="stop-camera" class="camera-exit" aria-label="카메라 닫기">닫기 <span aria-hidden="true">×</span></button><button id="camera-map" class="camera-map">벽화 지도로 보기 <span aria-hidden="true">→</span></button>
     </section>
   </main>
   <nav id="bottom-nav" aria-label="관람 화면" hidden>
@@ -61,6 +61,6 @@
   <dialog id="art-dialog" aria-labelledby="art-title"><div class="dialog-head"><div><p class="eyebrow" id="art-number"></p><h2 id="art-title"></h2></div><button id="close-art" class="icon" aria-label="그림 닫기">×</button></div><div class="art-body"><div class="art-image-wrap"><img id="art-image" alt=""><p id="art-image-error" hidden>그림을 불러오지 못했어요. 잠시 후 다시 열어 주세요.</p></div><div class="art-story"><p id="art-name"></p><div id="art-story"></div><p id="art-review" class="subtle"></p><a id="full-art" target="_blank" rel="noopener" class="text-button">원화 크게 보기 ↗</a></div></div></dialog>
   <dialog id="help-dialog" aria-labelledby="help-title"><div class="dialog-head"><div><p class="eyebrow">VISITOR GUIDE</p><h2 id="help-title">벽화와 만나는 방법</h2></div><button id="close-help" class="icon" aria-label="관람 방법 닫기">×</button></div><ol><li><strong>벽화를 비춰 주세요.</strong><br>카메라를 허용하고, 친구와 주변 그림이 화면에 함께 보이도록 담아 주세요.</li><li><strong>노란 표시를 눌러 보세요.</strong><br>아이의 원화와 요요진의 벽화, 그 안에 담긴 이야기가 열립니다.</li><li><strong>다른 친구도 만나 보세요.</strong><br>이야기를 닫고 벽화를 천천히 따라가 보세요.</li></ol><p>표시가 보이지 않으면 조금 뒤로 물러나거나 휴대폰을 잠시 멈춰 주세요. ‘벽화 지도’와 ‘아이들의 그림’으로도 이야기를 만날 수 있어요.</p><p class="subtle">카메라는 휴대폰의 Safari 또는 Chrome에서 사용할 수 있습니다. 영상은 기기에서만 처리하며 저장하거나 전송하지 않습니다.</p></dialog>
   <div id="fatal" hidden role="alert"><h2>관람 화면을 불러오지 못했어요</h2><p>인터넷 연결을 확인한 뒤 다시 시도해 주세요.</p><button id="reload-app" class="primary">다시 불러오기 <span aria-hidden="true">↻</span></button></div>
-  <script type="module" src="app.js?v=20260929-074126-bc52854c"></script>
+  <script type="module" src="app.js?v=ar-stability-20261005"></script>
 </body>
 </html>
