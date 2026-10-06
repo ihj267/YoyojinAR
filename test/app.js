@@ -253,8 +253,8 @@ async function startCamera() {
         }
       }else pinFilter.lose(now);
       const stabilized=pinFilter.frame({
-        now,left:12,right:w-12,top:$('#stop-camera').getBoundingClientRect().bottom+12,
-        bottom:$('#camera-map').getBoundingClientRect().top-12
+        now,left:19,right:w-19,top:$('#stop-camera').getBoundingClientRect().bottom+19,
+        bottom:$('#camera-map').getBoundingClientRect().top-19
       });
       const pins=$('#art-dialog').open?[]:stabilized;
       const nextVisible=new Set();

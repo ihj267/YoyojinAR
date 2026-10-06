@@ -1,6 +1,6 @@
 @charset "UTF-8";
-/* Compact AR labels: half the former 44px diameter, with readable digits. */
-#ar-points .point{left:0;top:0;width:22px;min-width:22px;height:22px;padding:0;border-width:1px;font-size:9px;line-height:1;box-shadow:0 1px 4px #0005;touch-action:manipulation}
+/* AR labels at 80% of the original 44px diameter, with readable digits. */
+#ar-points .point{left:0;top:0;width:35.2px;min-width:35.2px;height:35.2px;padding:0;border-width:1.5px;font-size:11px;line-height:1;box-shadow:0 1px 4px #0005;touch-action:manipulation}
 #ar-points .point:not([hidden]){will-change:transform}
 #ar-points .point:disabled{opacity:1;pointer-events:none}
 #art-dialog{overflow-anchor:none;scroll-behavior:auto}
