@@ -4,16 +4,16 @@
   "count": 499,
   "files": {
     ".nojekyll": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-    "app.js": "eefda13932e16a6f4f8f706f256250cf8038784dbd92cbca26413be5be83dadf",
+    "app.js": "d79fa709eeae0dadfbb9a1011e41b35a36db672c17009fc560e3ae43573e06dc",
     "ar-target-search.js": "39fbf77bebc73d3651ddb6fbfca34b8d8473ad7c99d977a7481f7f41aafc93ae",
     "artwork-pair.css": "9880b2d9c148b5d863b0755c00c713bf78e44f823b6cf4b63913260022aba364",
     "artwork-pair.js": "141f594f792908170652c8133bfb3caaff2e9945c437f8e492bdb1518507206c",
     "catalog-migrations.js": "453b157bdb15673b7fdb2ea41b38a43b89bb9d1b22654d650947d5e3d3cba4e6",
     "favicon.svg": "18ba5d908eaae78b9707830146a48d8f2176ccb7463cee4eb40a9757389c4844",
     "guide.js": "15e0972cd56dcda226e325e6f9d48fd8837b087263962c7fb4b58ca966b71431",
-    "index.html": "7844ca4e4cd983f310180dc7d94dd0ed1c6ee915f2d3ddd3d5874178accb9152",
+    "index.html": "74f37ffad39e1c038481f6d36aab3bf23f3e3520c2d7aa668f77f66dd88f4e79",
     "progressive-targets.js": "1155fb51dc420f00688734356909bad0a601e3bd25fb7e7c829c0ec1833efafb",
-    "style.css": "9027d3f04847b2bcd061af313f0d61a7ecce5fe18dfc1a69a64a8f8bd8aed300",
+    "style.css": "fd43d5d5eb191328074f577f510dea9fbbf5444dd1d525aed98701ac49c608cf",
     "test-board.html": "dd7d7c650c9ecf9826ba899ca94f295502d64ae95544f17550eb3e2abeeb5c25",
     "TEST-README.md": "fbe26198a2a2cea91ac3882aee40da2028c2fb1bc6cb6df516082f3a631e79b7",
     "THIRD_PARTY_NOTICES.md": "99515ff8e4470ae5e6a4d5e463c10b2ea9622d309636a4b06f795284ece69756",
@@ -1627,5 +1627,5 @@
     "vendor/yoyojin/targets/zone-38-53e7b6e678cd.mind": "53e7b6e678cde1c8c6e0714daf226ef1f6e521a4885da76b49dbbe9355b5f245",
     "vendor/yoyojin/stable-pins.js": "6f6f9d72751ebe4d5752a319b83f310e03bc3497716ec1872f6cf5ced41acef7"
   },
-  "applicationRevision": "ar-stability-20261005"
+  "applicationRevision": "ar-clean-view-20261006"
 }

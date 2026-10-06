@@ -7,7 +7,7 @@ const $ = s => document.querySelector(s);
 const preview = false; // Use the prepared GitHub snapshot.
 const lightMode = new URLSearchParams(location.search).get('ar') !== 'full';
 const DRAFT_KEY = 'yoyojin.mural.draft.v1';
-const state = {catalog:null, targets:null, view:'ready', galleryPage:0, zoom:1, ar:null, session:0, starting:false, cameraAbort:null, introTimer:null, guide:null, guidePromise:null, reduceOverlap:false};
+const state = {catalog:null, targets:null, view:'ready', galleryPage:0, zoom:1, ar:null, session:0, starting:false, cameraAbort:null, introTimer:null, guide:null, guidePromise:null};
 const worksheetTools=window.YoyojinWorksheet;
 const titleOf = worksheetTools.titleOf;
 const visibleItems = () => state.catalog.items.filter(i => preview || i.publish === true);
@@ -120,8 +120,8 @@ async function startCamera() {
   const abort=new AbortController();state.cameraAbort=abort;
   state.view='camera';['ready','map','gallery'].forEach(v=>$(`#${v}-view`).hidden=true);$('#camera-view').hidden=false;$('#bottom-nav').hidden=true;
   document.querySelectorAll('.topbar,#preview-banner,.skip-link').forEach(el=>el.inert=true);$('#stop-camera').focus();
+  $('#tracking-status').hidden=false;
   $('#tracking-status').textContent='관람 화면을 준비하고 있어요…';
-  $('#tracking-hint').textContent='잠시만 기다려 주세요. 처음에는 준비 시간이 필요해요.';
   const assertActive=()=>{if(token!==state.session||abort.signal.aborted)throw new DOMException('취소됨','AbortError');};
   let ar, downloadTimer, bytes=null;
   const releaseTargetBuffer=()=>{bytes=null;};
@@ -133,7 +133,6 @@ async function startCamera() {
     const bank=staged?{...originalBank,mind:staged.initial.url,bytes:staged.initial.bytes,sha256:staged.initial.sha256}:originalBank;
     if(!bank||bank.targets.length!==39||bank.targets.some((target,index)=>target.targetIndex!==index))throw new Error('벽화 전체 인식 자료를 다시 업데이트해 주세요.');
     downloadTimer=setTimeout(()=>abort.abort(),120000);
-    if(staged)$('#tracking-hint').textContent='잠시 후 벽화를 비춰 주세요.';
     const response=await fetch(bank.mind,{signal:abort.signal});if(!response.ok)throw new Error('인식 자료를 불러오지 못했어요. 인터넷 연결을 확인한 뒤 다시 시도해 주세요.');
     const limit=48*1024*1024,total=bank.bytes||Number(response.headers.get('Content-Length'))||0;
     if(total>limit)throw new Error('인식 자료 크기가 올바르지 않아요.');
@@ -203,7 +202,6 @@ async function startCamera() {
         ar.__progressive=progressiveModule.createProgressiveTargets({manifest:staged,targets:bank.targets,matchingDataList,signal:abort.signal,
           decode:data=>new Compiler().importData(data),fetchBytes:progressiveModule.fetchPatch,
           apply:list=>controller.worker.postMessage({type:'setup',inputWidth:controller.inputWidth,inputHeight:controller.inputHeight,projectionTransform:controller.projectionTransform,debugMode:false,matchingDataList:list}),
-          onStatus:text=>{if(token===state.session)$('#tracking-hint').textContent=text;}
         });
       }
       if(dimensions.length!==bank.targets.length)throw new Error('인식 구역 자료가 맞지 않아요. 다시 업데이트해 주세요.');
@@ -231,11 +229,10 @@ async function startCamera() {
     let timer;
     try{await Promise.race([ar.start(),new Promise((_,reject)=>{timer=setTimeout(()=>reject(new Error('카메라 준비가 지연되고 있어요. 권한을 확인한 뒤 다시 시도해 주세요.')),45000);})]);}finally{clearTimeout(timer);}
     if(token!==state.session){disposeAR(ar);return;}
-    $('#tracking-status').textContent='벽화를 천천히 비춰 주세요';
-    $('#tracking-hint').textContent='친구와 주변 그림이 함께 보이도록 담아 주세요.';
+    $('#tracking-status').textContent='벽화를 비춰 주세요';
     ar.renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));
     const projected=new THREE.Vector3();
-    let previousSequence=null,previousSource=null,previousSize='',wasShowing=false,visibleButtons=new Set();
+    let previousSequence=null,previousSource=null,previousSize='',visibleButtons=new Set();
     ar.renderer.setAnimationLoop(()=>{
       if(token!==state.session)return;
       const now=performance.now(),w=innerWidth,h=innerHeight,size=`${w}x${h}`;
@@ -256,8 +253,8 @@ async function startCamera() {
         }
       }else pinFilter.lose(now);
       const stabilized=pinFilter.frame({
-        now,left:24,right:w-24,top:$('#tracking-status').getBoundingClientRect().bottom+24,
-        bottom:$('#tracking-hint').getBoundingClientRect().top-24,reduceOverlap:state.reduceOverlap
+        now,left:12,right:w-12,top:$('#stop-camera').getBoundingClientRect().bottom+12,
+        bottom:$('#camera-map').getBoundingClientRect().top-12
       });
       const pins=$('#art-dialog').open?[]:stabilized;
       const nextVisible=new Set();
@@ -272,10 +269,8 @@ async function startCamera() {
       for(const b of visibleButtons)if(!nextVisible.has(b))b.hidden=true;
       visibleButtons=nextVisible;
       const showing=pins.some(pin=>pin.interactive);
-      if(!$('#art-dialog').open&&showing!==wasShowing){
-        $('#tracking-status').textContent=showing?'노란 번호를 눌러 보세요':'벽화를 천천히 비춰 주세요';
-        wasShowing=showing;
-      }
+      // Once the visitor sees a number, let the mural stay clear of prompts.
+      if(showing&&!$('#tracking-status').hidden)$('#tracking-status').hidden=true;
       ar.renderer.render(ar.scene,ar.camera);
     });
     $('#camera-message').textContent='';
@@ -309,7 +304,6 @@ function disposeAR(ar) {
 function stopCamera(){++state.session;state.starting=false;state.cameraAbort?.abort();state.cameraAbort=null;disposeAR(state.ar);state.ar=null;$('#ar-points').replaceChildren();$('#ar-container').replaceChildren();document.querySelectorAll('.topbar,#preview-banner,.skip-link').forEach(el=>el.inert=false);$('#start-camera').disabled=false;$('#start-camera').innerHTML='카메라로 관람하기 <span aria-hidden="true">↗</span>';}
 $('#start-camera').onclick=startCamera;$('#stop-camera').onclick=()=>{stopCamera();switchView('ready');$('#camera-message').textContent='';};
 $('#camera-map').onclick=()=>switchView('map');
-$('#reduce-overlap').onclick=()=>{state.reduceOverlap=!state.reduceOverlap;$('#reduce-overlap').setAttribute('aria-pressed',String(state.reduceOverlap));};
 $('#browse-wall').onclick=()=>switchView('map');$('#open-gallery').onclick=()=>switchView('gallery');
 document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>switchView(b.dataset.view));
 $('#home-link').onclick=event=>{event.preventDefault();switchView('ready');};
