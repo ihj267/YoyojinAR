@@ -4,14 +4,14 @@
   "count": 499,
   "files": {
     ".nojekyll": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-    "app.js": "9742363055de2137b98c7d015534e822fa6d6cb697cc21cb4f60f2802d74f8c8",
+    "app.js": "5732cc6d0cf73706b2ccf0c81e201fec6dc0ec7be961db0d83f142e3fab31e35",
     "ar-target-search.js": "39fbf77bebc73d3651ddb6fbfca34b8d8473ad7c99d977a7481f7f41aafc93ae",
     "artwork-pair.css": "9880b2d9c148b5d863b0755c00c713bf78e44f823b6cf4b63913260022aba364",
     "artwork-pair.js": "141f594f792908170652c8133bfb3caaff2e9945c437f8e492bdb1518507206c",
     "catalog-migrations.js": "453b157bdb15673b7fdb2ea41b38a43b89bb9d1b22654d650947d5e3d3cba4e6",
     "favicon.svg": "18ba5d908eaae78b9707830146a48d8f2176ccb7463cee4eb40a9757389c4844",
     "guide.js": "15e0972cd56dcda226e325e6f9d48fd8837b087263962c7fb4b58ca966b71431",
-    "index.html": "7c119bd8b7b220dd41a86628dcff13296511aa14d9fda59ac1003e1a2dcbe2a4",
+    "index.html": "6b8c9ecfe7296e28f6ce80eb0da7bc7a7d401ebd13e8c4d1dea3af144fedc5e6",
     "progressive-targets.js": "1155fb51dc420f00688734356909bad0a601e3bd25fb7e7c829c0ec1833efafb",
     "style.css": "99d986806b88b0984175f184c20c0320f6fecdb48ba7e0a76087bdc529f1676b",
     "test-board.html": "dd7d7c650c9ecf9826ba899ca94f295502d64ae95544f17550eb3e2abeeb5c25",
@@ -1625,7 +1625,9 @@
     "vendor/yoyojin/targets/zone-36-85b33b3f409d.mind": "85b33b3f409dbe6650d3ee79d2136a790d6a39675894313f25be1f75d0575b94",
     "vendor/yoyojin/targets/zone-37-f154c24e3c37.mind": "f154c24e3c37b94ba4ebf5cacf269a04e682cd895ab7fd34386bffb0dd3d74e1",
     "vendor/yoyojin/targets/zone-38-53e7b6e678cd.mind": "53e7b6e678cde1c8c6e0714daf226ef1f6e521a4885da76b49dbbe9355b5f245",
-    "vendor/yoyojin/stable-pins.js": "6f6f9d72751ebe4d5752a319b83f310e03bc3497716ec1872f6cf5ced41acef7"
+    "vendor/yoyojin/stable-pins.js": "6f6f9d72751ebe4d5752a319b83f310e03bc3497716ec1872f6cf5ced41acef7",
+    "vendor/yoyojin/entrance.css": "efca1a8afc1a9463dd7397961a0ad840ea569b27833149825ae0055bfb45d98c",
+    "vendor/yoyojin/entry-preload.js": "277ec27baba5dc60f80cf672dc6a8dcae281ccbc24be5ae4234cb326f65e30b6"
   },
-  "applicationRevision": "ar-pins-80pct-20261006"
+  "applicationRevision": "exhibition-entry-20261007"
 }

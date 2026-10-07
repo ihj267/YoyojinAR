@@ -1,6 +1,7 @@
 import './catalog-migrations.js';
 import './worksheet.js';
 import {createTargetSearchOrder} from './ar-target-search.js';
+import {createEntryPreload} from './vendor/yoyojin/entry-preload.js?v=entry-20261007';
 import {createStablePins} from './vendor/yoyojin/stable-pins.js?v=20261005';
 import {showArtworkPair,resetArtworkPair} from './artwork-pair.js?v=exhibition-20260929';
 const $ = s => document.querySelector(s);
@@ -8,6 +9,38 @@ const preview = false; // Use the prepared GitHub snapshot.
 const lightMode = new URLSearchParams(location.search).get('ar') !== 'full';
 const DRAFT_KEY = 'yoyojin.mural.draft.v1';
 const state = {catalog:null, targets:null, view:'ready', galleryPage:0, zoom:1, ar:null, session:0, starting:false, cameraAbort:null, introTimer:null, guide:null, guidePromise:null};
+
+let entryLanguage='ko',introOpener=null,entryWarmTimer=null;
+try{if(sessionStorage.getItem('yoyojin.entry.language')==='en')entryLanguage='en';}catch{}
+const entryPreload=createEntryPreload();
+const entryCopy=(ko,en)=>entryLanguage==='en'?en:ko;
+function cameraButtonLabel(){return `${entryCopy('카메라로 관람 시작','Start camera experience')} <span aria-hidden="true">↗</span>`;}
+function applyEntryLanguage(language){
+  entryLanguage=language==='en'?'en':'ko';
+  document.querySelectorAll('[data-entry-lang]').forEach(el=>el.hidden=el.dataset.entryLang!==entryLanguage);
+  document.querySelectorAll('[data-entry-choice]').forEach(el=>el.setAttribute('aria-pressed',String(el.dataset.entryChoice===entryLanguage)));
+  $('#ready-view').lang=entryLanguage;
+  $('#ready-view').setAttribute('aria-label',entryCopy('전시 소개와 관람 시작','Exhibition introduction and entry'));
+  $('.arrival-steps')?.setAttribute('aria-label',entryCopy('AR 관람 방법','How to explore with AR'));
+  $('.arrival-entry')?.setAttribute('aria-label',entryCopy('관람 시작','Start your visit'));
+  $('.arrival-window img')?.setAttribute('alt',entryCopy('요요진의 〈함께 살아가는 세계〉 벽화 일부','Detail of Yoyojin’s A World We Share mural'));
+  if(!state.starting)$('#start-camera').innerHTML=cameraButtonLabel();
+  try{sessionStorage.setItem('yoyojin.entry.language',entryLanguage);}catch{}
+}
+function recognitionBank(){
+  const original=state.targets?.automaticBank,staged=lightMode?state.targets?.progressive:null;
+  return staged?{...original,mind:staged.initial.url,bytes:staged.initial.bytes,sha256:staged.initial.sha256}:original;
+}
+function cancelEntryWarmup(){clearTimeout(entryWarmTimer);entryWarmTimer=null;entryPreload.cancel();}
+function warmEntry(){
+  if(document.hidden||navigator.connection?.saveData||!state.targets)return;
+  const bank=recognitionBank();if(!bank)return;
+  const timer=setTimeout(()=>entryPreload.cancel(),120000);entryWarmTimer=timer;
+  void entryPreload.load(bank).catch(()=>{}).finally(()=>{clearTimeout(timer);if(entryWarmTimer===timer)entryWarmTimer=null;});
+}
+document.querySelectorAll('[data-entry-choice]').forEach(button=>button.onclick=()=>applyEntryLanguage(button.dataset.entryChoice));
+applyEntryLanguage(entryLanguage);
+
 const worksheetTools=window.YoyojinWorksheet;
 const titleOf = worksheetTools.titleOf;
 const visibleItems = () => state.catalog.items.filter(i => preview || i.publish === true);
@@ -26,10 +59,11 @@ function validDraft(d, source) {
 }
 function switchView(view) {
   if(state.view==='camera'||state.starting) stopCamera();
-  state.view=view;
+  state.view=view;document.body.dataset.view=view;
+  if(view!=='ready'&&view!=='camera')cancelEntryWarmup();
   ['ready','map','gallery','camera'].forEach(v=>$(`#${v}-view`).hidden=v!==view);
   $('#bottom-nav').hidden=view==='ready'||view==='camera';
-  document.querySelectorAll('[data-view]').forEach(b=>{b.classList.toggle('active',b.dataset.view===view);if(b.dataset.view===view)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});
+  document.querySelectorAll('button[data-view]').forEach(b=>{b.classList.toggle('active',b.dataset.view===view);if(b.dataset.view===view)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});
   if(view==='gallery') renderGallery();
   if(view==='map') renderMap();
   if(view!=='camera'){window.scrollTo(0,0);(view==='ready'?$('#start-camera'):$('main h2#'+view+'-title'))?.focus({preventScroll:true});}
@@ -91,11 +125,25 @@ function openArtwork(item) {
 }
 function closeArtwork(){ resetArtworkPair();$('#art-dialog').close(); if(state.view==='camera')$('#stop-camera').focus({preventScroll:true});else artworkFocus?.focus({preventScroll:true}); }
 async function showIntro() {
-  if(!state.guide){$('#guide-stage').classList.remove('guide-unavailable');$('#guide-loading').hidden=false;$('#guide-loading').textContent='친구가 오는 중이에요…';}
-  $('#intro').hidden=false;for(const el of document.body.children)if(el!==$('#intro'))el.inert=true;$('#skip-intro').focus();const start=performance.now();
-  const lines=[['안녕! 벽화 속에서 만나자.','우리의 이야기는 아이들의 작은 상상에서 시작됐어.'],['카메라로 나를 찾아줘!','벽화를 천천히 비추면 노란 표시가 나타날 거야.'],['노란 표시를 톡, 눌러 볼까?','아이들이 그린 원화와 함께 살아가는 이야기를 만날 수 있어.']];
-  clearInterval(state.introTimer);
-  const tick=()=>{const elapsed=(performance.now()-start)/1000;const line=lines[Math.min(2,Math.floor(elapsed/3.4))];$('#intro-title').textContent=line[0];$('#intro-copy').textContent=line[1];$('#intro-progress').style.width=`${Math.min(100,elapsed*10)}%`;$('#intro-countdown').textContent=`${Math.max(0,Math.ceil(10-elapsed))}초 후 관람 화면으로 이동`;if(elapsed>=10)closeIntro();};
+  introOpener=document.activeElement;
+  const lines=entryLanguage==='en'?[
+    ['Hello! Meet me in the mural.','Our shared world began with imaginations from children and other participants.'],
+    ['Find us with your camera.','Point at a creature and include the drawing around it.'],
+    ['Tap a yellow number.','Discover the original drawing and its story.']
+  ]:[
+    ['안녕! 벽화 속에서 만나자.','우리의 세계는 어린이와 시민들의 작은 상상에서 시작됐어.'],
+    ['카메라로 우리를 찾아줘!','캐릭터와 주변 그림을 함께 비추면 노란 번호가 나타날 거야.'],
+    ['노란 번호를 톡, 눌러 볼까?','참여자들이 그린 원화와 그 안에 담긴 이야기를 만날 수 있어.']
+  ];
+  $('#intro').lang=entryLanguage;
+  $('#intro').setAttribute('aria-label',entryCopy('요요의 관람 안내','YoYo’s visitor guide'));
+  $('#skip-intro').innerHTML=`${entryCopy('닫기','Close')} <span aria-hidden="true">×</span>`;
+  $('#skip-intro').setAttribute('aria-label',entryCopy('요요의 안내 닫기','Close YoYo’s guide'));
+  $('#intro-continue').innerHTML=`${entryCopy('전시 소개로 돌아가기','Back to the exhibition')} <span aria-hidden="true">→</span>`;
+  if(!state.guide){$('#guide-stage').classList.remove('guide-unavailable');$('#guide-loading').hidden=false;$('#guide-loading').textContent=entryCopy('요요가 오는 중이에요…','YoYo is on the way…');}
+  $('#intro').hidden=false;for(const el of document.body.children)if(el!==$('#intro'))el.inert=true;$('#skip-intro').focus({preventScroll:true});
+  const start=performance.now();clearInterval(state.introTimer);
+  const tick=()=>{const elapsed=(performance.now()-start)/1000,line=lines[Math.min(2,Math.floor(elapsed/3.4))];$('#intro-title').textContent=line[0];$('#intro-copy').textContent=line[1];if(elapsed>=10)clearInterval(state.introTimer);};
   tick();state.introTimer=setInterval(tick,100);
   try{
     state.guidePromise??=import('./guide.js').then(module=>$('#intro').hidden?null:module.createGuide($('#guide-stage')));
@@ -103,29 +151,31 @@ async function showIntro() {
     if(!guide){state.guidePromise=null;return;}
     state.guide=guide;$('#guide-stage').classList.remove('guide-unavailable');
     if(!$('#intro').hidden)guide.play();else guide.pause();
-  }catch(e){state.guidePromise=null;$('#guide-stage').classList.add('guide-unavailable');$('#guide-loading').hidden=false;$('#guide-loading').textContent='벽화 속 친구들의 이야기를 만나 보세요.';console.warn('guide',e);}
+  }catch(e){state.guidePromise=null;$('#guide-stage').classList.add('guide-unavailable');$('#guide-loading').hidden=false;$('#guide-loading').textContent=entryCopy('벽화 속 친구들의 이야기를 만나 보세요.','Discover the stories of the creatures in the mural.');console.warn('guide',e);}
 }
-function closeIntro(){clearInterval(state.introTimer);$('#intro').hidden=true;for(const el of document.body.children)el.inert=false;state.guide?.pause();try{sessionStorage.setItem('yoyojin.intro.seen','1');}catch{}$('#start-camera').focus();}
+function closeIntro(){clearInterval(state.introTimer);$('#intro').hidden=true;for(const el of document.body.children)el.inert=false;state.guide?.pause();(introOpener?.isConnected?introOpener:$('#start-camera')).focus({preventScroll:true});}
 function cameraError(error) {
   const name=error?.name;
-  if(name==='NotAllowedError')return '카메라가 허용되지 않았어요. 주소창의 카메라 권한을 확인한 뒤 다시 눌러 주세요.';
-  if(name==='NotFoundError')return '사용 가능한 카메라를 찾지 못했어요. 카메라가 있는 휴대폰에서 열거나 벽화 지도를 이용해 주세요.';
-  if(name==='NotReadableError')return '다른 앱이 카메라를 사용 중일 수 있어요. 다른 카메라 앱을 닫고 다시 시도해 주세요.';
-  return '카메라 관람을 시작하지 못했어요. 인터넷 연결을 확인하고 다시 시도해 주세요. 벽화 지도로도 관람할 수 있어요.';
+  if(name==='NotAllowedError')return entryCopy('카메라가 허용되지 않았어요. 주소창의 카메라 권한을 확인한 뒤 다시 눌러 주세요.','Camera permission was not granted. Check camera permissions in your browser’s address bar, then try again.');
+  if(name==='NotFoundError')return entryCopy('사용 가능한 카메라를 찾지 못했어요. 카메라가 있는 휴대폰에서 열거나 벽화 지도를 이용해 주세요.','No camera was found. Open this page on a phone with a camera, or explore the mural map.');
+  if(name==='NotReadableError')return entryCopy('다른 앱이 카메라를 사용 중일 수 있어요. 다른 카메라 앱을 닫고 다시 시도해 주세요.','Another app may be using your camera. Close other camera apps, then try again.');
+  return entryCopy('카메라 관람을 시작하지 못했어요. 인터넷 연결을 확인하고 다시 시도해 주세요. 벽화 지도로도 관람할 수 있어요.','The camera experience could not start. Check your internet connection and try again, or explore the mural map.');
 }
 async function startCamera() {
   if(state.starting)return;
-  if(!window.isSecureContext||!navigator.mediaDevices?.getUserMedia){$('#camera-message').textContent='이 브라우저에서 카메라를 사용할 수 없어요. 휴대폰의 Safari 또는 Chrome에서 열거나 벽화 지도를 이용해 주세요.';return;}
-  state.starting=true;const token=++state.session;const button=$('#start-camera');button.disabled=true;button.textContent='카메라 준비 중…';$('#camera-message').textContent='관람 화면을 준비하고 있어요.';
+  if(!window.isSecureContext||!navigator.mediaDevices?.getUserMedia){$('#camera-message').textContent=entryCopy('이 브라우저에서 카메라를 사용할 수 없어요. 휴대폰의 Safari 또는 Chrome에서 열거나 벽화 지도를 이용해 주세요.','This browser cannot use the camera. Open this page in Safari or Chrome on your phone, or explore the mural map.');return;}
+  if(!state.catalog||!state.targets)return;
+  clearTimeout(entryWarmTimer);entryWarmTimer=null;
+  state.starting=true;const token=++state.session;const button=$('#start-camera');button.disabled=true;button.textContent=entryCopy('카메라 준비 중…','Preparing your camera…');$('#camera-message').textContent='';
   const abort=new AbortController();state.cameraAbort=abort;
-  state.view='camera';['ready','map','gallery'].forEach(v=>$(`#${v}-view`).hidden=true);$('#camera-view').hidden=false;$('#bottom-nav').hidden=true;
+  state.view='camera';document.body.dataset.view='camera';['ready','map','gallery'].forEach(v=>$(`#${v}-view`).hidden=true);$('#camera-view').hidden=false;$('#bottom-nav').hidden=true;
   document.querySelectorAll('.topbar,#preview-banner,.skip-link').forEach(el=>el.inert=true);$('#stop-camera').focus();
   $('#tracking-status').hidden=false;
-  $('#tracking-status').textContent='관람 화면을 준비하고 있어요…';
+  $('#tracking-status').textContent=entryCopy('관람 화면을 준비하고 있어요…','Preparing your visit…');
   const assertActive=()=>{if(token!==state.session||abort.signal.aborted)throw new DOMException('취소됨','AbortError');};
   let ar, downloadTimer, bytes=null;
   const releaseTargetBuffer=()=>{bytes=null;};
-  abort.signal.addEventListener('abort',releaseTargetBuffer,{once:true});
+  abort.signal.addEventListener('abort',()=>{entryPreload.cancel();releaseTargetBuffer();},{once:true});
   try{
     const originalBank=state.targets.automaticBank;
     const staged=lightMode?state.targets.progressive:null;
@@ -133,22 +183,12 @@ async function startCamera() {
     const bank=staged?{...originalBank,mind:staged.initial.url,bytes:staged.initial.bytes,sha256:staged.initial.sha256}:originalBank;
     if(!bank||bank.targets.length!==39||bank.targets.some((target,index)=>target.targetIndex!==index))throw new Error('벽화 전체 인식 자료를 다시 업데이트해 주세요.');
     downloadTimer=setTimeout(()=>abort.abort(),120000);
-    const response=await fetch(bank.mind,{signal:abort.signal});if(!response.ok)throw new Error('인식 자료를 불러오지 못했어요. 인터넷 연결을 확인한 뒤 다시 시도해 주세요.');
-    const limit=48*1024*1024,total=bank.bytes||Number(response.headers.get('Content-Length'))||0;
-    if(total>limit)throw new Error('인식 자료 크기가 올바르지 않아요.');
-    if(response.body?.getReader){
-      const reader=response.body.getReader(),chunks=[];let received=0;
-      while(true){
-        const {done,value}=await reader.read();if(done)break;assertActive();received+=value.byteLength;
-        if(received>limit){await reader.cancel();throw new Error('인식 자료 크기가 올바르지 않아요.');}
-        chunks.push(value);$('#tracking-status').textContent=total?`관람 준비 중 · ${Math.min(99,Math.floor(received/total*100))}%`:'관람 화면을 준비하고 있어요…';
-      }
-      bytes=new Uint8Array(received);let offset=0;for(const chunk of chunks){bytes.set(chunk,offset);offset+=chunk.length;}chunks.length=0;
-    }else bytes=new Uint8Array(await response.arrayBuffer());
+    bytes=await entryPreload.load(bank,{onProgress:({received,total})=>{
+      if(token!==state.session||abort.signal.aborted)return;
+      $('#tracking-status').textContent=total?`${entryCopy('관람 준비 중','Preparing your visit')} · ${Math.min(99,Math.floor(received/total*100))}%`:entryCopy('관람 화면을 준비하고 있어요…','Preparing your visit…');
+    }});
     clearTimeout(downloadTimer);assertActive();
-    if(bytes.byteLength<100||bytes.byteLength>limit||(bank.bytes&&bytes.byteLength!==bank.bytes))throw new Error('인식 자료가 완전히 내려받아지지 않았어요. 다시 시도해 주세요.');
-    if(bank.sha256&&crypto.subtle){const digest=[...new Uint8Array(await crypto.subtle.digest('SHA-256',bytes))].map(n=>n.toString(16).padStart(2,'0')).join('');if(digest!==bank.sha256)throw new Error('인식 자료의 버전이 달라요. 새로고침한 뒤 다시 시도해 주세요.');}
-    $('#tracking-status').textContent='카메라를 켜고 있어요…';
+    $('#tracking-status').textContent=entryCopy('카메라를 켜고 있어요…','Opening your camera…');
     const [{MindARThree},{C:Controller,a:Compiler},THREE]=await Promise.all([import('./vendor/dist/mindar-image-three.prod.js'),import('./vendor/dist/controller-mGt1s8dJ.js'),import('three')]);
     const progressiveModule=staged?await import('./vendor/yoyojin/progressive-targets.js?v=exhibition-20260929'):null;
     assertActive();
@@ -197,7 +237,7 @@ async function startCamera() {
       const trackAndUpdate=controller._trackAndUpdate.bind(controller);
       controller._trackAndUpdate=async(...args)=>token===state.session?trackAndUpdate(...args):null;
       assertActive();
-      const {dimensions,matchingDataList}=controller.addImageTargetsFromBuffer(bytes);releaseTargetBuffer();
+      const {dimensions,matchingDataList}=controller.addImageTargetsFromBuffer(bytes);entryPreload.release();releaseTargetBuffer();
       if(staged){
         ar.__progressive=progressiveModule.createProgressiveTargets({manifest:staged,targets:bank.targets,matchingDataList,signal:abort.signal,
           decode:data=>new Compiler().importData(data),fetchBytes:progressiveModule.fetchPatch,
@@ -206,7 +246,7 @@ async function startCamera() {
       }
       if(dimensions.length!==bank.targets.length)throw new Error('인식 구역 자료가 맞지 않아요. 다시 업데이트해 주세요.');
       ar.postMatrixs=dimensions.map(([width,height])=>new THREE.Matrix4().compose(new THREE.Vector3(width/2,height/2,0),new THREE.Quaternion(),new THREE.Vector3(width,width,width)));
-      $('#tracking-status').textContent='이제 벽화를 비춰 주세요';
+      $('#tracking-status').textContent=entryCopy('이제 벽화를 비춰 주세요','Point your camera at the mural');
       await new Promise(resolve=>requestAnimationFrame(resolve));assertActive();window.MINDAR.IMAGE.tf.tidy(()=>controller.dummyRun(ar.video));assertActive();controller.processVideo(ar.video);
     };
     const entries=[],buttons=new Map(),pinFilter=createStablePins();
@@ -229,7 +269,7 @@ async function startCamera() {
     let timer;
     try{await Promise.race([ar.start(),new Promise((_,reject)=>{timer=setTimeout(()=>reject(new Error('카메라 준비가 지연되고 있어요. 권한을 확인한 뒤 다시 시도해 주세요.')),45000);})]);}finally{clearTimeout(timer);}
     if(token!==state.session){disposeAR(ar);return;}
-    $('#tracking-status').textContent='벽화를 비춰 주세요';
+    $('#tracking-status').textContent=entryCopy('벽화를 비춰 주세요','Point your camera at the mural');
     ar.renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));
     const projected=new THREE.Vector3();
     let previousSequence=null,previousSource=null,previousSize='',visibleButtons=new Set();
@@ -274,8 +314,8 @@ async function startCamera() {
       ar.renderer.render(ar.scene,ar.camera);
     });
     $('#camera-message').textContent='';
-  }catch(error){if(token===state.session){stopCamera();switchView('ready');$('#camera-message').textContent=error?.name==='AbortError'?'준비가 오래 걸리고 있어요. 인터넷 연결을 확인한 뒤 다시 시도해 주세요.':cameraError(error);}else if(ar)disposeAR(ar);if(error?.name!=='AbortError')console.warn('camera',error);}
-  finally{clearTimeout(downloadTimer);if(token!==state.session||abort.signal.aborted)releaseTargetBuffer();if(token===state.session||!state.starting){state.starting=false;button.disabled=false;button.innerHTML='카메라로 관람하기 <span aria-hidden="true">↗</span>';}}
+  }catch(error){if(token===state.session){stopCamera();switchView('ready');$('#camera-message').textContent=error?.name==='AbortError'?entryCopy('준비가 오래 걸리고 있어요. 인터넷 연결을 확인한 뒤 다시 시도해 주세요.','Preparation is taking too long. Check your internet connection, then try again.'):cameraError(error);}else if(ar)disposeAR(ar);if(error?.name!=='AbortError')console.warn('camera',error);}
+  finally{clearTimeout(downloadTimer);if(token!==state.session||abort.signal.aborted)releaseTargetBuffer();if(token===state.session||!state.starting){state.starting=false;button.disabled=false;button.innerHTML=cameraButtonLabel();}}
 }
 function disposeAR(ar) {
   if(!ar)return;
@@ -301,11 +341,11 @@ function disposeAR(ar) {
   for(const handler of ar.__resizeHandlers||[])window.removeEventListener('resize',handler);
   if(ar.__url)URL.revokeObjectURL(ar.__url);
 }
-function stopCamera(){++state.session;state.starting=false;state.cameraAbort?.abort();state.cameraAbort=null;disposeAR(state.ar);state.ar=null;$('#ar-points').replaceChildren();$('#ar-container').replaceChildren();document.querySelectorAll('.topbar,#preview-banner,.skip-link').forEach(el=>el.inert=false);$('#start-camera').disabled=false;$('#start-camera').innerHTML='카메라로 관람하기 <span aria-hidden="true">↗</span>';}
+function stopCamera(){++state.session;state.starting=false;state.cameraAbort?.abort();state.cameraAbort=null;disposeAR(state.ar);state.ar=null;$('#ar-points').replaceChildren();$('#ar-container').replaceChildren();document.querySelectorAll('.topbar,#preview-banner,.skip-link').forEach(el=>el.inert=false);$('#start-camera').disabled=false;$('#start-camera').innerHTML=cameraButtonLabel();}
 $('#start-camera').onclick=startCamera;$('#stop-camera').onclick=()=>{stopCamera();switchView('ready');$('#camera-message').textContent='';};
 $('#camera-map').onclick=()=>switchView('map');
 $('#browse-wall').onclick=()=>switchView('map');$('#open-gallery').onclick=()=>switchView('gallery');
-document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>switchView(b.dataset.view));
+document.querySelectorAll('button[data-view]').forEach(b=>b.onclick=()=>switchView(b.dataset.view));
 $('#home-link').onclick=event=>{event.preventDefault();switchView('ready');};
 $('#search').oninput=()=>{state.galleryPage=0;renderGallery();};$('#prev-page').onclick=()=>{state.galleryPage--;renderGallery();$('#gallery-title').scrollIntoView();};$('#next-page').onclick=()=>{state.galleryPage++;renderGallery();$('#gallery-title').scrollIntoView();};
 for(const [selector,factor] of [['#zoom-in',1.4],['#zoom-out',1/1.4]])$(selector).onclick=()=>{state.zoom=Math.min(6,Math.max(1,state.zoom*factor));$('#map-canvas').style.height=`${state.zoom*100}%`;$('#zoom-label').textContent=`${Math.round(state.zoom*100)}%`;};
@@ -313,16 +353,16 @@ $('#close-art').onclick=closeArtwork;$('#help').onclick=()=>$('#help-dialog').sh
 $('#intro-continue').onclick=closeIntro;$('#reload-app').onclick=()=>location.reload();
 $('#skip-intro').onclick=closeIntro;$('#replay-intro').onclick=showIntro;
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('#intro').hidden)closeIntro();});
-window.addEventListener('pagehide',()=>{stopCamera();state.guide?.pause();});
-document.addEventListener('visibilitychange',()=>{if(document.hidden){if(state.ar||state.starting){stopCamera();switchView('ready');$('#camera-message').textContent='화면을 떠나 카메라를 껐어요. 다시 시작하려면 버튼을 눌러 주세요.';}state.guide?.pause();}else if(!$('#intro').hidden)state.guide?.play();});
+window.addEventListener('pagehide',()=>{cancelEntryWarmup();stopCamera();state.guide?.pause();});
+document.addEventListener('visibilitychange',()=>{if(document.hidden){cancelEntryWarmup();if(state.ar||state.starting){stopCamera();switchView('ready');$('#camera-message').textContent=entryCopy('화면을 떠나 카메라를 껐어요. 다시 시작하려면 버튼을 눌러 주세요.','The camera stopped when you left this page. Press the start button to continue.');}state.guide?.pause();}else if(!$('#intro').hidden)state.guide?.play();});
 window.addEventListener('storage',event=>{if(preview&&event.key===DRAFT_KEY)location.reload();});
 try{
   const [catalog,targets]=await Promise.all([json('./data/catalog.json'),json('./data/targets.json')]);state.catalog=catalog;state.targets=targets;
   if(preview){$('#preview-banner').hidden=false;try{const draft=JSON.parse(localStorage.getItem(DRAFT_KEY));if(validDraft(draft,catalog))state.catalog={...catalog,items:draft.items};}catch{}}
   state.catalog=worksheetTools.merge(state.catalog,new Map(catalog.items.filter(item=>item.worksheet).map(item=>[item.id,item.worksheet]))).catalog;
   state.catalog=window.YoyojinCatalogMigrations.removeLegacyCandidates(state.catalog).catalog;
-  let seenIntro=false;try{seenIntro=sessionStorage.getItem('yoyojin.intro.seen')==='1';}catch{}
-  if(!seenIntro&&new URLSearchParams(location.search).get('intro')!=='0')showIntro();
+  $('#start-camera').disabled=false;
+  warmEntry();
 }catch(error){console.warn('catalog',error);$('#fatal').hidden=false;$('#start-camera').disabled=true;$('#reload-app').focus();}
 
 const mapScroll=$('#map-scroll');let pan=null,suppressMapClick=false;
