@@ -10,7 +10,7 @@ const lightMode = new URLSearchParams(location.search).get('ar') !== 'full';
 const DRAFT_KEY = 'yoyojin.mural.draft.v1';
 const state = {catalog:null, targets:null, view:'ready', galleryPage:0, zoom:1, ar:null, session:0, starting:false, cameraAbort:null, introTimer:null, guide:null, guidePromise:null};
 
-let entryLanguage='ko',introOpener=null,entryWarmTimer=null;
+let entryLanguage='ko',entryWarmTimer=null,guideInView=true;
 try{if(sessionStorage.getItem('yoyojin.entry.language')==='en')entryLanguage='en';}catch{}
 const entryPreload=createEntryPreload();
 const entryCopy=(ko,en)=>entryLanguage==='en'?en:ko;
@@ -22,8 +22,10 @@ function applyEntryLanguage(language){
   $('#ready-view').lang=entryLanguage;
   $('#ready-view').setAttribute('aria-label',entryCopy('전시 소개와 관람 시작','Exhibition introduction and entry'));
   $('.arrival-steps')?.setAttribute('aria-label',entryCopy('AR 관람 방법','How to explore with AR'));
-  $('.arrival-entry')?.setAttribute('aria-label',entryCopy('관람 시작','Start your visit'));
-  $('.arrival-window img')?.setAttribute('alt',entryCopy('요요진의 〈함께 살아가는 세계〉 벽화 일부','Detail of Yoyojin’s A World We Share mural'));
+  $('.foyer-entry')?.setAttribute('aria-label',entryCopy('관람 시작','Start your visit'));
+  $('#guide-stage')?.setAttribute('aria-label',entryCopy('움직이는 요요 캐릭터','Animated YoYo character'));
+  $('.foyer-mural img')?.setAttribute('alt',entryCopy('요요진의 〈함께 살아가는 세계〉 벽화','Yoyojin’s A World We Share mural'));
+  if(!state.guide&&$('#guide-loading'))$('#guide-loading').textContent=$('#guide-stage')?.classList.contains('guide-unavailable')?entryCopy('벽화 속에서 만나자!','See you in the mural!'):entryCopy('요요가 오는 중이에요…','YoYo is on the way…');
   if(!state.starting)$('#start-camera').innerHTML=cameraButtonLabel();
   try{sessionStorage.setItem('yoyojin.entry.language',entryLanguage);}catch{}
 }
@@ -61,6 +63,7 @@ function switchView(view) {
   if(state.view==='camera'||state.starting) stopCamera();
   state.view=view;document.body.dataset.view=view;
   if(view!=='ready'&&view!=='camera')cancelEntryWarmup();
+  syncGuide();
   ['ready','map','gallery','camera'].forEach(v=>$(`#${v}-view`).hidden=v!==view);
   $('#bottom-nav').hidden=view==='ready'||view==='camera';
   document.querySelectorAll('button[data-view]').forEach(b=>{b.classList.toggle('active',b.dataset.view===view);if(b.dataset.view===view)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});
@@ -124,36 +127,23 @@ function openArtwork(item) {
   requestAnimationFrame(()=>{if(dialog.open&&opening===artworkOpenRevision)resetScroll();});
 }
 function closeArtwork(){ resetArtworkPair();$('#art-dialog').close(); if(state.view==='camera')$('#stop-camera').focus({preventScroll:true});else artworkFocus?.focus({preventScroll:true}); }
-async function showIntro() {
-  introOpener=document.activeElement;
-  const lines=entryLanguage==='en'?[
-    ['Hello! Meet me in the mural.','Our shared world began with imaginations from children and other participants.'],
-    ['Find us with your camera.','Point at a creature and include the drawing around it.'],
-    ['Tap a yellow number.','Discover the original drawing and its story.']
-  ]:[
-    ['안녕! 벽화 속에서 만나자.','우리의 세계는 어린이와 시민들의 작은 상상에서 시작됐어.'],
-    ['카메라로 우리를 찾아줘!','캐릭터와 주변 그림을 함께 비추면 노란 번호가 나타날 거야.'],
-    ['노란 번호를 톡, 눌러 볼까?','참여자들이 그린 원화와 그 안에 담긴 이야기를 만날 수 있어.']
-  ];
-  $('#intro').lang=entryLanguage;
-  $('#intro').setAttribute('aria-label',entryCopy('요요의 관람 안내','YoYo’s visitor guide'));
-  $('#skip-intro').innerHTML=`${entryCopy('닫기','Close')} <span aria-hidden="true">×</span>`;
-  $('#skip-intro').setAttribute('aria-label',entryCopy('요요의 안내 닫기','Close YoYo’s guide'));
-  $('#intro-continue').innerHTML=`${entryCopy('전시 소개로 돌아가기','Back to the exhibition')} <span aria-hidden="true">→</span>`;
-  if(!state.guide){$('#guide-stage').classList.remove('guide-unavailable');$('#guide-loading').hidden=false;$('#guide-loading').textContent=entryCopy('요요가 오는 중이에요…','YoYo is on the way…');}
-  $('#intro').hidden=false;for(const el of document.body.children)if(el!==$('#intro'))el.inert=true;$('#skip-intro').focus({preventScroll:true});
-  const start=performance.now();clearInterval(state.introTimer);
-  const tick=()=>{const elapsed=(performance.now()-start)/1000,line=lines[Math.min(2,Math.floor(elapsed/3.4))];$('#intro-title').textContent=line[0];$('#intro-copy').textContent=line[1];if(elapsed>=10)clearInterval(state.introTimer);};
-  tick();state.introTimer=setInterval(tick,100);
-  try{
-    state.guidePromise??=import('./guide.js').then(module=>$('#intro').hidden?null:module.createGuide($('#guide-stage')));
-    const guide=await state.guidePromise;
-    if(!guide){state.guidePromise=null;return;}
-    state.guide=guide;$('#guide-stage').classList.remove('guide-unavailable');
-    if(!$('#intro').hidden)guide.play();else guide.pause();
-  }catch(e){state.guidePromise=null;$('#guide-stage').classList.add('guide-unavailable');$('#guide-loading').hidden=false;$('#guide-loading').textContent=entryCopy('벽화 속 친구들의 이야기를 만나 보세요.','Discover the stories of the creatures in the mural.');console.warn('guide',e);}
+function syncGuide(){
+  if(state.view==='ready'&&!document.hidden&&guideInView)state.guide?.play();else state.guide?.pause();
 }
-function closeIntro(){clearInterval(state.introTimer);$('#intro').hidden=true;for(const el of document.body.children)el.inert=false;state.guide?.pause();(introOpener?.isConnected?introOpener:$('#start-camera')).focus({preventScroll:true});}
+async function prepareGuide(){
+  try{
+    const module=await import('./guide.js?v=yoyo-entry-20261010');
+    state.guide=await module.createGuide($('#guide-stage'));
+    syncGuide();
+  }catch(error){
+    $('#guide-stage').classList.add('guide-unavailable');
+    $('#guide-loading').hidden=false;
+    $('#guide-loading').textContent=entryCopy('벽화 속에서 만나자!','See you in the mural!');
+    console.warn('guide',error);
+  }
+}
+const guideObserver=new IntersectionObserver(entries=>{guideInView=entries[0].isIntersecting;syncGuide();},{threshold:0});
+if($('#yoyo-greeting')){guideObserver.observe($('#yoyo-greeting'));void prepareGuide();}
 function cameraError(error) {
   const name=error?.name;
   if(name==='NotAllowedError')return entryCopy('카메라가 허용되지 않았어요. 주소창의 카메라 권한을 확인한 뒤 다시 눌러 주세요.','Camera permission was not granted. Check camera permissions in your browser’s address bar, then try again.');
@@ -168,7 +158,7 @@ async function startCamera() {
   clearTimeout(entryWarmTimer);entryWarmTimer=null;
   state.starting=true;const token=++state.session;const button=$('#start-camera');button.disabled=true;button.textContent=entryCopy('카메라 준비 중…','Preparing your camera…');$('#camera-message').textContent='';
   const abort=new AbortController();state.cameraAbort=abort;
-  state.view='camera';document.body.dataset.view='camera';['ready','map','gallery'].forEach(v=>$(`#${v}-view`).hidden=true);$('#camera-view').hidden=false;$('#bottom-nav').hidden=true;
+  state.view='camera';syncGuide();document.body.dataset.view='camera';['ready','map','gallery'].forEach(v=>$(`#${v}-view`).hidden=true);$('#camera-view').hidden=false;$('#bottom-nav').hidden=true;
   document.querySelectorAll('.topbar,#preview-banner,.skip-link').forEach(el=>el.inert=true);$('#stop-camera').focus();
   $('#tracking-status').hidden=false;
   $('#tracking-status').textContent=entryCopy('관람 화면을 준비하고 있어요…','Preparing your visit…');
@@ -350,18 +340,18 @@ $('#home-link').onclick=event=>{event.preventDefault();switchView('ready');};
 $('#search').oninput=()=>{state.galleryPage=0;renderGallery();};$('#prev-page').onclick=()=>{state.galleryPage--;renderGallery();$('#gallery-title').scrollIntoView();};$('#next-page').onclick=()=>{state.galleryPage++;renderGallery();$('#gallery-title').scrollIntoView();};
 for(const [selector,factor] of [['#zoom-in',1.4],['#zoom-out',1/1.4]])$(selector).onclick=()=>{state.zoom=Math.min(6,Math.max(1,state.zoom*factor));$('#map-canvas').style.height=`${state.zoom*100}%`;$('#zoom-label').textContent=`${Math.round(state.zoom*100)}%`;};
 $('#close-art').onclick=closeArtwork;$('#help').onclick=()=>$('#help-dialog').showModal();$('#close-help').onclick=()=>$('#help-dialog').close();
-$('#intro-continue').onclick=closeIntro;$('#reload-app').onclick=()=>location.reload();
-$('#skip-intro').onclick=closeIntro;$('#replay-intro').onclick=showIntro;
-document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('#intro').hidden)closeIntro();});
+$('#reload-app').onclick=()=>location.reload();
+
+
 window.addEventListener('pagehide',()=>{cancelEntryWarmup();stopCamera();state.guide?.pause();});
-document.addEventListener('visibilitychange',()=>{if(document.hidden){cancelEntryWarmup();if(state.ar||state.starting){stopCamera();switchView('ready');$('#camera-message').textContent=entryCopy('화면을 떠나 카메라를 껐어요. 다시 시작하려면 버튼을 눌러 주세요.','The camera stopped when you left this page. Press the start button to continue.');}state.guide?.pause();}else if(!$('#intro').hidden)state.guide?.play();});
+document.addEventListener('visibilitychange',()=>{if(document.hidden){cancelEntryWarmup();if(state.ar||state.starting){stopCamera();switchView('ready');$('#camera-message').textContent=entryCopy('화면을 떠나 카메라를 껐어요. 다시 시작하려면 버튼을 눌러 주세요.','The camera stopped when you left this page. Press the start button to continue.');}state.guide?.pause();}else syncGuide();});
 window.addEventListener('storage',event=>{if(preview&&event.key===DRAFT_KEY)location.reload();});
 try{
   const [catalog,targets]=await Promise.all([json('./data/catalog.json'),json('./data/targets.json')]);state.catalog=catalog;state.targets=targets;
   if(preview){$('#preview-banner').hidden=false;try{const draft=JSON.parse(localStorage.getItem(DRAFT_KEY));if(validDraft(draft,catalog))state.catalog={...catalog,items:draft.items};}catch{}}
   state.catalog=worksheetTools.merge(state.catalog,new Map(catalog.items.filter(item=>item.worksheet).map(item=>[item.id,item.worksheet]))).catalog;
   state.catalog=window.YoyojinCatalogMigrations.removeLegacyCandidates(state.catalog).catalog;
-  $('#start-camera').disabled=false;
+  $('#start-camera').disabled=false;$('#browse-wall').disabled=false;
   warmEntry();
 }catch(error){console.warn('catalog',error);$('#fatal').hidden=false;$('#start-camera').disabled=true;$('#reload-app').focus();}
 

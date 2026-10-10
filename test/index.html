@@ -9,7 +9,7 @@
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="style.css?v=ar-pins-80pct-20261006">
   <link rel="stylesheet" href="artwork-pair.css?v=exhibition-20260929">
-  <link rel="stylesheet" href="vendor/yoyojin/entrance.css?v=entry-20261007">
+  <link rel="stylesheet" href="vendor/yoyojin/entrance.css?v=yoyo-entry-20261010">
   <script type="importmap">{"imports":{"three":"./vendor/build/three.module.js","three/addons/":"./vendor/examples/jsm/"}}</script>
 <meta name="robots" content="noindex,nofollow"></head>
 <body data-view="ready">
@@ -22,54 +22,50 @@
   </div>
   <div id="preview-banner" hidden>작업실 미리보기 </div>
   <main id="main">
-    <section id="ready-view" class="view arrival" aria-label="전시 소개와 관람 시작" lang="ko">
-      <div class="arrival-hero">
-        <div class="arrival-heading">
-          <p class="arrival-kicker"><span data-entry-lang="ko">수많은 상상, 하나의 벽화</span><span data-entry-lang="en" lang="en" hidden>Many imaginations. One shared world.</span></p>
-          <h1><img class="arrival-title" src="vendor/yoyojin/brand/exhibition-title.png" alt="함께 살아가는 세계 — A World We Share" width="587" height="145"></h1>
-          <p class="arrival-artist">요요진 <span aria-hidden="true">/</span> Yoyojin</p>
-          <p class="arrival-lead" data-entry-lang="ko">요요진의 〈함께 살아가는 세계〉는 작가의 캐릭터 ‘요요’와 어린이, 시민들이 상상한 생명체가 함께 살아가는 모습을 그린 벽화입니다.</p>
-          <p class="arrival-lead" data-entry-lang="en" lang="en" hidden>Yoyojin’s <em>A World We Share</em> is a mural depicting the artist’s character “YoYo” living alongside creatures imagined by children and other participants.</p>
-          <a class="arrival-read" href="#exhibition-story"><span data-entry-lang="ko">작품 이야기</span><span data-entry-lang="en" lang="en" hidden>Discover the story</span><span aria-hidden="true">↓</span></a>
+    <section id="ready-view" class="view foyer" aria-label="전시 소개와 관람 시작" lang="ko">
+      <div class="foyer-welcome">
+        <p class="foyer-kicker"><span data-entry-lang="ko">수많은 상상, 하나의 벽화</span><span data-entry-lang="en" lang="en" hidden>Many imaginations. One mural.</span></p>
+        <h1><img class="foyer-title" src="vendor/yoyojin/brand/exhibition-title.png" alt="함께 살아가는 세계 — A World We Share" width="587" height="145"></h1>
+        <div class="foyer-greeting" id="yoyo-greeting">
+          <div class="guide-stage" id="guide-stage" role="img" aria-label="움직이는 요요 캐릭터"><span id="guide-loading">요요가 오는 중이에요…</span></div>
+          <div class="foyer-hello">
+            <h2><span data-entry-lang="ko">안녕, 나는 요요야!</span><span data-entry-lang="en" lang="en" hidden>Hello, I’m YoYo!</span></h2>
+            <p data-entry-lang="ko">벽화 속 친구들을 만나 볼까?<br>노란 번호를 누르면 그림과 이야기가 열려.</p>
+            <p data-entry-lang="en" lang="en" hidden>Let’s meet the friends in the mural.<br>Tap a yellow number to discover their stories.</p>
+          </div>
         </div>
-        <figure class="arrival-art">
-          <div class="arrival-window"><img src="assets/wall-preview.webp" alt="요요진의 〈함께 살아가는 세계〉 벽화 일부" width="22149" height="4162" fetchpriority="high"></div>
-          <figcaption><span data-entry-lang="ko">함께 살아가는 세계 · 벽화 일부</span><span data-entry-lang="en" lang="en" hidden>A World We Share · Mural detail</span><span aria-hidden="true">↗</span></figcaption>
-        </figure>
+        <div class="foyer-languages" role="group" aria-label="안내 언어 선택 / Choose a language">
+          <button type="button" data-entry-choice="ko" lang="ko" aria-pressed="true">한국어 <span aria-hidden="true">↗</span></button>
+          <button type="button" data-entry-choice="en" lang="en" aria-pressed="false">English <span aria-hidden="true">↗</span></button>
+        </div>
       </div>
-      <section class="arrival-story" id="exhibition-story" aria-labelledby="story-heading">
-        <div class="arrival-section-label"><span aria-hidden="true">01</span><h2 id="story-heading"><span data-entry-lang="ko">상상이 모여, <br>하나의 세계로</span><span data-entry-lang="en" lang="en" hidden>Imagining <br>a world together</span></h2></div>
-        <div class="arrival-prose" data-entry-lang="ko">
+      <figure class="foyer-artwork">
+        <div class="foyer-mural"><img src="assets/wall-preview.webp" alt="요요진의 〈함께 살아가는 세계〉 벽화" width="22149" height="4162" loading="lazy"></div>
+        <figcaption>
+          <div class="foyer-credit"><span data-entry-lang="ko">요요진</span><span data-entry-lang="en" lang="en" hidden>Yoyojin</span><strong data-entry-lang="ko">‘함께 살아가는 세계’</strong><strong data-entry-lang="en" lang="en" hidden><em>A World We Share</em></strong></div>
+          <p data-entry-lang="ko">벽 위 아크릴, 2026, 23m × 4.2m</p><p data-entry-lang="en" lang="en" hidden>Acrylic on wall, 2026, 23m × 4.2m</p>
+        </figcaption>
+      </figure>
+      <section class="foyer-story" aria-label="작품 설명 / About the mural">
+        <div data-entry-lang="ko">
+          <p>요요진의 〈함께 살아가는 세계〉는 작가의 캐릭터 ‘요요’와 어린이, 시민들이 상상한 생명체가 함께 살아가는 모습을 그린 벽화입니다.</p>
           <p>전시가 시작되기에 앞서 8월 13일(목)부터 8월 30일(일)까지 18일 동안 사전 참여 프로그램 〈아직 만나지 못한 친구를 상상해 봐요!〉를 진행했습니다.</p>
           <p>어린이와 시민들이 상상한 생명체를 자유롭게 그리고 이야기를 적어 약 1,200장의 그림이 모였고, 이 가운데 498개의 생명체가 요요진의 방식으로 다시 그려져 벽화 속에 담겼습니다.</p>
           <p>전시장 입구의 영상에서는 ‘요요’와 참여자들이 상상한 다양한 생명체가 하나둘 더해지며 〈함께 살아가는 세계〉가 완성되어 가는 과정을 볼 수 있습니다.</p>
         </div>
-        <div class="arrival-prose" data-entry-lang="en" lang="en" hidden>
+        <div data-entry-lang="en" lang="en" hidden>
+          <p>Yoyojin’s <em>A World We Share</em> is a mural depicting the artist’s character “YoYo” living alongside creatures imagined by children and other participants.</p>
           <p>Ahead of the exhibition, the participatory program <em>Imagine a Friend You Haven’t Met Yet!</em> was held for 18 days, from August 13 to 30. Children and other participants were invited to draw creatures from their imagination and write stories about them, resulting in around 1,200 drawings. Of these, 498 creatures were selected and redrawn in Yoyojin’s style before becoming part of the mural.</p>
           <p>The video at the entrance to the gallery shows how <em>A World We Share</em> took shape, as YoYo and the many creatures imagined by participants gradually came together in the mural.</p>
         </div>
       </section>
-      <section class="arrival-experience" aria-labelledby="experience-heading">
-        <div class="arrival-section-label"><span aria-hidden="true">02</span><h2 id="experience-heading"><span data-entry-lang="ko">벽화 속 친구의 <br>처음을 만나 보세요</span><span data-entry-lang="en" lang="en" hidden>Meet the imagination <br>behind the mural</span></h2></div>
-        <div class="arrival-experience-body">
-          <p class="arrival-experience-lead" data-entry-lang="ko">AR로 벽화를 비추면, 참여자가 그린 원화와 그 안에 담긴 이야기를 만날 수 있습니다.</p>
-          <p class="arrival-experience-lead" data-entry-lang="en" lang="en" hidden>Use your camera to discover the participants’ original drawings and the stories behind the creatures in the mural.</p>
-          <ol class="arrival-steps" aria-label="AR 관람 방법">
-            <li><span aria-hidden="true">1</span><div><strong data-entry-lang="ko">벽화를 비춰 주세요</strong><strong data-entry-lang="en" lang="en" hidden>Point at the mural</strong><p data-entry-lang="ko">캐릭터와 주변 그림이 함께 보이도록 담아 주세요.</p><p data-entry-lang="en" lang="en" hidden>Include a creature and the drawing around it.</p></div></li>
-            <li><span aria-hidden="true">2</span><div><strong data-entry-lang="ko">노란 번호를 눌러 주세요</strong><strong data-entry-lang="en" lang="en" hidden>Tap a yellow number</strong><p data-entry-lang="ko">원화와 요요진의 벽화를 함께 볼 수 있습니다.</p><p data-entry-lang="en" lang="en" hidden>See the original drawing alongside Yoyojin’s mural.</p></div></li>
-            <li><span aria-hidden="true">3</span><div><strong data-entry-lang="ko">그림에 담긴 이야기를 읽어 보세요</strong><strong data-entry-lang="en" lang="en" hidden>Discover its story</strong><p data-entry-lang="ko">이야기를 닫고 또 다른 친구를 찾아보세요.</p><p data-entry-lang="en" lang="en" hidden>Close the story to meet another creature.</p></div></li>
-          </ol>
-          <button class="arrival-guide" id="replay-intro"><span data-entry-lang="ko">요요의 짧은 안내 보기</span><span data-entry-lang="en" lang="en" hidden>Watch YoYo’s short guide</span><span aria-hidden="true">↗</span></button>
+      <div class="foyer-entry" aria-label="관람 시작">
+        <div class="foyer-actions">
+          <button class="visit-button" id="start-camera" disabled>카메라로 관람 시작 <span aria-hidden="true">↗</span></button>
+          <button class="visit-button" id="browse-wall" disabled><span data-entry-lang="ko">카메라 없이 둘러보기</span><span data-entry-lang="en" lang="en" hidden>Explore without a camera</span><span aria-hidden="true">↗</span></button>
         </div>
-      </section>
-      <footer class="arrival-footer"><span>울산시립미술관 <span lang="en">Ulsan Art Museum</span></span><span data-entry-lang="ko">요요진 · 어린이와 시민들의 상상</span><span data-entry-lang="en" lang="en" hidden>Yoyojin · Imaginations of children and participants</span></footer>
-      <div class="arrival-entry" aria-label="관람 시작">
-        <div class="arrival-entry-inner">
-          <p class="arrival-entry-copy"><span data-entry-lang="ko">벽화를 비추고, 원화와 이야기를 만나세요.</span><span data-entry-lang="en" lang="en" hidden>Point at the mural. Discover the stories.</span></p>
-          <div class="arrival-entry-actions"><button class="primary" id="start-camera" disabled>카메라로 관람 시작 <span aria-hidden="true">↗</span></button><button class="arrival-map" id="browse-wall"><span data-entry-lang="ko">카메라 없이 둘러보기</span><span data-entry-lang="en" lang="en" hidden>Explore without a camera</span></button></div>
-          <p class="camera-note"><span data-entry-lang="ko">카메라 허용이 필요합니다. 영상은 저장·전송하지 않습니다.</span><span data-entry-lang="en" lang="en" hidden>Camera permission is needed. Video is never saved or sent.</span></p>
-          <p id="camera-message" class="status-text" role="status"></p>
-        </div>
+        <p class="foyer-camera-note"><span data-entry-lang="ko">카메라 영상은 저장하거나 전송하지 않습니다.</span><span data-entry-lang="en" lang="en" hidden>Your camera video is never saved or sent.</span></p>
+        <p id="camera-message" class="status-text" role="status"></p>
       </div>
     </section>
     <section id="map-view" class="view" hidden aria-labelledby="map-title">
@@ -94,13 +90,9 @@
     <button data-view="map"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 5 6-2 6 2 6-2v16l-6 2-6-2-6 2ZM9 3v16m6-14v16"/></svg><span>벽화 지도</span></button>
     <button data-view="gallery"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span>아이들의 그림</span></button>
   </nav>
-  <section id="intro" class="intro" hidden role="dialog" aria-modal="true" aria-label="벽화 속 친구의 관람 안내" tabindex="-1">
-    <button id="skip-intro" class="intro-close" aria-label="캐릭터 안내 건너뛰기">건너뛰기 <span aria-hidden="true">×</span></button>
-    <div class="intro-inner"><img class="intro-wordmark" src="vendor/yoyojin/brand/exhibition-title.png" alt="함께 살아가는 세계 — A World We Share" width="587" height="145"><div class="guide-stage" id="guide-stage"><span id="guide-loading">친구가 오는 중이에요…</span></div><h2 id="intro-title">안녕! 벽화 속에서 만나자.</h2><p id="intro-copy">우리의 이야기는 아이들의 작은 상상에서 시작됐어.</p><button id="intro-continue" class="primary">전시 소개로 돌아가기 <span aria-hidden="true">→</span></button></div>
-  </section>
   <dialog id="art-dialog" aria-labelledby="art-title"><div class="dialog-head"><div><p class="eyebrow" id="art-number"></p><h2 id="art-title"></h2></div><button id="close-art" class="icon" aria-label="그림 닫기">×</button></div><div class="art-body"><div class="art-image-wrap"><img id="art-image" alt=""><p id="art-image-error" hidden>그림을 불러오지 못했어요. 잠시 후 다시 열어 주세요.</p></div><div class="art-story"><p id="art-name"></p><div id="art-story"></div><p id="art-review" class="subtle"></p><a id="full-art" target="_blank" rel="noopener" class="text-button">원화 크게 보기 ↗</a></div></div></dialog>
   <dialog id="help-dialog" aria-labelledby="help-title"><div class="dialog-head"><div><p class="eyebrow">VISITOR GUIDE</p><h2 id="help-title">벽화와 만나는 방법</h2></div><button id="close-help" class="icon" aria-label="관람 방법 닫기">×</button></div><ol><li><strong>벽화를 비춰 주세요.</strong><br>카메라를 허용하고, 친구와 주변 그림이 화면에 함께 보이도록 담아 주세요.</li><li><strong>노란 표시를 눌러 보세요.</strong><br>아이의 원화와 요요진의 벽화, 그 안에 담긴 이야기가 열립니다.</li><li><strong>다른 친구도 만나 보세요.</strong><br>이야기를 닫고 벽화를 천천히 따라가 보세요.</li></ol><p>표시가 보이지 않으면 조금 뒤로 물러나거나 휴대폰을 잠시 멈춰 주세요. ‘벽화 지도’와 ‘아이들의 그림’으로도 이야기를 만날 수 있어요.</p><p class="subtle">카메라는 휴대폰의 Safari 또는 Chrome에서 사용할 수 있습니다. 영상은 기기에서만 처리하며 저장하거나 전송하지 않습니다.</p></dialog>
   <div id="fatal" hidden role="alert"><h2>관람 화면을 불러오지 못했어요</h2><p>인터넷 연결을 확인한 뒤 다시 시도해 주세요.</p><button id="reload-app" class="primary">다시 불러오기 <span aria-hidden="true">↻</span></button></div>
-  <script type="module" src="app.js?v=entry-20261007"></script>
+  <script type="module" src="app.js?v=yoyo-entry-20261010"></script>
 </body>
 </html>
